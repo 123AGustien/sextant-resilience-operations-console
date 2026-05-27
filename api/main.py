@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 from core.resilience_engine import ResilienceEngine
 from core.validation_engine import ValidationEngine
@@ -11,6 +12,19 @@ from evidence_engine.logger import EvidenceLogger
 # ---------------------------
 app = FastAPI(title="Sextant Resilience API")
 
+# Enable CORS (for dashboard / browser access)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# ---------------------------
+# Core Components
+# ---------------------------
 logger = EvidenceLogger()
 engine = ResilienceEngine(logger=logger)
 validator = ValidationEngine()
@@ -30,24 +44,23 @@ class InputSignal(BaseModel):
 @app.post("/evaluate")
 def evaluate_system(input_data: InputSignal):
 
-    # Convert input to dict
     input_dict = input_data.dict()
 
     # Step 1 — Resilience evaluation
     result = engine.evaluate(input_dict)
 
-    # Step 2 — Validation layer (audit / verification)
+    # Step 2 — Validation layer (audit)
     validated = validator.validate(result)
 
-    # Step 3 — Return structured explainable output
-    response = {
+    # Step 3 — Response
+    return {
         "input": input_dict,
         "resilience_result": result,
         "validation": validated,
         "explainability": {
             "summary": (
                 "System evaluated risk score and executed resilience logic. "
-                "Fallback is triggered when risk exceeds threshold."
+                "Fallback triggers when risk exceeds threshold."
             ),
             "state_meaning": {
                 "STABLE": "System operating normally with no intervention required.",
@@ -55,8 +68,6 @@ def evaluate_system(input_data: InputSignal):
             }
         }
     }
-
-    return response
 
 
 # ---------------------------
