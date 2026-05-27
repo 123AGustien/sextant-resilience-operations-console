@@ -27,73 +27,29 @@ jobs:
         run: |
           if [ -f requirements.txt ]; then
             pip install -r requirements.txt
-          else
-            echo "No requirements.txt found - skipping install"
           fi
 
-      - name: Verify API import (safe)
-        run: |
-          python -c "import main; print('API OK')" || exit 1
+      - name: Verify core import
+        run: python -c "import main; print('API OK')"
 
       - name: Runtime sanity check
+        run: python -c "print('System OK')"
+
+      - name: Filename safety guard
         run: |
-          python -c "print('System OK')"
-
-      - name: Filename safety guard (hardened)
-        run: |
-          echo "Checking filenames..."
-
-          error_found=0
-
+          error=0
           while IFS= read -r file; do
             name=$(basename "$file")
 
             if [ ${#name} -gt 120 ]; then
-              echo "ERROR: filename too long -> $name"
-              error_found=1
+              echo "Too long: $name"
+              error=1
             fi
 
             echo "$name" | grep -E "[#{}\[\]]" >/dev/null && {
-              echo "ERROR: unsafe filename -> $name"
-              error_found=1
+              echo "Unsafe: $name"
+              error=1
             }
           done < <(find . -type f)
 
-          if [ "$error_found" -ne 0 ]; then
-            echo "Filename validation FAILED"
-            exit 1
-          fi
-
-          echo "Filename validation PASSED"
-
-
-  pages:
-    needs: build
-    runs-on: ubuntu-latest
-
-    permissions:
-      pages: write
-      id-token: write
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Build static site
-        run: |
-          mkdir -p dist
-          cp -r web/* dist/ 2>/dev/null || true
-          cp README.md dist/ 2>/dev/null || true
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          exit $error
