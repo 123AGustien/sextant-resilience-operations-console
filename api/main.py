@@ -12,7 +12,6 @@ from evidence_engine.logger import EvidenceLogger
 # ---------------------------
 app = FastAPI(title="Sextant Resilience API")
 
-# Enable CORS (for dashboard / browser access)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -28,6 +27,16 @@ app.add_middleware(
 logger = EvidenceLogger()
 engine = ResilienceEngine(logger=logger)
 validator = ValidationEngine()
+
+
+# ---------------------------
+# Simple Memory Layer (Agent Bridge)
+# ---------------------------
+memory = {
+    "last_state": None,
+    "last_risk": None,
+    "events": []
+}
 
 
 # ---------------------------
@@ -52,11 +61,19 @@ def evaluate_system(input_data: InputSignal):
     # Step 2 — Validation layer (audit)
     validated = validator.validate(result)
 
-    # Step 3 — Response
+    # Step 3 — Update memory (agent readiness)
+    memory["last_state"] = result["state"]
+    memory["last_risk"] = result["risk_score"]
+    memory["events"].append({
+        "input": input_dict,
+        "result": result
+    })
+
     return {
         "input": input_dict,
         "resilience_result": result,
         "validation": validated,
+        "memory": memory,
         "explainability": {
             "summary": (
                 "System evaluated risk score and executed resilience logic. "
