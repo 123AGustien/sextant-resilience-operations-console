@@ -30,7 +30,7 @@ validator = ValidationEngine()
 
 
 # ---------------------------
-# Simple Memory Layer (Agent Bridge)
+# Simple Memory Layer
 # ---------------------------
 memory = {
     "last_state": None,
@@ -58,15 +58,16 @@ def evaluate_system(input_data: InputSignal):
     # Step 1 — Resilience evaluation
     result = engine.evaluate(input_dict)
 
-    # Step 2 — Validation layer (audit)
+    # Step 2 — Validation layer
     validated = validator.validate(result)
 
-    # Step 3 — Update memory (agent readiness)
+    # Step 3 — Update memory
     memory["last_state"] = result["state"]
     memory["last_risk"] = result["risk_score"]
     memory["events"].append({
         "input": input_dict,
-        "result": result
+        "result": result,
+        "validation": validated
     })
 
     return {
