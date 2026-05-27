@@ -1,0 +1,6 @@
+This CI pipeline:
+- Checks out the repository
+- Sets up Python 3.11
+- Installs dependencies from requirements.txt
+- Verifies core module imports (engine, validation, agent, API)
+- Runs a basic runtime sanity check to ensure system components load correctly
