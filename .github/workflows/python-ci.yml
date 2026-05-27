@@ -1,4 +1,5 @@
-name: Sextant Resilience CI
+nname
+nameame: Sextant Resilience CI
 
 on:
   push:
@@ -43,3 +44,28 @@ jobs:
       - name: Basic runtime sanity check
         run: |
           python -c "from core.resilience_engine import ResilienceEngine; print('Engine import OK')"
+
+
+# 7. Repository filename safety check (CI hardening)
+      - name: Validate filenames (anti-corruption guard)
+        run: |
+          echo "Checking for unsafe filenames..."
+
+          find . -type f | while read file; do
+            name=$(basename "$file")
+
+            # Rule 1: block extremely long filenames
+            length=${#name}
+            if [ "$length" -gt 120 ]; then
+              echo "ERROR: Filename too long -> $name"
+              exit 1
+            fi
+
+            # Rule 2: block markdown-like filenames
+            if echo "$name" | grep -E "[#>{}\[\]]"; then
+              echo "ERROR: Unsafe filename detected -> $name"
+              exit 1
+            fi
+          done
+
+          echo "Filename validation passed"
