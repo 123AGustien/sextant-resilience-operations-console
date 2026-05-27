@@ -1,9 +1,29 @@
 {
   "name": "Stress Test Scenario",
   "steps": [
-    { "input": { "risk": 0.1, "signal": "NORMAL" } },
-    { "input": { "risk": 0.4, "signal": "LOAD" } },
-    { "input": { "risk": 0.7, "signal": "WARNING" } },
-    { "input": { "risk": 0.95, "signal": "CRITICAL" } }
+    {
+      "input": {
+        "risk": 0.2,
+        "signal": "NORMAL"
+      }
+    },
+    {
+      "input": {
+        "risk": 0.4,
+        "signal": "LOAD"
+      }
+    },
+    {
+      "input": {
+        "risk": 0.6,
+        "signal": "WARNING"
+      }
+    },
+    {
+      "input": {
+        "risk": 0.85,
+        "signal": "CRITICAL"
+      }
+    }
   ]
 }
