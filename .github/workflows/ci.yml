@@ -27,9 +27,11 @@ jobs:
         run: |
           if [ -f requirements.txt ]; then
             pip install -r requirements.txt
+          else
+            echo "No requirements.txt found - skipping install"
           fi
 
-      - name: Verify core import
+      - name: Verify API import (safe)
         run: |
           python -c "import main; print('API OK')" || exit 1
 
@@ -37,21 +39,33 @@ jobs:
         run: |
           python -c "print('System OK')"
 
-      - name: Filename safety guard
+      - name: Filename safety guard (hardened)
         run: |
-          find . -type f | while read file; do
+          echo "Checking filenames..."
+
+          error_found=0
+
+          while IFS= read -r file; do
             name=$(basename "$file")
 
             if [ ${#name} -gt 120 ]; then
               echo "ERROR: filename too long -> $name"
-              exit 1
+              error_found=1
             fi
 
-            echo "$name" | grep -E "[#{}\[\]]" && {
+            echo "$name" | grep -E "[#{}\[\]]" >/dev/null && {
               echo "ERROR: unsafe filename -> $name"
-              exit 1
+              error_found=1
             }
-          done
+          done < <(find . -type f)
+
+          if [ "$error_found" -ne 0 ]; then
+            echo "Filename validation FAILED"
+            exit 1
+          fi
+
+          echo "Filename validation PASSED"
+
 
   pages:
     needs: build
