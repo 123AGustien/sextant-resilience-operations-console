@@ -2,13 +2,12 @@ name: Sextant Resilience CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +24,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run basic import test
+      - name: Verify core imports
         run: |
           python -c "import core.resilience_engine; print('Core OK')"
+          python -c "import core.validation_engine; print('Validation OK')"
           python -c "import api.main; print('API OK')"
+
+      - name: Basic runtime sanity check
+        run: |
+          python -c "from core.resilience_engine import ResilienceEngine; engine = ResilienceEngine(); print(engine.evaluate({'risk':0.5}))"
