@@ -1,4 +1,4 @@
-name: Sextant Resilience CI (GREEN FIX)
+name: Sextant Resilience CI (Production Stable)
 
 on:
   push:
@@ -26,11 +26,9 @@ jobs:
         run: |
           if [ -f requirements.txt ]; then
             pip install -r requirements.txt
-          else
-            echo "No requirements.txt found - skipping"
           fi
 
-      - name: Verify core import (safe)
+      - name: Verify core import
         run: |
           python -c "import main; print('API OK')" || exit 1
 
@@ -40,8 +38,6 @@ jobs:
 
       - name: Filename safety guard
         run: |
-          echo "Checking filenames..."
-
           find . -type f | while read file; do
             name=$(basename "$file")
 
@@ -56,4 +52,33 @@ jobs:
             }
           done
 
-          echo "All checks passed"
+  pages:
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build static site
+        run: |
+          mkdir -p dist
+          cp -r web/* dist/ 2>/dev/null || true
+          cp README.md dist/ 2>/dev/null || true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
