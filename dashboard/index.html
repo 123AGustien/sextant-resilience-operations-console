@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8" />
     <title>Sextant Resilience Control Room v2</title>
 
     <style>
         body {
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             background: #0b1220;
             color: white;
             margin: 0;
@@ -28,8 +29,15 @@
             border-radius: 12px;
         }
 
-        .stable { color: #4ade80; font-weight: bold; }
-        .degraded { color: #f87171; font-weight: bold; }
+        .stable {
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .degraded {
+            color: #f87171;
+            font-weight: bold;
+        }
 
         pre {
             background: #0f172a;
@@ -52,6 +60,10 @@
 
         .section {
             margin-top: 15px;
+        }
+
+        button:hover {
+            background: #2563eb;
         }
     </style>
 </head>
@@ -83,7 +95,7 @@
 
     <div class="card">
         <h3>Validation</h3>
-        <div id="validation">-</div>
+        <pre id="validation">-</pre>
     </div>
 
     <div class="card">
@@ -102,23 +114,34 @@
 
 <script>
 
+const API = "http://127.0.0.1:8000";
+
+/* ---------------------------
+   FETCH EVIDENCE
+--------------------------- */
 async function fetchEvidence() {
     try {
-        const res = await fetch("http://127.0.0.1:8000/evidence");
+        const res = await fetch(`${API}/evidence`);
         const data = await res.json();
 
+        const records = data.records || [];
+
         document.getElementById("evidence").innerText =
-            JSON.stringify(data.records.slice(-10), null, 2);
+            JSON.stringify(records.slice(-10), null, 2);
 
     } catch (e) {
-        console.log("Evidence error", e);
+        document.getElementById("evidence").innerText =
+            "Evidence feed offline";
     }
 }
 
+/* ---------------------------
+   MAIN DASHBOARD UPDATE
+--------------------------- */
 async function updateDashboard(riskValue = 0.5) {
 
     try {
-        const response = await fetch("http://127.0.0.1:8000/evaluate", {
+        const response = await fetch(`${API}/evaluate`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -127,43 +150,58 @@ async function updateDashboard(riskValue = 0.5) {
             })
         });
 
+        if (!response.ok) throw new Error("API unreachable");
+
         const data = await response.json();
 
-        const result = data.resilience_result;
+        const result = data.resilience_result || {};
 
-        // main fields
-        document.getElementById("state").innerText = result.state;
-        document.getElementById("risk").innerText = result.risk_score;
-        document.getElementById("action").innerText = result.action;
+        const state = result.state || "UNKNOWN";
+        const risk = result.risk_score ?? 0;
+        const action = result.action || "NO_ACTION";
 
-        // validation
+        // update UI
+        document.getElementById("state").innerText = state;
+        document.getElementById("risk").innerText = risk;
+        document.getElementById("action").innerText = action;
+
         document.getElementById("validation").innerText =
-            JSON.stringify(data.validation, null, 2);
+            JSON.stringify(data.validation || {}, null, 2);
 
-        // full trace
         document.getElementById("trace").innerText =
             JSON.stringify(data, null, 2);
 
-        // color logic
+        // state color
         const stateEl = document.getElementById("state");
-        stateEl.className = result.state === "DEGRADED" ? "degraded" : "stable";
+        stateEl.className = (state === "DEGRADED") ? "degraded" : "stable";
 
     } catch (err) {
-        console.log("API error", err);
+
+        document.getElementById("state").innerText = "OFFLINE";
+        document.getElementById("state").className = "degraded";
+
+        document.getElementById("trace").innerText =
+            "System error: " + err.message;
     }
 }
 
-// simulation mode
+/* ---------------------------
+   SIMULATION
+--------------------------- */
 function runSimulation() {
-    const risk = Math.random(); // 0 → 1
+    const risk = Math.random();
     updateDashboard(risk);
 }
 
-// auto refresh loops
+/* ---------------------------
+   AUTO REFRESH LOOPS
+--------------------------- */
 setInterval(() => updateDashboard(0.4), 3000);
 setInterval(fetchEvidence, 4000);
 
-// initial load
+/* ---------------------------
+   INITIAL LOAD
+--------------------------- */
 updateDashboard(0.4);
 fetchEvidence();
 
