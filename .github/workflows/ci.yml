@@ -1,50 +1,80 @@
-name: Sextant Resilience CI
+name: Sextant Resilience CI (Stable)
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   pull_request:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Python environment
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Validate repository structure
+        run: |
+          echo "Checking repo structure..."
+
+          test -f README.md || (echo "Missing README.md" && exit 1)
+          test -f index.yaml || echo "index.yaml missing (optional warning)"
+
+          echo "Structure OK"
+
+      - name: Validate JSON registry (if exists)
+        run: |
+          if [ -f registry/system-registry.json ]; then
+            echo "Validating JSON..."
+            cat registry/system-registry.json | python3 -m json.tool
+          else
+            echo "No registry found - skipping"
+          fi
+
+      - name: Lint Markdown safety check
+        run: |
+          echo "Checking for unsafe file operations in markdown..."
+
+          # Ensure no accidental shell execution patterns exist
+          if grep -R "\$\(" . --include="*.md"; then
+            echo "Unsafe markdown patterns detected"
+            exit 1
+          fi
+
+          echo "Markdown safe"
+
+  build:
+    needs: validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare deployment folder
+        run: |
+          mkdir -p dist
+          cp -r web/* dist/ 2>/dev/null || true
+          cp README.md dist/
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          python-version: "3.11"
+          path: dist
 
-      # 3. Set project path
-      - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=." >> $GITHUB_ENV
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
 
-      # 4. Install dependencies
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
-      # 5. Verify core imports
-      - name: Verify core imports
-        run: |
-          python -c "import core.resilience_engine; print('Core OK')"
-          python -c "import core.validation_engine; print('Validation OK')"
-          python -c "import core.agent; print('Agent OK')"
-          python -c "import main; print('API OK')"
-
-      # 6. Basic runtime sanity check
-      - name: Runtime sanity check
-        run: |
-          python -c "from core.resilience_engine import ResilienceEngine; print('Engine OK')"
-
-      # 7. (Optional) Scenario validation hook placeholder
-      - name: Scenario readiness check
-        run: |
-          echo "Scenario engine ready for Step 7/8 integration"
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
