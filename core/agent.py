@@ -10,6 +10,7 @@ class ResilienceAgent:
         self.logger = logger
 
         self.running = False
+
         self.state_memory = {
             "last_state": None,
             "last_risk": None,
@@ -27,6 +28,7 @@ class ResilienceAgent:
         # 3. Update memory
         self.state_memory["last_state"] = result["state"]
         self.state_memory["last_risk"] = result["risk_score"]
+
         self.state_memory["events"].append({
             "input": input_signal,
             "result": result,
@@ -49,10 +51,6 @@ class ResilienceAgent:
 
     def run_loop(self, input_stream, interval: float = 1.0, max_steps: int = 10):
 
-        """
-        Continuous agent execution loop (simulation mode)
-        """
-
         self.running = True
         outputs = []
 
@@ -61,9 +59,7 @@ class ResilienceAgent:
             if not self.running or i >= max_steps:
                 break
 
-            output = self.step(signal)
-            outputs.append(output)
-
+            outputs.append(self.step(signal))
             time.sleep(interval)
 
         return {
