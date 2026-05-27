@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sextant Resilience Control Dashboard</title>
+    <title>Sextant Resilience Control Room v2</title>
+
     <style>
         body {
             font-family: Arial;
@@ -12,18 +13,18 @@
         }
 
         h1 {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            gap: 12px;
         }
 
         .card {
             background: #1e293b;
-            padding: 15px;
+            padding: 12px;
             border-radius: 12px;
         }
 
@@ -36,23 +37,28 @@
             border-radius: 8px;
             overflow: auto;
             font-size: 12px;
+            max-height: 300px;
         }
 
         button {
+            margin-top: 10px;
+            padding: 10px;
             background: #3b82f6;
             color: white;
             border: none;
-            padding: 10px;
             border-radius: 8px;
             cursor: pointer;
-            margin-top: 10px;
+        }
+
+        .section {
+            margin-top: 15px;
         }
     </style>
 </head>
 
 <body>
 
-<h1>🧭 Sextant Resilience Control Dashboard</h1>
+<h1>🧭 Sextant Resilience Control Room v2</h1>
 
 <div class="grid">
 
@@ -73,25 +79,51 @@
 
 </div>
 
-<div class="card" style="margin-top:15px;">
-    <h3>Live API Response</h3>
-    <pre id="raw">Waiting...</pre>
+<div class="grid section">
+
+    <div class="card">
+        <h3>Validation</h3>
+        <div id="validation">-</div>
+    </div>
+
+    <div class="card">
+        <h3>Evidence Logs</h3>
+        <pre id="evidence">Loading...</pre>
+    </div>
+
+    <div class="card">
+        <h3>System Trace</h3>
+        <pre id="trace">Waiting...</pre>
+    </div>
+
 </div>
 
-<button onclick="triggerTest()">Run Test Signal</button>
+<button onclick="runSimulation()">🎯 Run Simulation</button>
 
 <script>
-async function updateDashboard(riskValue = 0.6) {
+
+async function fetchEvidence() {
+    try {
+        const res = await fetch("http://127.0.0.1:8000/evidence");
+        const data = await res.json();
+
+        document.getElementById("evidence").innerText =
+            JSON.stringify(data.records.slice(-10), null, 2);
+
+    } catch (e) {
+        console.log("Evidence error", e);
+    }
+}
+
+async function updateDashboard(riskValue = 0.5) {
 
     try {
         const response = await fetch("http://127.0.0.1:8000/evaluate", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 risk: riskValue,
-                signal: "DASHBOARD_SIGNAL"
+                signal: "CONTROL_ROOM"
             })
         });
 
@@ -99,11 +131,17 @@ async function updateDashboard(riskValue = 0.6) {
 
         const result = data.resilience_result;
 
+        // main fields
         document.getElementById("state").innerText = result.state;
         document.getElementById("risk").innerText = result.risk_score;
         document.getElementById("action").innerText = result.action;
 
-        document.getElementById("raw").innerText =
+        // validation
+        document.getElementById("validation").innerText =
+            JSON.stringify(data.validation, null, 2);
+
+        // full trace
+        document.getElementById("trace").innerText =
             JSON.stringify(data, null, 2);
 
         // color logic
@@ -111,21 +149,24 @@ async function updateDashboard(riskValue = 0.6) {
         stateEl.className = result.state === "DEGRADED" ? "degraded" : "stable";
 
     } catch (err) {
-        console.log("API error:", err);
+        console.log("API error", err);
     }
 }
 
-// auto refresh
-setInterval(() => updateDashboard(0.6), 3000);
-
-// manual test trigger
-function triggerTest() {
-    const risk = Math.random();
+// simulation mode
+function runSimulation() {
+    const risk = Math.random(); // 0 → 1
     updateDashboard(risk);
 }
 
+// auto refresh loops
+setInterval(() => updateDashboard(0.4), 3000);
+setInterval(fetchEvidence, 4000);
+
 // initial load
-updateDashboard(0.6);
+updateDashboard(0.4);
+fetchEvidence();
+
 </script>
 
 </body>
