@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sextant Resilience Dashboard</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            padding: 20px;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+        }
+
+        .status-stable { color: #4ade80; }
+        .status-degraded { color: #f87171; }
+    </style>
+</head>
+
+<body>
+
+<h1>🧭 Sextant Resilience Dashboard</h1>
+
+<div class="card">
+    <h2>System Status</h2>
+    <p id="status">STABLE</p>
+</div>
+
+<div class="card">
+    <h2>Risk Score</h2>
+    <p id="risk">0.0</p>
+</div>
+
+<div class="card">
+    <h2>Last Action</h2>
+    <p id="action">NO_ACTION</p>
+</div>
+
+<script>
+async function fetchData() {
+    // later we connect API
+    const sample = {
+        state: "STABLE",
+        risk: 0.3,
+        action: "NO_ACTION"
+    };
+
+    document.getElementById("status").innerText = sample.state;
+    document.getElementById("risk").innerText = sample.risk;
+    document.getElementById("action").innerText = sample.action;
+}
+
+fetchData();
+setInterval(fetchData, 3000);
+</script>
+
+</body>
+</html>
