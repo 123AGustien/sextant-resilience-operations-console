@@ -66,3 +66,40 @@ System behaviour is modelled across four states:
 Failures do not occur in isolation.
 
 Instead, they propagate through dependency chains:
+
+
+This propagation effect is a core focus of the ecosystem.
+
+---
+
+## 6. Resilience Mechanism
+
+Resilience is achieved through:
+
+- Early detection of degradation signals
+- Mapping of system dependencies
+- Identification of weak coupling points
+- Simulation of failure propagation scenarios
+
+---
+
+## 7. Key Principle
+
+> The earliest indicator of system failure is not failure itself, but degradation within dependent systems.
+
+---
+
+## 8. Institutional Interpretation
+
+From a financial infrastructure perspective, this model enables:
+
+- Early risk identification
+- Improved system dependency visibility
+- Structured understanding of cascading failure risk
+- Enhanced operational continuity planning
+
+---
+
+## 9. Summary
+
+This model shifts the focus from reactive failure response to proactive degradation awareness, enabling systems to be evaluated before critical failure occurs.
