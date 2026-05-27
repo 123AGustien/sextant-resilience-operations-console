@@ -1,8 +1,8 @@
 class ResilienceEngine:
-    def __init__(self, logger=None, threshold: float = 0.7):
+    def __init__(self, logger=None):
         self.state = "STABLE"
         self.logger = logger
-        self.threshold = threshold
+        self.threshold = 0.7
 
     def evaluate(self, input_signal: dict):
 
@@ -22,14 +22,17 @@ class ResilienceEngine:
             "action": action
         }
 
-        # Structured audit logging
+        # Evidence logging (safe check)
         if self.logger:
-            self.logger.log_decision(input_signal, output)
+            self.logger.log_event("RESILIENCE_EVAL", {
+                "input": input_signal,
+                "output": output
+            })
 
         return output
 
-    def _assess_risk(self, input_signal: dict) -> float:
+    def _assess_risk(self, input_signal: dict):
         return float(input_signal.get("risk", 0.0))
 
-    def _trigger_fallback(self, input_signal: dict) -> str:
+    def _trigger_fallback(self, input_signal: dict):
         return "FALLBACK_WORKFLOW_INITIATED"
