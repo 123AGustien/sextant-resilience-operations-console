@@ -9,9 +9,9 @@ from core.agent import ResilienceAgent
 
 
 # ---------------------------
-# App Initialization
+# APP INIT
 # ---------------------------
-app = FastAPI(title="Sextant Resilience API")
+app = FastAPI(title="Sextant Resilience Control Platform")
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,27 +23,21 @@ app.add_middleware(
 
 
 # ---------------------------
-# Core Components
+# CORE SYSTEM COMPONENTS
 # ---------------------------
 logger = EvidenceLogger()
 engine = ResilienceEngine(logger=logger)
 validator = ValidationEngine()
 
-agent = ResilienceAgent(engine=engine, validator=validator, logger=logger)
+agent = ResilienceAgent(
+    engine=engine,
+    validator=validator,
+    logger=logger
+)
 
 
 # ---------------------------
-# Memory Layer
-# ---------------------------
-memory = {
-    "last_state": None,
-    "last_risk": None,
-    "events": []
-}
-
-
-# ---------------------------
-# Input Schema
+# INPUT MODEL
 # ---------------------------
 class InputSignal(BaseModel):
     risk: float = 0.0
@@ -51,7 +45,17 @@ class InputSignal(BaseModel):
 
 
 # ---------------------------
-# Evaluate Endpoint
+# 🟦 SYSTEM MEMORY (SINGLE SOURCE OF TRUTH)
+# ---------------------------
+system_memory = {
+    "last_state": None,
+    "last_risk": None,
+    "events": []
+}
+
+
+# ---------------------------
+# 🟦 CORE EVALUATION
 # ---------------------------
 @app.post("/evaluate")
 def evaluate_system(input_data: InputSignal):
@@ -59,11 +63,12 @@ def evaluate_system(input_data: InputSignal):
     input_dict = input_data.dict()
 
     result = engine.evaluate(input_dict)
-    validated = validator.validate(result)
+    validation = validator.validate(result)
 
-    memory["last_state"] = result["state"]
-    memory["last_risk"] = result["risk_score"]
-    memory["events"].append({
+    # update system memory
+    system_memory["last_state"] = result["state"]
+    system_memory["last_risk"] = result["risk_score"]
+    system_memory["events"].append({
         "input": input_dict,
         "result": result
     })
@@ -71,16 +76,16 @@ def evaluate_system(input_data: InputSignal):
     return {
         "input": input_dict,
         "resilience_result": result,
-        "validation": validated,
-        "memory": memory
+        "validation": validation,
+        "system_memory": system_memory
     }
 
 
 # ---------------------------
-# Evidence Endpoint
+# 🟦 EVIDENCE LAYER
 # ---------------------------
 @app.get("/evidence")
-def get_evidence():
+def evidence():
     return {
         "total_records": len(logger.records),
         "records": logger.records
@@ -88,20 +93,19 @@ def get_evidence():
 
 
 # ---------------------------
-# Health Check
+# 🟦 HEALTH CHECK
 # ---------------------------
 @app.get("/health")
-def health_check():
+def health():
     return {
         "status": "ACTIVE",
-        "system": "Sextant Resilience API"
+        "system": "Sextant Resilience Platform"
     }
 
 
 # ---------------------------
-# AGENT ENDPOINTS (STEP 3 COMPLETE)
+# 🟦 AGENT CONTROL LAYER
 # ---------------------------
-
 @app.post("/agent/step")
 def agent_step(input_data: InputSignal):
     return agent.step(input_data.dict())
