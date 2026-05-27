@@ -1,62 +1,131 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sextant Resilience Dashboard</title>
+    <title>Sextant Resilience Control Dashboard</title>
     <style>
         body {
             font-family: Arial;
-            background: #0f172a;
+            background: #0b1220;
             color: white;
+            margin: 0;
             padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
         }
 
         .card {
             background: #1e293b;
             padding: 15px;
-            margin: 10px 0;
-            border-radius: 10px;
+            border-radius: 12px;
         }
 
-        .status-stable { color: #4ade80; }
-        .status-degraded { color: #f87171; }
+        .stable { color: #4ade80; font-weight: bold; }
+        .degraded { color: #f87171; font-weight: bold; }
+
+        pre {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 8px;
+            overflow: auto;
+            font-size: 12px;
+        }
+
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
     </style>
 </head>
 
 <body>
 
-<h1>🧭 Sextant Resilience Dashboard</h1>
+<h1>🧭 Sextant Resilience Control Dashboard</h1>
 
-<div class="card">
-    <h2>System Status</h2>
-    <p id="status">STABLE</p>
+<div class="grid">
+
+    <div class="card">
+        <h3>System State</h3>
+        <div id="state" class="stable">STABLE</div>
+    </div>
+
+    <div class="card">
+        <h3>Risk Score</h3>
+        <div id="risk">0.0</div>
+    </div>
+
+    <div class="card">
+        <h3>Action</h3>
+        <div id="action">NO_ACTION</div>
+    </div>
+
 </div>
 
-<div class="card">
-    <h2>Risk Score</h2>
-    <p id="risk">0.0</p>
+<div class="card" style="margin-top:15px;">
+    <h3>Live API Response</h3>
+    <pre id="raw">Waiting...</pre>
 </div>
 
-<div class="card">
-    <h2>Last Action</h2>
-    <p id="action">NO_ACTION</p>
-</div>
+<button onclick="triggerTest()">Run Test Signal</button>
 
 <script>
-async function fetchData() {
-    // later we connect API
-    const sample = {
-        state: "STABLE",
-        risk: 0.3,
-        action: "NO_ACTION"
-    };
+async function updateDashboard(riskValue = 0.6) {
 
-    document.getElementById("status").innerText = sample.state;
-    document.getElementById("risk").innerText = sample.risk;
-    document.getElementById("action").innerText = sample.action;
+    try {
+        const response = await fetch("http://127.0.0.1:8000/evaluate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                risk: riskValue,
+                signal: "DASHBOARD_SIGNAL"
+            })
+        });
+
+        const data = await response.json();
+
+        const result = data.resilience_result;
+
+        document.getElementById("state").innerText = result.state;
+        document.getElementById("risk").innerText = result.risk_score;
+        document.getElementById("action").innerText = result.action;
+
+        document.getElementById("raw").innerText =
+            JSON.stringify(data, null, 2);
+
+        // color logic
+        const stateEl = document.getElementById("state");
+        stateEl.className = result.state === "DEGRADED" ? "degraded" : "stable";
+
+    } catch (err) {
+        console.log("API error:", err);
+    }
 }
 
-fetchData();
-setInterval(fetchData, 3000);
+// auto refresh
+setInterval(() => updateDashboard(0.6), 3000);
+
+// manual test trigger
+function triggerTest() {
+    const risk = Math.random();
+    updateDashboard(risk);
+}
+
+// initial load
+updateDashboard(0.6);
 </script>
 
 </body>
