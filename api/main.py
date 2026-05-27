@@ -33,10 +33,12 @@ agent = ResilienceAgent(engine=engine, validator=validator, logger=logger)
 # SYSTEM MEMORY
 # ---------------------------
 system_memory = {
-    "last_state": None,
+    "last_state": "UNKNOWN",
     "last_risk": 0.0,
     "events": []
 }
+
+MAX_MEMORY = 100  # prevents uncontrolled growth
 
 # ---------------------------
 # INPUT MODEL (HARDENED)
@@ -61,13 +63,21 @@ def evaluate_system(input_data: InputSignal):
         result = engine.evaluate(input_dict)
         validation = validator.validate(result)
 
-        # safe memory update
-        system_memory["last_state"] = result.get("state", "UNKNOWN")
-        system_memory["last_risk"] = result.get("risk_score", 0.0)
+        # safe extraction
+        state = result.get("state", "UNKNOWN")
+        risk = result.get("risk_score", 0.0)
+
+        # memory update (bounded)
+        system_memory["last_state"] = state
+        system_memory["last_risk"] = risk
+
         system_memory["events"].append({
             "input": input_dict,
             "result": result
         })
+
+        if len(system_memory["events"]) > MAX_MEMORY:
+            system_memory["events"] = system_memory["events"][-MAX_MEMORY:]
 
         return {
             "status": "SUCCESS",
@@ -91,7 +101,7 @@ def evaluate_system(input_data: InputSignal):
 def evidence():
     return {
         "total_records": len(logger.records),
-        "records": logger.records[-50:]  # prevent overload
+        "records": logger.records[-50:]
     }
 
 
