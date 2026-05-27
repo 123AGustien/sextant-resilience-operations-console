@@ -1,0 +1,23 @@
+{
+  "name": "Baseline Operation",
+  "steps": [
+    {
+      "input": {
+        "risk": 0.1,
+        "signal": "NORMAL"
+      }
+    },
+    {
+      "input": {
+        "risk": 0.2,
+        "signal": "NORMAL"
+      }
+    },
+    {
+      "input": {
+        "risk": 0.3,
+        "signal": "LOAD"
+      }
+    }
+  ]
+}
