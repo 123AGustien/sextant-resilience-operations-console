@@ -1,6 +1,50 @@
-This CI pipeline:
-- Checks out the repository
-- Sets up Python 3.11
-- Installs dependencies from requirements.txt
-- Verifies core module imports (engine, validation, agent, API)
-- Runs a basic runtime sanity check to ensure system components load correctly
+name: Sextant Resilience CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # 3. Set project path
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=." >> $GITHUB_ENV
+
+      # 4. Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 5. Verify core imports
+      - name: Verify core imports
+        run: |
+          python -c "import core.resilience_engine; print('Core OK')"
+          python -c "import core.validation_engine; print('Validation OK')"
+          python -c "import core.agent; print('Agent OK')"
+          python -c "import main; print('API OK')"
+
+      # 6. Basic runtime sanity check
+      - name: Runtime sanity check
+        run: |
+          python -c "from core.resilience_engine import ResilienceEngine; print('Engine OK')"
+
+      # 7. (Optional) Scenario validation hook placeholder
+      - name: Scenario readiness check
+        run: |
+          echo "Scenario engine ready for Step 7/8 integration"
