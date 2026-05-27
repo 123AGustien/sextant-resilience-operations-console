@@ -1,0 +1,29 @@
+{
+  "name": "Failure Mode Scenario",
+  "steps": [
+    {
+      "input": {
+        "risk": 0.7,
+        "signal": "WARNING"
+      }
+    },
+    {
+      "input": {
+        "risk": 0.9,
+        "signal": "CRITICAL"
+      }
+    },
+    {
+      "input": {
+        "risk": 1.0,
+        "signal": "SYSTEM_OVERLOAD"
+      }
+    },
+    {
+      "input": {
+        "risk": 0.8,
+        "signal": "DEGRADED_MODE"
+      }
+    }
+  ]
+}
