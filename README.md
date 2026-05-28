@@ -20,101 +20,20 @@ It models distributed system behavior under stress conditions such as:
 - recovery scenarios
 
 ---
-
 ## 🔌 API Contract (Production Interface)
 
 ### POST `/evaluate`
 
 Simulates a resilience event across the system.
 
-#### Request
+---
+
+### 📥 Request
+
 ```json
 {
   "event": "node_failure",
   "node": "service_A"
 }
-
-{
-  "event": {
-    "type": "node_failure",
-    "node": "service_A"
-  },
-  "simulation": {
-    "status": "completed",
-    "mode": "deterministic",
-    "agents_executed": [
-      {
-        "name": "sre_agent",
-        "result": "DEGRADED_STATE_DETECTED"
-      },
-      {
-        "name": "dependency_agent",
-        "result": "CASCADE_ANALYSIS_COMPLETE"
-      },
-      {
-        "name": "recovery_agent",
-        "result": "RECOVERY_STRATEGY_IDENTIFIED"
-      }
-    ]
-  },
-  "system_state": {
-    "current": "DEGRADED",
-    "previous": "HEALTHY",
-    "impact_level": "MEDIUM"
-  },
-  "memory": {
-    "recorded": true,
-    "memory_size": 12,
-    "retention_mode": "audit_grade"
-  },
-  "access": {
-    "tier": "free",
-    "limits": {
-      "memory_visibility": "restricted",
-      "history_depth": 5
-    }
-  }
-}
-
-
-[
-  {
-    "event": {
-      "type": "node_failure",
-      "node": "service_A"
-    },
-    "simulation": {
-      "status": "completed",
-      "agents_executed": [
-        {
-          "name": "sre_agent",
-          "result": "DEGRADED_STATE_DETECTED"
-        }
-      ]
-    }
-  }
-]
-
-x-api-key: free-tier-key | pro-tier-key
-
-git clone https://github.com/123AGustien/sextant-resilience-operations-console
-cd sextant-resilience-operations-console
-docker compose up --build
-
-curl -X POST http://localhost:8000/evaluate \
--H "Content-Type: application/json" \
--H "x-api-key: free-tier-key" \
--d '{
-  "event": "node_failure",
-  "node": "service_A"
-}'
-
-{
-  "event": "node_failure",
-  "node": "service_A"
-}
-
-{
-  "event": "cascade_failure",
-  "severity": 0.9
-}
+        
+  
