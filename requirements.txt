@@ -1,4 +1,7 @@
-pyyaml
+
 fastapi
 uvicorn[standard]
 pydantic
+python-dotenv
+websockets
+jinja2
