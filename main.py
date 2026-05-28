@@ -9,6 +9,7 @@ from core.validation_engine import ValidationEngine
 from evidence_engine.logger import EvidenceLogger
 from core.agent import ResilienceAgent
 
+
 # ---------------------------
 # APP INIT
 # ---------------------------
@@ -21,6 +22,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # ---------------------------
 # CORE SYSTEM
@@ -35,8 +37,9 @@ agent = ResilienceAgent(
     logger=logger
 )
 
+
 # ---------------------------
-# SYSTEM MEMORY (SAFE BOUNDARY)
+# SYSTEM MEMORY
 # ---------------------------
 system_memory = {
     "last_state": "UNKNOWN",
@@ -46,8 +49,9 @@ system_memory = {
 
 MAX_MEMORY = 100
 
+
 # ---------------------------
-# WEB SOCKET STREAM MANAGER
+# WEBSOCKET MANAGER
 # ---------------------------
 class StreamManager:
     def __init__(self):
@@ -61,22 +65,25 @@ class StreamManager:
         self.connections.discard(websocket)
 
     async def broadcast(self, message: dict):
-        dead = []
+        if not self.connections:
+            return
 
-        for conn in self.connections:
+        dead = set()
+
+        for conn in list(self.connections):
             try:
                 await conn.send_json(message)
             except:
-                dead.append(conn)
+                dead.add(conn)
 
-        for conn in dead:
-            self.connections.discard(conn)
+        self.connections -= dead
 
 
 stream = StreamManager()
 
+
 # ---------------------------
-# INPUT MODEL (HARDENED)
+# INPUT MODEL
 # ---------------------------
 class InputSignal(BaseModel):
     risk: float = Field(ge=0.0, le=1.0)
@@ -85,8 +92,9 @@ class InputSignal(BaseModel):
     class Config:
         extra = "forbid"
 
+
 # ---------------------------
-# SAFE EVALUATION CORE
+# RESILIENCE ENGINE
 # ---------------------------
 @app.post("/evaluate")
 async def evaluate_system(input_data: InputSignal):
@@ -94,17 +102,16 @@ async def evaluate_system(input_data: InputSignal):
     try:
         input_dict = input_data.dict()
 
-        # 1. Engine evaluation
+        # Engine execution
         result = engine.evaluate(input_dict)
 
-        # 2. Validation
+        # Validation
         validation = validator.validate(result)
 
-        # 3. Safe extraction
         state = result.get("state", "UNKNOWN")
-        risk = result.get("risk_score", 0.0)
+        risk = float(result.get("risk_score", 0.0))
 
-        # 4. Memory update (bounded)
+        # Memory update
         system_memory["last_state"] = state
         system_memory["last_risk"] = risk
 
@@ -116,7 +123,7 @@ async def evaluate_system(input_data: InputSignal):
         if len(system_memory["events"]) > MAX_MEMORY:
             system_memory["events"] = system_memory["events"][-MAX_MEMORY:]
 
-        # 5. REAL-TIME STREAM BROADCAST (STEP 11 CORE FEATURE)
+        # WebSocket broadcast
         await stream.broadcast({
             "type": "RISK_UPDATE",
             "state": state,
@@ -133,10 +140,17 @@ async def evaluate_system(input_data: InputSignal):
         }
 
     except Exception as e:
+        logger.log({
+            "type": "ERROR",
+            "error": str(e),
+            "input": input_data.dict() if input_data else None
+        })
+
         return {
             "status": "FAILED",
             "error": str(e)
         }
+
 
 # ---------------------------
 # EVIDENCE LAYER
@@ -148,6 +162,7 @@ def evidence():
         "records": logger.records[-50:]
     }
 
+
 # ---------------------------
 # HEALTH CHECK
 # ---------------------------
@@ -158,8 +173,9 @@ def health():
         "system": "Sextant Resilience Platform"
     }
 
+
 # ---------------------------
-# AGENT LAYER
+# AGENT ENDPOINTS
 # ---------------------------
 @app.post("/agent/step")
 def agent_step(input_data: InputSignal):
@@ -184,8 +200,9 @@ def agent_run():
 def agent_state():
     return agent.state_memory
 
+
 # ---------------------------
-# WEBSOCKET CONTROL ROOM (STEP 11)
+# WEBSOCKET ENDPOINT
 # ---------------------------
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -194,8 +211,10 @@ async def websocket_endpoint(websocket: WebSocket):
 
     try:
         while True:
-            # keep connection alive
-            await websocket.receive_text()
+            try:
+                await asyncio.wait_for(websocket.receive_text(), timeout=30)
+            except asyncio.TimeoutError:
+                await websocket.send_json({"type": "PING"})
 
     except WebSocketDisconnect:
         stream.disconnect(websocket)
