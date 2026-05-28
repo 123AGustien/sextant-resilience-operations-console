@@ -6,3 +6,16 @@ Built for:
 - SRE teams
 - Infrastructure engineers
 - FinTech / regulated system validation
+
+---
+
+## 🔌 API Contract (Production Interface)
+
+### POST /evaluate
+
+**Request**
+```json
+{
+  "event": "node_failure",
+  "node": "service_A"
+}
