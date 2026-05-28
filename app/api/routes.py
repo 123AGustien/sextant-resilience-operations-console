@@ -9,15 +9,16 @@ engine = CognitiveOrchestrator()
 @router.post("/evaluate")
 def evaluate(event: dict, tier: str = Depends(verify_api_key)):
     """
-    Multi-agent SRE evaluation with tier awareness
+    Multi-agent SRE evaluation with tier-aware execution.
+    Core monetisable endpoint of the system.
     """
 
     result = engine.process_event(event)
 
-    # 🧠 Add commercial tier metadata
+    # 🧠 Attach subscription tier metadata
     result["tier"] = tier
 
-    # 💡 Example: limit free tier behavior
+    # 💡 Free-tier constraints (usage control logic)
     if tier == "free":
         result["memory_size"] = min(result["memory_size"], 10)
 
@@ -27,11 +28,13 @@ def evaluate(event: dict, tier: str = Depends(verify_api_key)):
 @router.get("/memory")
 def memory(tier: str = Depends(verify_api_key)):
     """
-    Tier-controlled memory access
+    Tier-controlled access to cognitive memory store.
     """
+
     data = engine.memory.get_all()
 
+    # 🔒 Limit visibility for free tier users
     if tier == "free":
-        return data[-5:]  # limit exposure
+        return data[-5:]
 
     return data
