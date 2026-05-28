@@ -17,25 +17,37 @@ class CognitiveOrchestrator:
         ]
 
     def process_event(self, event: dict) -> dict:
+        """
+        Main cognitive execution loop:
+        1. Broadcast event to all agents
+        2. Collect outputs
+        3. Store in cognitive memory
+        4. Return structured audit response
+        """
+
         outputs = []
 
         for agent in self.agents:
             try:
                 result = agent.act(event)
+
                 outputs.append({
                     "agent": getattr(agent, "role", "unknown"),
                     "output": result
                 })
+
             except Exception as e:
                 outputs.append({
                     "agent": getattr(agent, "role", "unknown"),
                     "error": str(e)
                 })
 
+        # 🧠 Cognitive persistence layer
         self.memory.store(event, outputs)
 
         return {
             "event": event,
             "outputs": outputs,
-            "memory_size": self.memory.size()
+            "memory_size": self.memory.size(),
+            "status": "processed"
         }
