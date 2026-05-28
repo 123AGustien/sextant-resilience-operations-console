@@ -11,6 +11,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # 🔧 Fix for Node 20 deprecation warning in GitHub Actions
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -38,16 +42,19 @@ jobs:
       - name: Filename safety guard
         run: |
           error=0
+
           while IFS= read -r file; do
             name=$(basename "$file")
 
+            # Reject overly long filenames
             if [ ${#name} -gt 120 ]; then
-              echo "Too long: $name"
+              echo "Too long filename detected: $name"
               error=1
             fi
 
+            # Reject unsafe characters in filenames
             echo "$name" | grep -E "[#{}\[\]]" >/dev/null && {
-              echo "Unsafe: $name"
+              echo "Unsafe filename detected: $name"
               error=1
             }
           done < <(find . -type f)
