@@ -9,9 +9,23 @@ Built for:
 
 ---
 
+## ⚡ Overview
+
+Sextant Resilience Platform is a multi-agent deterministic simulation engine that evaluates infrastructure failure scenarios, tracks system state transitions, and maintains an audit-grade memory of all executions.
+
+It models distributed system behavior under stress conditions such as:
+- node failures
+- cascading dependency breakdowns
+- degraded system states
+- recovery scenarios
+
+---
+
 ## 🔌 API Contract (Production Interface)
 
-### POST /evaluate
+### POST `/evaluate`
+
+Simulates a resilience event across the system.
 
 **Request**
 ```json
