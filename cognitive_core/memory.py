@@ -1,6 +1,6 @@
 class CognitiveMemory:
     """
-    Simple cognitive memory engine for multi-agent SRE system.
+    Cognitive memory engine for multi-agent SRE system.
     Stores event + agent outputs for audit and learning.
     """
 
@@ -8,37 +8,70 @@ class CognitiveMemory:
         self._store = []
 
     def store(self, event: dict, outputs: list):
-        """
-        Persist a cognitive interaction snapshot.
-        """
         entry = {
             "event": event,
-            "outputs": outputs
+            "outputs": outputs,
+            "risk": event.get("risk", 0.0),
+            "signal": event.get("signal", "UNKNOWN")
         }
         self._store.append(entry)
 
     def size(self) -> int:
-        """
-        Returns number of stored cognitive records.
-        """
         return len(self._store)
 
     def get_all(self) -> list:
-        """
-        Returns full memory history.
-        """
         return self._store
 
     def get_latest(self):
-        """
-        Returns most recent cognitive event.
-        """
-        if not self._store:
-            return None
-        return self._store[-1]
+        return self._store[-1] if self._store else None
 
     def clear(self):
-        """
-        Clears memory (useful for simulation resets).
-        """
         self._store = []
+
+    # -----------------------------------
+    # 🧠 NEW: Cognitive Intelligence Layer
+    # -----------------------------------
+
+    def risk_trend(self) -> dict:
+        """
+        Basic risk evolution analysis.
+        """
+
+        if not self._store:
+            return {
+                "trend": "stable",
+                "average_risk": 0.0,
+                "samples": 0
+            }
+
+        risks = [e["risk"] for e in self._store]
+
+        avg = sum(risks) / len(risks)
+        latest = risks[-1]
+
+        if latest > avg and latest > 0.7:
+            trend = "degrading"
+        elif latest < avg:
+            trend = "recovering"
+        else:
+            trend = "stable"
+
+        return {
+            "trend": trend,
+            "average_risk": avg,
+            "latest_risk": latest,
+            "samples": len(risks)
+        }
+
+    def signal_distribution(self) -> dict:
+        """
+        Shows frequency of system signals (CRITICAL, OK, etc).
+        """
+
+        distribution = {}
+
+        for entry in self._store:
+            signal = entry.get("signal", "UNKNOWN")
+            distribution[signal] = distribution.get(signal, 0) + 1
+
+        return distribution
