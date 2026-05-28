@@ -9,29 +9,46 @@ Built for:
 
 ---
 
-## ⚡ Overview
+## ⚡ What this system does
 
-A deterministic simulation engine for infrastructure resilience testing under failure conditions such as node failures, cascading dependencies, and recovery scenarios.
+Sextant Resilience Platform simulates infrastructure failure scenarios in a deterministic way to evaluate:
 
----
+- Node failures
+- Cascading dependency breakdowns
+- System degradation states
+- Recovery behavior under controlled conditions
 
-## 🔌 API
-
-Full API documentation:
-
-👉 See: `docs/api.md`
-
----
-
-## 🧪 Scenarios
-
-Test cases:
-
-👉 See: `docs/scenarios.md`
+It provides reproducible outputs for engineering validation and resilience testing.
 
 ---
 
-## 🚀 Run
+## 🔌 Core Capability
+
+- Deterministic simulation engine
+- Multi-agent evaluation model
+- System state tracking (HEALTHY → DEGRADED → FAILED)
+- Audit-grade execution memory
+- Reproducible API responses
+
+---
+
+## 📡 API Documentation
+
+Full API specification:
+
+👉 `docs/api.md`
+
+---
+
+## 🧪 Test Scenarios
+
+Validation cases:
+
+👉 `docs/scenarios.md`
+
+---
+
+## 🚀 Quick Start
 
 ```bash
 git clone https://github.com/123AGustien/sextant-resilience-operations-console
