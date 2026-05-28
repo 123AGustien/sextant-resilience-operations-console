@@ -1,0 +1,7 @@
+# cognitive_core/config.py
+
+MEMORY_DECAY_RATE = 0.01
+
+CONFIDENCE_THRESHOLD = 0.7
+
+ENABLE_REFLECTION = True
