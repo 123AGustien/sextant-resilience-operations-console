@@ -27,7 +27,7 @@ It models distributed system behavior under stress conditions such as:
 
 Simulates a resilience event across the system.
 
-**Request**
+#### Request
 ```json
 {
   "event": "node_failure",
