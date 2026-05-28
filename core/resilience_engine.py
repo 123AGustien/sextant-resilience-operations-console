@@ -24,10 +24,13 @@ class ResilienceEngine:
 
         # Evidence logging (safe check)
         if self.logger:
-            self.logger.log_event("RESILIENCE_EVAL", {
-                "input": input_signal,
-                "output": output
-            })
+            try:
+                self.logger.log_event("RESILIENCE_EVAL", {
+                    "input": input_signal,
+                    "output": output
+                })
+            except:
+                pass
 
         return output
 
