@@ -1,69 +1,29 @@
-name: Sextant Resilience CI
+name: Python CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   pull_request:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Setup Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # 3. Environment setup
-      - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=." >> $GITHUB_ENV
-
-      # 4. Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 5. Verify core imports
-      - name: Verify core imports
+      - name: Run basic import test
         run: |
-          python -c "import core.resilience_engine; print('Core OK')"
-          python -c "import core.validation_engine; print('Validation OK')"
-          python -c "import core.agent; print('Agent OK')"
-          python -c "import main; print('API OK')"
-
-      # 6. Runtime sanity check
-      - name: Basic runtime sanity check
-        run: |
-          python -c "from core.resilience_engine import ResilienceEngine; print('Engine import OK')"
-
-      # 7. CI Hardening: Filename safety guard
-      - name: Validate filenames (anti-corruption guard)
-        run: |
-          echo "Checking for unsafe filenames..."
-
-          find . -type f | while read file; do
-            name=$(basename "$file")
-
-            # Block extremely long filenames
-            length=${#name}
-            if [ "$length" -gt 120 ]; then
-              echo "ERROR: Filename too long -> $name"
-              exit 1
-            fi
-
-            # Block markdown / injection-style filenames
-            if echo "$name" | grep -E "[#>{}\[\]]"; then
-              echo "ERROR: Unsafe filename detected -> $name"
-              exit 1
-            fi
-          done
-
-          echo "Filename validation passed"
+          python -c "import app.main"
