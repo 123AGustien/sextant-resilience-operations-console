@@ -13,3 +13,9 @@ This document defines deterministic validation scenarios for infrastructure resi
   "event": "node_failure",
   "node": "service_A"
 }
+
+#Scenario 2 — Cascading Failure
+{
+  "event": "cascade_failure",
+  "severity": 0.9
+}
