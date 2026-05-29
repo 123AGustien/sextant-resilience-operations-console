@@ -1,3 +1,28 @@
+
+
+## 📘 Documentation
+
+This repository includes structured engineering evaluation documentation:
+
+- 📄 Runbook (Engineer Execution Guide)  
+  `docs/runbook.md`  
+  → Step-by-step clone → build → run → simulate → log workflow
+
+- 🛡️ Guard Policy (CI/CD Governance Rules)  
+  `docs/v4-policy.md`  
+  → Defines SAFE / MAINTENANCE / NORMAL execution behavior
+
+- 🧭 Architecture Overview  
+  `docs/architecture-v4.md`  
+  → High-level system design and layer separation model
+
+---
+
+## 🔧 Evaluation Quick Start
+
+Clone → Build → Run → Simulate → Observe Logs
+
+Full execution steps: `docs/runbook.md`
 # 🧭 Sextant Resilience Platform (Enterprise v1)
 
 Deterministic infrastructure resilience simulation API for failure modeling, dependency analysis, and system recovery validation.
