@@ -1,17 +1,16 @@
-# 🧪 Scenario 2 — Cascading Failure Simulation
-## Sextant Resilience Platform (Bank Evaluation Pack)
+🧪 Scenario 2 — Cascading Failure Simulation
 
----
+Sextant Resilience Platform (Bank Evaluation Pack)
 
-## 🎯 Purpose
+🎯 Purpose
 
-This scenario validates **multi-service failure propagation** across dependent systems.
+This scenario validates multi-service failure propagation across dependent systems.
 
 It is designed to simulate real-world banking infrastructure risk where a single failure spreads across multiple services.
 
 ---
 
-## ⚠️ Scenario Classification
+⚠️ Scenario Classification
 
 - Severity: HIGH
 - Type: Dependency Cascade Failure
@@ -20,48 +19,17 @@ It is designed to simulate real-world banking infrastructure risk where a single
 
 ---
 
-## 📥 Input Payload
+📥 Input Payload
 
-```json id="cascade_input"
 {
   "scenario": "cascade_failure",
   "nodes": 5,
   "intensity": "high"
 }
 
-# 🧪 Scenario 2 — Cascading Failure Simulation
-## Sextant Resilience Platform (Bank Evaluation Pack)
-
 ---
 
-## 🎯 Purpose
-
-This scenario validates **multi-service failure propagation** across dependent systems.
-
-It is designed to simulate real-world banking infrastructure risk where a single failure spreads across multiple services.
-
----
-
-## ⚠️ Scenario Classification
-
-- Severity: HIGH
-- Type: Dependency Cascade Failure
-- Environment: Sandbox Only
-- Reproducibility: Required
-
----
-
-## 📥 Input Payload
-
-```json
-{
-  "scenario": "cascade_failure",
-  "nodes": 5,
-  "intensity": "high"
-}
-```
-
-## ⚙️ Execution Description
+⚙️ Execution Description
 
 The system will:
 
@@ -71,16 +39,19 @@ The system will:
 4. Evaluate system degradation state
 5. Generate deterministic audit output
 
-## 📊 Expected System Behavior
+---
+
+📊 Expected System Behavior
 
 - Failure spreads from root node to dependent services
 - Partial system degradation occurs
 - Non-critical services remain stable
 - Recovery logic is not triggered automatically
 
-## 📤 Expected Output
+---
 
-```json
+📤 Expected Output
+
 {
   "status": "DEGRADED",
   "failed_nodes": 2,
@@ -94,9 +65,10 @@ The system will:
   "deterministic": true,
   "audit_trace_id": "trace-cascade-002"
 }
-```
 
-## 📌 Validation Rules
+---
+
+📌 Validation Rules
 
 Engineers must verify:
 
@@ -106,7 +78,9 @@ Engineers must verify:
 - Audit trace ID is generated
 - No external systems are involved
 
-## 🛡️ Banking Relevance
+---
+
+🛡️ Banking Relevance
 
 This scenario models:
 
@@ -115,7 +89,9 @@ This scenario models:
 - API gateway propagation failure
 - Microservice chain instability
 
-## ⚠️ Safety Boundary
+---
+
+⚠️ Safety Boundary
 
 This simulation:
 
@@ -124,4 +100,26 @@ This simulation:
 - Runs only in an isolated sandbox
 - Is deterministic and replayable
 
-## ✅ END OF SCENARIO 2
+---
+
+✅ Success Criteria
+
+The scenario is considered successful when:
+
+- Failure propagation behaves consistently across runs
+- Deterministic outputs are generated
+- Audit records are created
+- Results are reproducible by independent evaluators
+- No external dependencies are required
+
+---
+
+📎 Related Documents
+
+- docs/runbook.md
+- docs/evidence-pack.md
+- docs/scenario-1-node-failure.md
+
+---
+
+✅ END OF SCENARIO 2
