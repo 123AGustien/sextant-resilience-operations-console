@@ -26,3 +26,25 @@ To provide verifiable proof that:
   "node": "auth-service",
   "failure_type": "crash"
 }
+
+
+{
+
+Expected Response
+  "simulation_id": "sim-001",
+  "initial_state": "HEALTHY",
+  "final_state": "DEGRADED",
+  "affected_nodes": ["auth-service"],
+  "cascade_triggered": false,
+  "deterministic": true
+}
+
+
+Expected Logs
+
+simulation started
+node failure injected: auth-service
+dependency graph evaluated
+no cascade triggered
+final state: DEGRADED
+audit snapshot stored
