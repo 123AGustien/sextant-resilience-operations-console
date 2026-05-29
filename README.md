@@ -2,11 +2,14 @@
 
 Deterministic infrastructure resilience simulation and governance evaluation framework for modeling system failure propagation, dependency analysis, and audit-grade operational resilience testing.
 
-Built for:
-- SRE / Platform Engineering teams
-- Infrastructure resilience validation
-- FinTech / regulated system testing
-- CI/CD governance and reliability engineering
+---
+
+## 🎯 Built For
+
+- SRE / Platform Engineering teams  
+- Infrastructure resilience validation  
+- FinTech / regulated system testing  
+- CI/CD governance and reliability engineering  
 
 ---
 
@@ -19,6 +22,33 @@ git clone https://github.com/123AGustien/sextant-resilience-operations-console
 cd sextant-resilience-operations-console
 docker compose up --build
 
+You’re very close — but this version will break GitHub formatting because the code block is not closed and headings are not separated.
+I’ll fix it cleanly for you.
+✅ COPY THIS EXACT FINAL VERSION
+Markdown
+# 🧭 Sextant Resilience Platform (Enterprise v1)
+
+Deterministic infrastructure resilience simulation and governance evaluation framework for modeling system failure propagation, dependency analysis, and audit-grade operational resilience testing.
+
+---
+
+## 🎯 Built For
+
+- SRE / Platform Engineering teams  
+- Infrastructure resilience validation  
+- FinTech / regulated system testing  
+- CI/CD governance and reliability engineering  
+
+---
+
+## ⚡ Evaluation Quick Start (Primary Entry Point)
+
+Clone → Build → Run → Simulate → Observe Logs
+
+```bash
+git clone https://github.com/123AGustien/sextant-resilience-operations-console
+cd sextant-resilience-operations-console
+docker compose up --build
 Then:
 Run API locally
 Trigger simulation endpoint
@@ -94,5 +124,6 @@ Control production systems
 Access external infrastructure
 Provide enterprise SLAs
 🧭 Repository Entry Point
-Start here:
-https://github.com/123AGustien/sextant-resilience-operations-console⁠�
+https://github.com/123AGustien/sextant-resilience-operations-console
+
+
