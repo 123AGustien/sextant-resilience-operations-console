@@ -34,3 +34,40 @@ This is an engineering validation tool only.
 git clone https://github.com/123AGustien/sextant-resilience-operations-console
 cd sextant-resilience-operations-console
 docker compose up --build
+
+
+## 📡 Example Simulation Request
+
+POST /simulate
+
+```json
+{
+  "scenario": "cascade_failure",
+  "nodes": 5,
+  "load": "high"
+}
+
+Expected Output
+
+{
+  "status": "DEGRADED",
+  "failed_nodes": 2,
+  "recovery_time_ms": 1200,
+  "deterministic": true
+}
+
+```md
+## 📘 Full Engineer Runbook
+See full deterministic execution steps:
+
+👉 docs/runbook.md
+
+## 🧪 Deterministic Guarantee
+
+Every simulation run produces:
+
+- Identical output for identical input
+- No randomness
+- Audit-traceable logs
+- Replayable execution state
+
