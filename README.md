@@ -1,148 +1,36 @@
-# 🧭 Sextant Resilience Platform (Enterprise v1)
+# 🧭 Sextant Resilience Platform (Enterprise Evaluation System v1)
 
-Deterministic infrastructure resilience simulation and governance evaluation framework for modeling system failure propagation, dependency analysis, and audit-grade operational resilience testing.
-
----
-
-## 🎯 Built For
-
-- SRE / Platform Engineering teams
-- Infrastructure resilience validation
-- FinTech / regulated system testing
-- CI/CD governance and reliability engineering
+Deterministic infrastructure resilience simulation framework for testing system failure propagation, dependency breakdown, and recovery behavior in controlled environments.
 
 ---
 
-## ⚡ Evaluation Quick Start (Primary Entry Point)
+## 🎯 Purpose
 
-Clone → Buisextant-resilience-operations-consoleb.com/123AGustien/sextant-resilience-operations-console
-cd sextant-resilience-operations-sextant-resilience-operations-con
----
+This system is designed for:
 
-## 🧠 What This System Does
+- SRE / Platform Engineering validation
+- Infrastructure resilience testing
+- CI/CD failure simulation
+- Regulated system behavior analysis (FinTech / enterprise environments)
 
-Sextant simulates controlled infrastructure failure scenarios to evaluate:
-
-- Node failures  
-- Cascading dependency breakdowns  
-- System degradation states (HEALTHY → DEGRADED → FAILED)  
-- Recovery behavior under deterministic execution  
-- Audit-traceable simulation outputs  
-
-This enables reproducible resilience testing in isolated environments.
+It provides a deterministic simulation environment for reproducible engineering evaluation.
 
 ---
 
-## 🔧 Core Capabilities
+## ⚠️ Safety Boundary
 
-- Deterministic simulation engine  
-- Multi-node dependency modeling  
-- Reproducible execution state machine  
-- Audit-grade logging and traceability  
-- CI/CD governance layer (Guard v4)  
-- Sandbox-only execution environment  
+- Sandbox execution only
+- No production system access
+- No external dependency required for core simulation
+- No persistent data storage outside runtime
 
----
-
-## 🛡️ Governance Layer (Guard v4)
-
-| Mode | Behavior |
-|------|----------|
-| NORMAL | Logging + analysis |
-| SAFE | Observation only |
-| MAINTENANCE | Enforcement disabled |
-
-Purpose:
-- Prevent recursive CI failures  
-- Enable controlled workflow evaluation  
-- Support safe governance testing  
-
-👉 Policy: `docs/v4-policy.md`
+This is an engineering validation tool only.
 
 ---
 
-## 🧭 System Architecture
-
-- Operations Console → API orchestration layer  
-- Orbital Resilience Framework → Simulation engine  
-- Python Engine → Backend service foundation  
-
-Together they form a deterministic resilience evaluation stack.
-
-👉 Architecture: `docs/architecture-v4.md`
-
----
-
-## 📡 API Interface
-
-Key endpoints:
-
-- `/simulate` → failure propagation simulation  
-- `/health` → system status check  
-
-All outputs are deterministic and replayable.
-
-👉 API spec: `docs/api.md`
-
----
-
-## 🧪 Test Scenarios
-
-- Single node failure  
-- Cascading dependency collapse  
-- System recovery simulation  
-- Stress propagation modeling  
-
-👉 Scenarios: `docs/scenarios.md`
-
----
-
-## 📘 Documentation
-
-This repository includes structured engineering evaluation documentation:
-
-- 📄 Runbook (Engineer Execution Guide)  
-  `docs/runbook.md`  
-  → Step-by-step clone → build → run → simulate → log workflow  
-
-- 🛡️ Guard Policy (CI/CD Governance Rules)  
-  `docs/v4-policy.md`  
-  → Defines SAFE / MAINTENANCE / NORMAL execution behavior  
-
-- 🧭 Architecture Overview  
-  `docs/architecture-v4.md`  
-  → High-level system design and layer separation model  
-
----
-
-## ⚠️ System Boundary
-
-This platform is strictly:
-
-- Sandbox execution only  
-- Non-production evaluation environment  
-- Deterministic simulation framework  
-- Research / engineering validation tool  
-
-It does NOT:
-
-- Control production systems  
-- Access external infrastructure  
-- Provide enterprise SLAs  
-
----
-## 🧪 First Validation Step (Expected Behavior)
-
-After running:
+## ⚡ Quick Start
 
 ```bash
+git clone https://github.com/123AGustien/sextant-resilience-operations-console
+cd sextant-resilience-operations-console
 docker compose up --build
-## 🧭 Repository Entry Point
-
-https://github.com/123AGustien/sextant-resilience-operations-console
-```md
-## 📡 Engineering Validation Pack
-
-Full deterministic test suite:
-
-👉 `docs/bank_execution_testpack.md`
