@@ -61,35 +61,14 @@ All scenarios are:
 
 ---
 
-## 📡 Core API Interface
+## 🔌 Core API Interface
+
+---
 
 ### ▶️ Simulation Endpoint
+
 ```http
 POST /simulate
----
-{
-  "scenario": "cascade_failure",
-  "nodes": 5,
-  "intensity": "high"
-}
-----
-
-System Output Model
-All scenarios produce deterministic outputs:
-System state transitions (HEALTHY → DEGRADED → FAILED → HEALTHY)
-Dependency impact mapping
-Node-level failure propagation
-Audit trace ID generation
-🛡️ Governance & Safety Boundary
-This platform:
-Does NOT connect to production systems
-Does NOT execute external network calls
-Does NOT persist sensitive data
-Runs entirely in sandbox mode
-Is designed for controlled engineering evaluation only
-🧾 Engineering Value Proposition
-This system enables banks to:
-Pre-test infrastructure failure modes
 Simulate real-world outage propagation
 Validate recovery procedures before incidents occur
 Improve SRE readiness and audit compliance
