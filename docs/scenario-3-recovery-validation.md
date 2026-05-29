@@ -50,3 +50,11 @@ docs/runbook.md
 docs/evidence-pack.md
 docs/scenario-1-node-failure.md
 docs/scenario-2-cascade-failure.md
+## ⚠️ Safety Boundary
+
+This simulation:
+
+- Does NOT affect production systems
+- Does NOT connect to external APIs
+- Runs only within a sandbox environment
+- Is deterministic and replayable
