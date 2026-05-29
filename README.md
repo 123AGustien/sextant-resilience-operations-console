@@ -1,72 +1,10 @@
-
-# 🏦 Sextant Resilience Platform
-## Executive Overview (CTO Evaluation Summary)
-
----
-
-## 🎯 What This System Is
-
-Sextant Resilience Platform is a **deterministic infrastructure resilience simulation framework** designed to model:
-
-- System failure propagation across dependencies  
-- Cascading service outages in distributed architectures  
-- Recovery behavior under controlled conditions  
-- Audit-grade operational resilience validation  
-
-It enables banks and regulated institutions to **simulate production-like failure scenarios safely in a sandbox environment**.
-
----
-
-## 🧠 Core Purpose
-
-This platform is built to answer one critical question:
-
-> “What happens to our infrastructure when key services fail — and can we recover predictably?”
-
-It provides **repeatable, observable, and auditable simulation of system resilience**.
-
----
-
-## 🧪 What It Simulates
-
-### 1. Node Failure
-- Single service failure impact
-- Baseline resilience validation
-
-### 2. Cascading Failure
-- Multi-service dependency collapse
-- Banking-grade systemic risk modeling
-
-### 3. Recovery Validation
-- Restoration from degraded states
-- Health state reconstitution (DEGRADED → HEALTHY)
-
----
-
-## ⚙️ System Characteristics
-
-- Deterministic execution (same input → same output)
-- Replayable simulations for audit and compliance
-- Isolated sandbox execution (no production interaction)
-- Stateless runtime evaluation model
-- Structured logging with trace IDs
-
----
-
-## 🔌 Core Interface
-
-### Simulation Endpoint
-
-```http
-POST /simulate
-
-# 🧭 Sextant Resilience Platform (Enterprise Evaluation System v1)
+🧭 Sextant Resilience Platform (Enterprise Evaluation System v1)
 
 Deterministic infrastructure resilience simulation framework for testing system failure propagation, dependency breakdown, and recovery behavior in controlled environments.
 
 ---
 
-## 🎯 Purpose
+🎯 Purpose
 
 This system is designed for:
 
@@ -79,7 +17,7 @@ It provides a deterministic simulation environment for reproducible engineering 
 
 ---
 
-## ⚠️ Safety Boundary
+⚠️ Safety Boundary
 
 - Sandbox execution only
 - No production system access
@@ -90,19 +28,22 @@ This is an engineering validation tool only.
 
 ---
 
-## ⚡ Quick Start
+⚡ Quick Start
 
-```bash
 git clone https://github.com/123AGustien/sextant-resilience-operations-console
 cd sextant-resilience-operations-console
 docker compose up --build
 
+---
 
-## 📡 Example Simulation Request
+📡 Example Simulation Request
+
+Endpoint
 
 POST /simulate
 
-```json
+Request Payload
+
 {
   "scenario": "cascade_failure",
   "nodes": 5,
@@ -118,13 +59,17 @@ Expected Output
   "deterministic": true
 }
 
-```md
-## 📘 Full Engineer Runbook
+---
+
+📘 Full Engineer Runbook
+
 See full deterministic execution steps:
 
-👉 docs/runbook.md
+"docs/runbook.md"
 
-## 🧪 Deterministic Guarantee
+---
+
+🧪 Deterministic Guarantee
 
 Every simulation run produces:
 
@@ -133,3 +78,20 @@ Every simulation run produces:
 - Audit-traceable logs
 - Replayable execution state
 
+---
+
+🏦 Engineering Evaluation Focus
+
+This platform supports:
+
+- Controlled resilience testing
+- Dependency propagation analysis
+- Recovery validation workflows
+- Sandbox-only operational simulations
+- Audit-oriented engineering review
+
+---
+
+✅ Repository Entry Point
+
+https://github.com/123AGustien/sextant-resilience-operations-console
