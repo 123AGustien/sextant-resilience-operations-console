@@ -74,3 +74,15 @@ Start the system using Docker Compose:
 docker compose up --build
 
 curl http://localhost:8000/health
+{
+  "status": "OK",
+  "engine": "resilience-core",
+  "mode": "sandbox",
+  "deterministic": true
+}
+
+Validation Rules:
+Must return HTTP 200
+Status must be OK
+Mode must be sandbox
+Deterministic flag must be true
