@@ -140,3 +140,9 @@ docker compose up --build
 ## 🧭 Repository Entry Point
 
 https://github.com/123AGustien/sextant-resilience-operations-console
+```md
+## 📡 Engineering Validation Pack
+
+Full deterministic test suite:
+
+👉 `docs/bank_execution_testpack.md`
