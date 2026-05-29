@@ -52,3 +52,12 @@ Ensure the following tools are installed:
 git clone https://github.com/123AGustien/sextant-resilience-operations-console
 git clone https://github.com/123AGustien/sextant-orbital-resilience-framework
 git clone https://github.com/123AGustien/sextant-python-engine
+
+# 5. 🏗️ SYSTEM BUILD & START
+
+## Step 1 — Start Core System
+
+From the Operations Console repository:
+
+```bash
+docker compose up --build
