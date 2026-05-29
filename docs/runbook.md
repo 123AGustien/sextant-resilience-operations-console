@@ -1,63 +1,52 @@
-# 🧭 Sextant Resilience Platform  
+# 🧭 Sextant Resilience Platform
 ## Engineer Evaluation Runbook (Sandbox v1)
 
-**Document Classification:** Internal Evaluation Guide  
-**Purpose:** Controlled execution procedure for validating deterministic resilience simulation, CI/CD governance behavior, and audit logging within an isolated sandbox environment.
+---
+
+## 📘 Document Classification
+Internal Evaluation Guide
 
 ---
 
-# 1. PURPOSE
+## 🎯 Purpose
 
-This runbook defines a step-by-step procedure for engineers to:
+This runbook defines a deterministic execution procedure for:
 
-- Clone Sextant repositories
-- Build and run a local sandbox environment
-- Execute resilience simulation workflows
-- Trigger and evaluate Guard Layer CI logic (V4)
-- Observe deterministic system behavior
-- Review logs and audit outputs
+- System setup via Docker
+- Resilience simulation execution
+- CI/CD governance validation (Guard v4)
+- Audit log verification
+- Failure scenario testing
 
-This environment is strictly intended for **non-production evaluation and research purposes only**.
-
----
-
-# 2. SYSTEM OVERVIEW
-
-Sextant operates as a multi-repository deterministic resilience simulation framework composed of:
-
-- Operations Console → Execution & orchestration layer  
-- Orbital Resilience Framework → Simulation engine  
-- Python Engine → Backend service foundation  
-- Guard Layer (V4) → CI/CD governance and validation logic  
-
-Together, these components enable controlled simulation of infrastructure failure and recovery behavior.
+This is a **sandbox-only engineering validation system**.
 
 ---
 
-# 3. PREREQUISITES
+## ⚠️ System Boundary
 
-Ensure the following tools are installed:
+This system does NOT:
+
+- Interact with production banking systems
+- Access external infrastructure
+- Execute financial transactions
+- Store persistent production data
+
+It is strictly a deterministic simulation environment.
+
+---
+
+## 🧰 1. Prerequisites
+
+Install:
 
 - Git
-- Docker & Docker Compose
-- Python 3.10+
-- curl or Postman (API testing)
-- GitHub CLI (optional for workflow testing)
+- Docker + Docker Compose
+- Python 3.10+ (optional)
+- curl or Postman
 
 ---
 
-# 4. REPOSITORY CLONE
+## 📥 2. Clone Repository
 
 ```bash
 git clone https://github.com/123AGustien/sextant-resilience-operations-console
-git clone https://github.com/123AGustien/sextant-orbital-resilience-framework
-git clone https://github.com/123AGustien/sextant-python-engine
-
-# 5. 🏗️ SYSTEM BUILD & START
-
-## Step 1 — Start Core System
-
-From the Operations Console repository:
-
-```bash
-docker compose up --build
