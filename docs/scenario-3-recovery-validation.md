@@ -59,3 +59,58 @@ The system will:
   "deterministic": true,
   "audit_trace_id": "trace-recovery-003"
 }
+## 📌 Validation Rules
+
+Engineers must verify:
+
+- Recovery behavior is reproducible
+- State transitions occur correctly
+- Audit logs are generated
+- Outputs remain deterministic
+- No external systems are contacted
+
+---
+
+## 🛡️ Banking Relevance
+
+This scenario models:
+
+- Service restoration procedures
+- Operational recovery workflows
+- Resilience validation testing
+- Controlled recovery of dependent services
+
+---
+
+## ⚠️ Safety Boundary
+
+This simulation:
+
+- Does NOT affect production systems
+- Does NOT connect to external APIs
+- Runs only within a sandbox environment
+- Is deterministic and replayable
+
+---
+
+## ✅ Success Criteria
+
+The scenario is successful when:
+
+- Recovery completes successfully
+- System returns to HEALTHY state
+- Audit records are generated
+- Results are reproducible
+
+---
+
+## 📎 Related Documents
+
+- docs/runbook.md
+- docs/evidence-pack.md
+- docs/scenario-1-node-failure.md
+- docs/scenario-2-cascade-failure.md
+
+---
+
+## ✅ END OF SCENARIO 3
