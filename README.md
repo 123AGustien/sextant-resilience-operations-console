@@ -131,7 +131,12 @@ It does NOT:
 - Provide enterprise SLAs  
 
 ---
+## 🧪 First Validation Step (Expected Behavior)
 
+After running:
+
+```bash
+docker compose up --build
 ## 🧭 Repository Entry Point
 
 https://github.com/123AGustien/sextant-resilience-operations-console
