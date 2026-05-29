@@ -1,4 +1,3 @@
-
 # 🧭 Sextant Resilience Platform (Enterprise v1)
 
 Deterministic infrastructure resilience simulation and governance evaluation framework for modeling system failure propagation, dependency analysis, and audit-grade operational resilience testing.
@@ -19,6 +18,7 @@ Clone → Build → Run → Simulate → Observe Logs
 git clone https://github.com/123AGustien/sextant-resilience-operations-console
 cd sextant-resilience-operations-console
 docker compose up --build
+
 Then:
 Run API locally
 Trigger simulation endpoint
@@ -94,7 +94,5 @@ Control production systems
 Access external infrastructure
 Provide enterprise SLAs
 🧭 Repository Entry Point
-Start here: https://github.com/123AGustien/sextant-resilience-operations-console
-
----
-
+Start here:
+https://github.com/123AGustien/sextant-resilience-operations-console⁠�
