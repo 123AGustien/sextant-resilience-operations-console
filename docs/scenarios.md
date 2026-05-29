@@ -40,3 +40,14 @@ Simulates failure of a single compute node in the system.
   "nodes": 1,
   "intensity": "low"
 }
+
+Expected Output
+JSON
+{
+  "status": "DEGRADED",
+  "failed_nodes": 1,
+  "impact_scope": "local",
+  "services_affected": ["single-service"],
+  "deterministic": true,
+  "audit_trace_id": "trace-node-001"
+}
