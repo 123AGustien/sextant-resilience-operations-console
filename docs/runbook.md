@@ -50,3 +50,27 @@ Install:
 
 ```bash
 git clone https://github.com/123AGustien/sextant-resilience-operations-console
+## 🧰 3. Prerequisites
+
+Install the following tools before execution:
+
+- Git
+- Docker + Docker Compose
+- Python 3.10+ (optional for local inspection)
+- curl or Postman (API testing)
+
+---
+
+## 📥 4. Repository Clone
+
+```bash
+git clone https://github.com/123AGustien/sextant-resilience-operations-console
+cd sextant-resilience-operations-console
+## 🏗️ 5. System Build & Start
+
+Start the system using Docker Compose:
+
+```bash
+docker compose up --build
+
+curl http://localhost:8000/health
