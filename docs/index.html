@@ -1,33 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Sextant Resilience Dashboard</title>
+  <title>Sextant Dashboard</title>
   <style>
     body { font-family: Arial; background:#0b0f1a; color:white; margin:0; }
     header { padding:20px; background:#11182a; text-align:center; }
-    .container { display:grid; grid-template-columns:1fr 1fr; gap:20px; padding:20px; }
-    .card { background:#151d33; padding:15px; border-radius:10px; }
-    button { padding:10px; background:#3b82f6; border:none; color:white; cursor:pointer; }
+    .card { margin:20px; padding:15px; background:#151d33; border-radius:10px; }
+    button { padding:10px; background:#3b82f6; color:white; border:none; }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Sextant Resilience Dashboard</h1>
-  <p>Simulation Engine Active</p>
+  <h1>Sextant Dashboard</h1>
 </header>
 
-<div class="container">
-  <div class="card">
-    <h2>Status</h2>
-    <p>ONLINE</p>
-    <button onclick="alert('Running Simulation')">Run Simulation</button>
-  </div>
+<div class="card">
+  <h2>Status: ONLINE</h2>
+  <button onclick="alert('Simulation running')">Run Simulation</button>
+</div>
 
-  <div class="card">
-    <h2>Architecture</h2>
-    <p>FastAPI → Core → Engine → Audit</p>
-  </div>
+<div class="card">
+  <h2>Architecture</h2>
+  <p>FastAPI → Engine → Audit</p>
 </div>
 
 </body>
