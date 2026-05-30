@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sextant Resilience System</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0b0f1a;
+      color: #e6e6e6;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      padding: 20px;
+      background: #11182a;
+      text-align: center;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .card {
+      background: #151d33;
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    button {
+      padding: 10px;
+      background: #3b82f6;
+      border: none;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+      border-radius: 6px;
+    }
+
+    pre {
+      background: #0b0f1a;
+      padding: 10px;
+      border-radius: 8px;
+      overflow: auto;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Sextant Resilience Control Dashboard</h1>
+  <p>Deterministic Infrastructure Failure Simulation Engine</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>System Status</h2>
+    <p id="status">ONLINE (SIMULATED)</p>
+
+    <h3>Risk Score</h3>
+    <p id="risk">0.12</p>
+
+    <button onclick="runSimulation()">Run Simulation</button>
+  </div>
+
+  <div class="card">
+    <h2>Event Log</h2>
+    <pre id="log">System initialized...</pre>
+  </div>
+
+  <div class="card">
+    <h2>Architecture View</h2>
+    <p>FastAPI → Cognitive Core → Simulation Engine → Audit Layer</p>
+  </div>
+
+  <div class="card">
+    <h2>Simulation Output</h2>
+    <pre id="output">{}</pre>
+  </div>
+
+</div>
+
+<script>
+function runSimulation() {
+  let risk = (Math.random() * 0.9).toFixed(2);
+
+  let event = {
+    timestamp: new Date().toISOString(),
+    event: "NODE_FAILURE",
+    cascade: "DEPENDENCY_PROPAGATION",
+    severity: risk
+  };
+
+  document.getElementById("risk").innerText = risk;
+  document.getElementById("output").innerText = JSON.stringify(event, null, 2);
+
+  document.getElementById("log").innerText +=
+    "\n" + event.timestamp + " - " + event.event + " | risk=" + risk;
+}
+</script>
+
+</body>
+</html>
