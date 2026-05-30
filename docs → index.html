@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sextant Resilience Dashboard</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0b0f1a;
+      color: white;
+      margin: 0;
+    }
+
+    header {
+      padding: 20px;
+      background: #11182a;
+      text-align: center;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .card {
+      background: #151d33;
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    button {
+      padding: 10px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    pre {
+      background: #0b0f1a;
+      padding: 10px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Sextant Resilience Dashboard</h1>
+  <p>Live Simulation Control Panel</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Status</h2>
+    <p>ONLINE</p>
+    <button onclick="runSim()">Run Simulation</button>
+  </div>
+
+  <div class="card">
+    <h2>Risk Score</h2>
+    <p id="risk">0.00</p>
+  </div>
+
+  <div class="card">
+    <h2>Architecture</h2>
+    <p>FastAPI → Core → Engine → Audit</p>
+  </div>
+
+  <div class="card">
+    <h2>Output</h2>
+    <pre id="out">{}</pre>
+  </div>
+
+</div>
+
+<script>
+function runSim() {
+  let r = (Math.random() * 0.9).toFixed(2);
+
+  document.getElementById("risk").innerText = r;
+  document.getElementById("out").innerText =
+    JSON.stringify({
+      event: "NODE_FAILURE",
+      risk: r,
+      time: new Date().toISOString()
+    }, null, 2);
+}
+</script>
+
+</body>
+</html>
