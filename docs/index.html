@@ -38,9 +38,9 @@
       background: #1f2a44;
     }
 
-    .danger { background: #7f1d1d !important; }
-    .warn { background: #92400e !important; }
-    .ok { background: #14532d !important; }
+    .ok { background: #14532d; }
+    .warn { background: #92400e; }
+    .danger { background: #7f1d1d; }
 
     button {
       padding: 10px;
@@ -49,6 +49,13 @@
       border: none;
       cursor: pointer;
       border-radius: 6px;
+      margin-top: 10px;
+    }
+
+    select {
+      padding: 8px;
+      margin-top: 10px;
+      width: 100%;
     }
 
     pre {
@@ -70,27 +77,39 @@
 
 <div class="grid">
 
+  <!-- CONTROL PANEL -->
   <div class="card">
     <h2>Control Panel</h2>
+
+    <label>Scenario</label>
+    <select id="scenario">
+      <option value="bank">🏦 Bank Core System</option>
+      <option value="cloud">☁️ Cloud Infrastructure</option>
+      <option value="satellite">🛰 Satellite Network</option>
+    </select>
+
     <button onclick="runSim()">Run Simulation</button>
+
     <p>Risk: <span id="risk">0.00</span></p>
   </div>
 
+  <!-- ARCHITECTURE -->
   <div class="card">
     <h2>Architecture Map</h2>
-    <div id="nodes">
-      <div class="node ok" id="api">FastAPI</div>
-      <div class="node ok" id="core">Core</div>
-      <div class="node ok" id="engine">Engine</div>
-      <div class="node ok" id="audit">Audit</div>
-    </div>
+
+    <div class="node ok" id="api">FastAPI</div>
+    <div class="node ok" id="core">Core</div>
+    <div class="node ok" id="engine">Engine</div>
+    <div class="node ok" id="audit">Audit</div>
   </div>
 
+  <!-- LOG -->
   <div class="card">
     <h2>Event Stream</h2>
     <pre id="log">SYSTEM INITIALIZED...</pre>
   </div>
 
+  <!-- OUTPUT -->
   <div class="card">
     <h2>Simulation Output</h2>
     <pre id="out">{}</pre>
@@ -99,12 +118,12 @@
 </div>
 
 <script>
-function setState(risk) {
-  let nodes = ["api","core","engine","audit"];
 
-  nodes.forEach(n => {
-    document.getElementById(n).className = "node ok";
-  });
+function setState(risk) {
+  document.getElementById("api").className = "node ok";
+  document.getElementById("core").className = "node ok";
+  document.getElementById("engine").className = "node ok";
+  document.getElementById("audit").className = "node ok";
 
   if (risk > 0.3) document.getElementById("engine").className = "node warn";
   if (risk > 0.6) document.getElementById("core").className = "node danger";
@@ -112,12 +131,23 @@ function setState(risk) {
 }
 
 function runSim() {
-  let risk = parseFloat((Math.random()).toFixed(2));
+
+  let scenario = document.getElementById("scenario").value;
+
+  let baseRisk = Math.random();
+  let multiplier = 1;
+
+  if (scenario === "bank") multiplier = 0.9;
+  if (scenario === "cloud") multiplier = 1.1;
+  if (scenario === "satellite") multiplier = 1.3;
+
+  let risk = parseFloat((baseRisk * multiplier).toFixed(2));
 
   setState(risk);
 
   let event = {
     time: new Date().toISOString(),
+    scenario: scenario,
     event: "CASCADE_SIMULATION",
     risk: risk
   };
@@ -128,18 +158,12 @@ function runSim() {
     JSON.stringify(event, null, 2);
 
   document.getElementById("log").innerText =
-    "[" + event.time + "] risk=" + risk + "\n" +
+    "[" + scenario.toUpperCase() + "] " +
+    event.time + " risk=" + risk + "\n" +
     document.getElementById("log").innerText;
 }
+
 </script>
 
 </body>
 </html>
-
-<h3>Scenario</h3>
-<select id="scenario">
-  <option value="bank">🏦 Bank Core System</option>
-  <option value="cloud">☁️ Cloud Infrastructure</option>
-  <option value="satellite">🛰 Satellite Network</option>
-</select>
-
