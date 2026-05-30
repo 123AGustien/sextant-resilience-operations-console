@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Sextant Resilience Control Room</title>
+  <title>Sextant Resilience Control Room v5</title>
 
   <style>
     body {
@@ -62,7 +62,7 @@
       background: #0b0f1a;
       padding: 10px;
       border-radius: 8px;
-      height: 200px;
+      height: 220px;
       overflow: auto;
     }
   </style>
@@ -71,8 +71,8 @@
 <body>
 
 <header>
-  <h1>🧭 Sextant Control Room</h1>
-  <p>Deterministic Infrastructure Cascade Simulation Engine v3</p>
+  <h1>🧭 Sextant Control Room v5</h1>
+  <p>Incident Intelligence + Cascade Simulation Engine</p>
 </header>
 
 <div class="grid">
@@ -97,22 +97,31 @@
   <div class="card">
     <h2>Architecture Map</h2>
 
-    <div class="node ok" id="api">FastAPI</div>
-    <div class="node ok" id="core">Core</div>
-    <div class="node ok" id="engine">Engine</div>
-    <div class="node ok" id="audit">Audit</div>
+    <div id="api" class="node ok">FastAPI</div>
+    <div id="core" class="node ok">Core</div>
+    <div id="engine" class="node ok">Engine</div>
+    <div id="audit" class="node ok">Audit</div>
   </div>
 
-  <!-- LOG -->
+  <!-- EVENT LOG -->
   <div class="card">
     <h2>Event Stream</h2>
-    <pre id="log">SYSTEM INITIALIZED...</pre>
+    <pre id="log">SYSTEM READY...</pre>
   </div>
 
   <!-- OUTPUT -->
   <div class="card">
     <h2>Simulation Output</h2>
-    <pre id="out">{}</pre>
+    <pre id="out">
+{
+  "id": "INC-48391",
+  "scenario": "cloud",
+  "severity": "S2 - High",
+  "risk": 0.72,
+  "rootCause": "Service mesh propagation failure",
+  "status": "RESOLVED (SIMULATED)"
+}
+    </pre>
   </div>
 
 </div>
@@ -137,6 +146,19 @@ function sleep(ms) {
   return new Promise(r => setTimeout(r, ms));
 }
 
+function classify(risk) {
+  if (risk > 0.85) return "S1 - Critical";
+  if (risk > 0.65) return "S2 - High";
+  if (risk > 0.40) return "S3 - Medium";
+  return "S4 - Low";
+}
+
+function rootCause(scenario) {
+  if (scenario === "bank") return "Ledger dependency overload";
+  if (scenario === "cloud") return "Service mesh propagation failure";
+  return "Signal latency instability";
+}
+
 async function runSim() {
 
   const scenario = document.getElementById("scenario").value;
@@ -144,43 +166,41 @@ async function runSim() {
 
   reset();
 
-  // deterministic seed (no randomness)
   let seed = scenario.length * 17;
   let risk = ((seed % 100) / 100) * model.spread;
   risk = parseFloat(risk.toFixed(2));
 
+  let incident = {
+    id: "INC-" + Math.floor(Math.random() * 99999),
+    scenario,
+    severity: classify(risk),
+    risk,
+    rootCause: rootCause(scenario),
+    status: "RESOLVED (SIMULATED)",
+    time: new Date().toISOString()
+  };
+
   document.getElementById("risk").innerText = risk;
 
-  document.getElementById("out").innerText = JSON.stringify({
-    scenario,
-    engine: "cascade-v3",
-    risk,
-    time: new Date().toISOString()
-  }, null, 2);
+  document.getElementById("out").innerText =
+    JSON.stringify(incident, null, 2);
 
   document.getElementById("log").innerText =
-    "[" + scenario.toUpperCase() + "] CASCADE INIT\n" +
+    `[${scenario.toUpperCase()}] INCIDENT ${incident.id}\n` +
     document.getElementById("log").innerText;
 
-  // cascade propagation
   await sleep(model.delay);
   document.getElementById("engine").className = "node warn";
 
   await sleep(model.delay);
-
   if (risk > 0.4) document.getElementById("core").className = "node warn";
   if (risk > 0.7) document.getElementById("core").className = "node danger";
 
   await sleep(model.delay);
-
   if (risk > 0.6) document.getElementById("api").className = "node warn";
   if (risk > 0.85) document.getElementById("api").className = "node danger";
 
   document.getElementById("audit").className = "node ok";
-
-  document.getElementById("log").innerText =
-    "[" + scenario.toUpperCase() + "] CASCADE COMPLETE | risk=" + risk + "\n" +
-    document.getElementById("log").innerText;
 }
 
 </script>
