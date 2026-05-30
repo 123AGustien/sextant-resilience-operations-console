@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Sextant Resilience Dashboard</title>
+  <title>Sextant Resilience Control Room</title>
 
   <style>
     body {
@@ -17,7 +17,7 @@
       text-align: center;
     }
 
-    .container {
+    .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 20px;
@@ -30,18 +30,33 @@
       border-radius: 10px;
     }
 
+    .node {
+      display: inline-block;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 8px;
+      background: #1f2a44;
+    }
+
+    .danger { background: #7f1d1d !important; }
+    .warn { background: #92400e !important; }
+    .ok { background: #14532d !important; }
+
     button {
       padding: 10px;
       background: #3b82f6;
       color: white;
       border: none;
       cursor: pointer;
+      border-radius: 6px;
     }
 
     pre {
       background: #0b0f1a;
       padding: 10px;
       border-radius: 8px;
+      height: 200px;
+      overflow: auto;
     }
   </style>
 </head>
@@ -49,46 +64,72 @@
 <body>
 
 <header>
-  <h1>Sextant Resilience Dashboard</h1>
-  <p>Live Simulation Control Panel</p>
+  <h1>🧭 Sextant Control Room</h1>
+  <p>Live Infrastructure Resilience Simulation</p>
 </header>
 
-<div class="container">
+<div class="grid">
 
   <div class="card">
-    <h2>Status</h2>
-    <p>ONLINE</p>
-    <button onclick="run()">Run Simulation</button>
+    <h2>Control Panel</h2>
+    <button onclick="runSim()">Run Simulation</button>
+    <p>Risk: <span id="risk">0.00</span></p>
   </div>
 
   <div class="card">
-    <h2>Risk Score</h2>
-    <p id="risk">0.00</p>
+    <h2>Architecture Map</h2>
+    <div id="nodes">
+      <div class="node ok" id="api">FastAPI</div>
+      <div class="node ok" id="core">Core</div>
+      <div class="node ok" id="engine">Engine</div>
+      <div class="node ok" id="audit">Audit</div>
+    </div>
   </div>
 
   <div class="card">
-    <h2>Architecture</h2>
-    <p>FastAPI → Engine → Audit</p>
+    <h2>Event Stream</h2>
+    <pre id="log">SYSTEM INITIALIZED...</pre>
   </div>
 
   <div class="card">
-    <h2>Output</h2>
+    <h2>Simulation Output</h2>
     <pre id="out">{}</pre>
   </div>
 
 </div>
 
 <script>
-function run() {
-  let r = (Math.random() * 0.9).toFixed(2);
+function setState(risk) {
+  let nodes = ["api","core","engine","audit"];
 
-  document.getElementById("risk").innerText = r;
+  nodes.forEach(n => {
+    document.getElementById(n).className = "node ok";
+  });
+
+  if (risk > 0.3) document.getElementById("engine").className = "node warn";
+  if (risk > 0.6) document.getElementById("core").className = "node danger";
+  if (risk > 0.8) document.getElementById("api").className = "node danger";
+}
+
+function runSim() {
+  let risk = parseFloat((Math.random()).toFixed(2));
+
+  setState(risk);
+
+  let event = {
+    time: new Date().toISOString(),
+    event: "CASCADE_SIMULATION",
+    risk: risk
+  };
+
+  document.getElementById("risk").innerText = risk;
+
   document.getElementById("out").innerText =
-    JSON.stringify({
-      event: "NODE_FAILURE",
-      risk: r,
-      time: new Date().toISOString()
-    }, null, 2);
+    JSON.stringify(event, null, 2);
+
+  document.getElementById("log").innerText =
+    "[" + event.time + "] risk=" + risk + "\n" +
+    document.getElementById("log").innerText;
 }
 </script>
 
