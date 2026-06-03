@@ -1,10 +1,10 @@
-🧭 Sextant Resilience Platform (Enterprise Evaluation System v1)
+🧭 Sextant Resilience Platform (v1)
 
 Deterministic infrastructure resilience simulation framework for testing system failure propagation, dependency breakdown, and recovery behavior in controlled environments.
 
 ---
 
-🎯 Purpose
+## 🎯 Purpose
 
 This system is designed for:
 
@@ -17,81 +17,56 @@ It provides a deterministic simulation environment for reproducible engineering 
 
 ---
 
-⚠️ Safety Boundary
+## ⚙️ System Architecture
 
-- Sandbox execution only
-- No production system access
-- No external dependency required for core simulation
-- No persistent data storage outside runtime
+### 1. 🌐 Visual Simulation Layer (GitHub Pages)
+Interactive control room UI running in browser:
 
-This is an engineering validation tool only.
+👉 https://123agustien.github.io/sextant-resilience-operations-console/
 
----
-
-⚡ Quick Start
-
-git clone https://github.com/123AGustien/sextant-resilience-operations-console
-cd sextant-resilience-operations-console
-docker compose up --build
+Features:
+- Node failure simulation
+- Cascade failure simulation
+- Deterministic UI-based outputs
+- No installation required
 
 ---
 
-📡 Example Simulation Request
+### 2. 🧠 Offline Simulation Engine (Python)
 
-Endpoint
+Core logic implemented in Python modules:
 
-POST /simulate
+- `cognitive_core/orchestrator.py`
+- `cognitive_core/evidence_engine.py`
+- `cognitive_core/replay_engine.py`
 
-Request Payload
+This engine runs locally using a Python runtime environment.
 
+Recommended tool:
+Pydroid 3
+
+---
+
+### 3. 🚫 Backend API (NOT IMPLEMENTED)
+
+This project does NOT currently include:
+
+- REST API server
+- `/simulate` endpoint
+- Docker deployment
+- cloud backend execution
+
+These are future expansion options.
+
+---
+
+## 🧪 Example Simulation Model
+
+Input:
+
+```json
 {
   "scenario": "cascade_failure",
   "nodes": 5,
   "load": "high"
 }
-
-Expected Output
-
-{
-  "status": "DEGRADED",
-  "failed_nodes": 2,
-  "recovery_time_ms": 1200,
-  "deterministic": true
-}
-
----
-
-📘 Full Engineer Runbook
-
-See full deterministic execution steps:
-
-"docs/runbook.md"
-
----
-
-🧪 Deterministic Guarantee
-
-Every simulation run produces:
-
-- Identical output for identical input
-- No randomness
-- Audit-traceable logs
-- Replayable execution state
-
----
-
-🏦 Engineering Evaluation Focus
-
-This platform supports:
-
-- Controlled resilience testing
-- Dependency propagation analysis
-- Recovery validation workflows
-- Sandbox-only operational simulations
-- Audit-oriented engineering review
-
----
-
-✅ Repository Entry Point
-
-https://github.com/123AGustien/sextant-resilience-operations-console
