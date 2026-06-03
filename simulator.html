@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sextant Control Room - Simulator</title>
+
+<style>
+body{
+    font-family: Arial;
+    background:#0b0f19;
+    color:#00ffcc;
+    text-align:center;
+    padding:20px;
+}
+
+button{
+    padding:10px;
+    margin:5px;
+    background:black;
+    color:#00ffcc;
+    border:1px solid #00ffcc;
+    cursor:pointer;
+}
+
+#output{
+    margin-top:20px;
+    padding:15px;
+    border:1px solid #00ffcc;
+}
+
+#log{
+    margin-top:20px;
+    border:1px solid #00ffcc;
+    height:180px;
+    overflow-y:auto;
+    padding:10px;
+    text-align:left;
+}
+
+#status{
+    font-weight:bold;
+    font-size:22px;
+}
+
+#riskBox{
+    margin-top:20px;
+    padding:10px;
+    border:1px solid #00ffcc;
+}
+</style>
+</head>
+
+<body>
+
+<h1>SEXTANT CONTROL ROOM</h1>
+
+<h2>
+System Status:
+<span id="status">HEALTHY</span>
+</h2>
+
+<button onclick="runSim('normal')">Normal Operation</button>
+<button onclick="runSim('failure')">Core Banking Failure</button>
+<button onclick="runSim('cascade')">Cascade Failure</button>
+
+<div id="output">Awaiting simulation...</div>
+
+<div id="riskBox">
+<h3>Risk Engine</h3>
+<p>Risk Score: <span id="risk">0</span> / 100</p>
+<p>Risk Level: <span id="level">LOW</span></p>
+</div>
+
+<h3>Event Log</h3>
+<div id="log">System initialized.</div>
+
+<script>
+
+function log(msg){
+    const logBox = document.getElementById("log");
+    const time = new Date().toLocaleTimeString();
+
+    logBox.innerHTML += "<br>[" + time + "] " + msg;
+    logBox.scrollTop = logBox.scrollHeight;
+}
+
+function setRisk(score){
+    document.getElementById("risk").innerText = score;
+
+    let level = "LOW";
+    if(score >= 30) level = "MEDIUM";
+    if(score >= 60) level = "HIGH";
+    if(score >= 85) level = "CRITICAL";
+
+    document.getElementById("level").innerText = level;
+}
+
+function runSim(type){
+
+    const status = document.getElementById("status");
+    const output = document.getElementById("output");
+
+    if(type === "normal"){
+        status.innerText = "HEALTHY";
+        status.style.color = "#00ff00";
+        setRisk(5);
+
+        output.innerHTML = "<h3>Simulation Result</h3><p>All systems operational</p>";
+        log("NORMAL OPERATION");
+        return;
+    }
+
+    if(type === "failure"){
+        status.innerText = "DEGRADED";
+        status.style.color = "#ffcc00";
+        setRisk(55);
+
+        output.innerHTML =
+            "<h3>Simulation Result</h3>" +
+            "<p>CORE BANKING FAILED</p>" +
+            "<p>PAYMENT GATEWAY DEGRADED</p>" +
+            "<p>MOBILE BANKING DEGRADED</p>";
+
+        log("CORE_BANKING FAILED");
+        log("PAYMENT_GATEWAY DEGRADED");
+        log("MOBILE_BANKING DEGRADED");
+        return;
+    }
+
+    if(type === "cascade"){
+        status.innerText = "CRITICAL";
+        status.style.color = "#ff0000";
+        setRisk(88);
+
+        output.innerHTML =
+            "<h3>Simulation Result</h3>" +
+            "<p>CORE BANKING FAILED</p>" +
+            "<p>PAYMENT GATEWAY FAILED</p>" +
+            "<p>MOBILE BANKING DEGRADED</p>";
+
+        log("CASCADE FAILURE STARTED");
+        log("CORE_BANKING FAILED");
+        log("PAYMENT_GATEWAY FAILED");
+        log("MOBILE_BANKING DEGRADED");
+        return;
+    }
+}
+
+</script>
+
+</body>
+</html>
