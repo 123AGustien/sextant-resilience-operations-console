@@ -35,7 +35,7 @@ button{
 #log{
     margin-top:20px;
     border:1px solid #00ffcc;
-    height:220px;
+    height:200px;
     overflow-y:auto;
     padding:10px;
     text-align:left;
@@ -45,6 +45,17 @@ button{
     font-weight:bold;
     font-size:20px;
 }
+
+.node{
+    display:inline-block;
+    padding:10px;
+    margin:10px;
+    border:1px solid #00ffcc;
+}
+
+.healthy{ color:#00ff00; }
+.degraded{ color:#ffcc00; }
+.failed{ color:#ff0000; }
 </style>
 
 </head>
@@ -58,13 +69,17 @@ System Status:
 <span id="status">HEALTHY</span>
 </h2>
 
+<div>
+<div class="node" id="core">CORE BANKING</div>
+<div class="node" id="payment">PAYMENT GATEWAY</div>
+<div class="node" id="mobile">MOBILE BANKING</div>
+</div>
+
 <button onclick="runSim('normal')">Normal Operation</button>
 <button onclick="runSim('failure')">Core Banking Failure</button>
 <button onclick="runSim('cascade')">Cascade Failure</button>
 
-<div id="output">
-Awaiting simulation...
-</div>
+<div id="output">Awaiting simulation...</div>
 
 <div id="impactBox">
 <h3>Impact Analysis</h3>
@@ -87,13 +102,12 @@ function log(msg){
     logBox.scrollTop = logBox.scrollHeight;
 }
 
-function updateImpact(impact, services){
-    document.getElementById("impact").innerText = impact;
-    document.getElementById("services").innerText = services;
+function setNode(id, state){
+    const el = document.getElementById(id);
+    el.className = "node " + state;
 }
 
 function setStatus(state){
-
     const status = document.getElementById("status");
 
     status.innerText = state;
@@ -103,52 +117,65 @@ function setStatus(state){
     if(state==="CRITICAL") status.style.color="#ff0000";
 }
 
+function updateImpact(i,s){
+    document.getElementById("impact").innerText = i;
+    document.getElementById("services").innerText = s;
+}
+
+function resetNodes(){
+    setNode("core","healthy");
+    setNode("payment","healthy");
+    setNode("mobile","healthy");
+}
+
 function runSim(type){
 
-    document.getElementById("log").innerHTML = "System initialized.";
+    document.getElementById("log").innerHTML="System initialized.";
+
+    resetNodes();
 
     log("SIMULATION START: " + type.toUpperCase());
 
     if(type==="normal"){
 
         setStatus("HEALTHY");
-
         updateImpact("LOW","All services operational");
 
         log("NO FAILURE DETECTED");
-
-        log("SYSTEM STATE = HEALTHY");
 
         return;
     }
 
     if(type==="failure"){
 
+        setNode("core","failed");
+        setNode("payment","degraded");
+        setNode("mobile","degraded");
+
         setStatus("CRITICAL");
 
-        log("CORE_BANKING FAILED");
-        log("PAYMENT_GATEWAY DEGRADED");
-        log("MOBILE_BANKING DEGRADED");
+        updateImpact("HIGH","Payment + Mobile impacted");
 
-        updateImpact("HIGH","Payment + Mobile affected");
-
-        log("SYSTEM STATE = CRITICAL");
+        log("CORE BANKING FAILED");
+        log("PAYMENT GATEWAY DEGRADED");
+        log("MOBILE BANKING DEGRADED");
 
         return;
     }
 
     if(type==="cascade"){
 
-        setStatus("CRITICAL");
+        setNode("core","failed");
+        setNode("payment","failed");
+        setNode("mobile","degraded");
 
-        log("CORE_BANKING FAILED");
-        log("PAYMENT_GATEWAY FAILED");
-        log("MOBILE_BANKING DEGRADED");
+        setStatus("CRITICAL");
 
         updateImpact("VERY HIGH","Core + Payment impacted");
 
-        log("CASCADE PROPAGATION COMPLETE");
-        log("SYSTEM STATE = CRITICAL");
+        log("CORE BANKING FAILED");
+        log("PAYMENT GATEWAY FAILED");
+        log("MOBILE BANKING DEGRADED");
 
         return;
     }
