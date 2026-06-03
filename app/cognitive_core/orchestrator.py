@@ -1,4 +1,5 @@
-from typing import Dict, Any, List
+from typing import Dict, Any
+from app.cognitive_core.evidence_engine import EvidenceEngine
 
 
 class CognitiveOrchestrator:
@@ -10,7 +11,7 @@ class CognitiveOrchestrator:
     def __init__(self):
         self.state = "HEALTHY"
         self.previous_state = None
-        self.memory: List[Dict[str, Any]] = []
+        self.evidence = EvidenceEngine()
 
     # -----------------------------
     # MAIN ENTRY
@@ -55,9 +56,9 @@ class CognitiveOrchestrator:
         }
 
         # -----------------------------
-        # AUDIT MEMORY
+        # AUDIT LAYER (NOW ACTIVE)
         # -----------------------------
-        self.memory.append(result)
+        self.evidence.record(event, result)
 
         return result
 
