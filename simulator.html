@@ -106,9 +106,6 @@ function runSim(type){
     const status = document.getElementById("status");
     const output = document.getElementById("output");
 
-    // ---------------------------
-    // ENGINE MODE
-    // ---------------------------
     if(type === "cascade"){
 
         const scenario = {
@@ -122,7 +119,6 @@ function runSim(type){
 
         const result = runSimulation(scenario);
 
-        // SAVE FOR AUDIT EXPORT
         window.lastSimulationResult = result;
 
         status.innerText = result.final_state;
@@ -135,30 +131,18 @@ function runSim(type){
         setRisk(Math.min(100, result.fx.pressure_score * 60));
 
         output.innerHTML =
-            "<h3>📊 SUPERVISORY STRESS REPORT</h3>" +
-
+            "<h3>SUPERVISORY STRESS REPORT</h3>" +
             "<p><b>Scenario:</b> " + result.scenario + "</p>" +
-            "<p><b>FX Pair:</b> USD/IDR</p>" +
-            "<p><b>Exchange Rate:</b> " + result.fx.usd_idr + "</p>" +
-
-            "<hr>" +
-
-            "<p><b>FX Pressure Index:</b> " + result.fx.pressure_score + "</p>" +
-            "<p><b>FX Regime:</b> " + result.fx.regime + "</p>" +
-
-            "<hr>" +
-
+            "<p><b>USD/IDR:</b> " + result.fx.usd_idr + "</p>" +
+            "<p><b>FX Pressure:</b> " + result.fx.pressure_score + "</p>" +
+            "<p><b>Regime:</b> " + result.fx.regime + "</p>" +
             "<p><b>Banking Stress:</b> " + result.system.bankingStress.toFixed(2) + "</p>" +
             "<p><b>Liquidity Stress:</b> " + result.system.liquidityStress.toFixed(2) + "</p>" +
             "<p><b>Equity Stress:</b> " + result.system.equityStress.toFixed(2) + "</p>" +
-
-            "<hr>" +
-
-            "<p><b>System Classification:</b> " + result.final_state + "</p>" +
+            "<p><b>System State:</b> " + result.final_state + "</p>" +
             "<p><b>Interpretation:</b><br>" + result.interpretation + "</p>";
 
         log("ENGINE MODE RUN");
-        log("USD/IDR: " + result.fx.usd_idr);
         log("STATE: " + result.final_state);
 
         return;
@@ -168,7 +152,6 @@ function runSim(type){
         status.innerText = "HEALTHY";
         status.style.color = "#00ff00";
         setRisk(5);
-
         output.innerHTML = "<h3>Simulation Result</h3><p>All systems operational</p>";
         log("NORMAL OPERATION");
         return;
@@ -186,8 +169,6 @@ function runSim(type){
             "<p>MOBILE BANKING DEGRADED</p>";
 
         log("CORE_BANKING FAILED");
-        log("PAYMENT_GATEWAY DEGRADED");
-        log("MOBILE_BANKING DEGRADED");
         return;
     }
 }
@@ -199,21 +180,14 @@ function exportAudit(){
         return;
     }
 
-    const data = window.lastSimulationResult;
-
     const report = {
         report_id: "OJK-" + Date.now(),
         timestamp: new Date().toISOString(),
-
-        scenario: data.scenario,
-
-        fx: data.fx,
-
-        system: data.system,
-
-        classification: data.final_state,
-
-        interpretation: data.interpretation
+        scenario: window.lastSimulationResult.scenario,
+        fx: window.lastSimulationResult.fx,
+        system: window.lastSimulationResult.system,
+        classification: window.lastSimulationResult.final_state,
+        interpretation: window.lastSimulationResult.interpretation
     };
 
     const blob = new Blob([JSON.stringify(report, null, 2)], {
