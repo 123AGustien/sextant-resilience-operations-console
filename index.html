@@ -1,6 +1,9 @@
-<!DOCTYPE html><html>
+<!DOCTYPE html>
+<html>
 <head>
-<title>Sextant Control Room</title><style>
+<title>Sextant Control Room</title>
+
+<style>
 body{
     font-family:Arial;
     background:#0b0f19;
@@ -23,6 +26,12 @@ button{
     border:1px solid #00ffcc;
 }
 
+#impactBox{
+    margin-top:20px;
+    border:1px solid #00ffcc;
+    padding:10px;
+}
+
 #log{
     margin-top:20px;
     border:1px solid #00ffcc;
@@ -36,20 +45,39 @@ button{
     font-weight:bold;
     font-size:20px;
 }
-</style></head><body><h1>SEXTANT CONTROL ROOM</h1><h2>
+</style>
+</head>
+
+<body>
+
+<h1>SEXTANT CONTROL ROOM</h1>
+
+<h2>
 System Status:
 <span id="status">HEALTHY</span>
-</h2><button onclick="runSim('normal')">
-Normal Operation
-</button><button onclick="runSim('failure')">
-Core Banking Failure
-</button><button onclick="runSim('cascade')">
-Cascade Failure
-</button><div id="output">
+</h2>
+
+<button onclick="runSim('normal')">Normal Operation</button>
+<button onclick="runSim('failure')">Core Banking Failure</button>
+<button onclick="runSim('cascade')">Cascade Failure</button>
+
+<div id="output">
 Awaiting simulation...
-</div><h3>Event Log</h3><div id="log">
+</div>
+
+<div id="impactBox">
+<h3>Impact Analysis</h3>
+<p>Impact Level: <span id="impact">-</span></p>
+<p>Affected Services: <span id="services">-</span></p>
+</div>
+
+<h3>Event Log</h3>
+
+<div id="log">
 System initialized.
-</div><script>
+</div>
+
+<script>
 
 function log(msg){
 
@@ -74,15 +102,24 @@ function runSim(type){
     const output =
         document.getElementById("output");
 
+    let impact = "-";
+    let services = "-";
+
     if(type==="normal"){
 
         status.innerText="HEALTHY";
         status.style.color="#00ff00";
 
-        output.innerHTML=
+        impact = "LOW";
+        services = "All services operational";
+
+        output.innerHTML =
             "<h3>Simulation Result</h3>" +
             "<p>State: HEALTHY</p>" +
             "<p>Impact: LOW</p>";
+
+        document.getElementById("impact").innerText = impact;
+        document.getElementById("services").innerText = services;
 
         log("NORMAL OPERATION");
         return;
@@ -93,12 +130,18 @@ function runSim(type){
         status.innerText="CRITICAL";
         status.style.color="#ff0000";
 
-        output.innerHTML=
+        impact = "HIGH";
+        services = "Payment + Mobile banking impacted";
+
+        output.innerHTML =
             "<h3>Simulation Result</h3>" +
             "<p>CORE BANKING FAILED</p>" +
             "<p>PAYMENT GATEWAY DEGRADED</p>" +
             "<p>MOBILE BANKING DEGRADED</p>" +
             "<p>Impact: HIGH</p>";
+
+        document.getElementById("impact").innerText = impact;
+        document.getElementById("services").innerText = services;
 
         log("CORE_BANKING FAILED");
         log("PAYMENT_GATEWAY DEGRADED");
@@ -112,12 +155,18 @@ function runSim(type){
         status.innerText="CRITICAL";
         status.style.color="#ff0000";
 
-        output.innerHTML=
+        impact = "VERY HIGH";
+        services = "Core + Payment systems impacted";
+
+        output.innerHTML =
             "<h3>Simulation Result</h3>" +
             "<p>CORE BANKING FAILED</p>" +
             "<p>PAYMENT GATEWAY FAILED</p>" +
             "<p>MOBILE BANKING DEGRADED</p>" +
             "<p>Impact: VERY HIGH</p>";
+
+        document.getElementById("impact").innerText = impact;
+        document.getElementById("services").innerText = services;
 
         log("CASCADE FAILURE STARTED");
         log("CORE_BANKING FAILED");
@@ -128,5 +177,7 @@ function runSim(type){
     }
 }
 
-</script></body>
+</script>
+
+</body>
 </html>
