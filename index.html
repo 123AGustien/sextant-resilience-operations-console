@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Sextant Control Room v4 FINAL</title>
+<title>Sextant Control Room v5 Evidence Engine</title>
 
 <style>
 body{
@@ -26,16 +26,10 @@ button{
     border:1px solid #00ffcc;
 }
 
-#impactBox{
-    margin-top:20px;
-    border:1px solid #00ffcc;
-    padding:10px;
-}
-
 #log{
     margin-top:20px;
     border:1px solid #00ffcc;
-    height:220px;
+    height:200px;
     overflow-y:auto;
     padding:10px;
     text-align:left;
@@ -46,13 +40,19 @@ button{
     font-size:20px;
 }
 
+#panel{
+    margin-top:20px;
+    border:1px solid #00ffcc;
+    padding:10px;
+    text-align:left;
+}
+
 /* GRAPH */
 .graph{
     margin-top:20px;
     display:flex;
     justify-content:center;
     gap:20px;
-    align-items:center;
 }
 
 .node{
@@ -60,36 +60,11 @@ button{
     padding:10px;
     width:140px;
     cursor:pointer;
-    user-select:none;
-    transition: all 0.4s ease;
 }
 
-.node:hover{
-    opacity:0.85;
-    transform:scale(1.05);
-}
-
-.line{
-    width:40px;
-    height:2px;
-    background:#00ffcc;
-}
-
-/* STATES */
 .healthy{ color:#00ff00; }
 .degraded{ color:#ffcc00; }
 .failed{ color:#ff0000; }
-
-/* ANIMATION */
-.shock{
-    animation:pulse 0.5s ease-in-out 2;
-}
-
-@keyframes pulse{
-    0%{transform:scale(1);}
-    50%{transform:scale(1.1);}
-    100%{transform:scale(1);}
-}
 </style>
 
 </head>
@@ -103,142 +78,215 @@ System Status:
 <span id="status">HEALTHY</span>
 </h2>
 
-<!-- DEPENDENCY GRAPH -->
 <div class="graph">
-    <div id="core" class="node healthy" onclick="failNode('core')">
-        CORE BANKING
-    </div>
-
-    <div class="line"></div>
-
-    <div id="payment" class="node healthy" onclick="failNode('payment')">
-        PAYMENT
-    </div>
-
-    <div class="line"></div>
-
-    <div id="mobile" class="node healthy" onclick="failNode('mobile')">
-        MOBILE
-    </div>
+    <div id="core" class="node healthy" onclick="fail('core')">CORE BANKING</div>
+    <div id="payment" class="node healthy" onclick="fail('payment')">PAYMENT</div>
+    <div id="mobile" class="node healthy" onclick="fail('mobile')">MOBILE</div>
 </div>
 
-<button onclick="resetSystem()">Reset System</button>
-<button onclick="autoCascade()">Run Cascade Simulation</button>
+<button onclick="resetSystem()">Reset</button>
+<button onclick="runCascade()">Run Scenario</button>
+<button onclick="exportEvidence()">Export Evidence Pack</button>
 
 <div id="output">Awaiting simulation...</div>
 
-<div id="impactBox">
-<h3>Impact Analysis</h3>
-<p>Impact: <span id="impact">-</span></p>
-<p>Services: <span id="services">-</span></p>
-</div>
-
-<h3>Incident Timeline</h3>
+<h3>Incident Log</h3>
 <div id="log">System initialized.</div>
+
+<h3>Evidence Panel</h3>
+<pre id="panel">No evidence generated.</pre>
 
 <script>
 
+/* ---------------------------
+   STATE + EVIDENCE STORE
+----------------------------*/
+
+const evidence = {
+    scenarioId: null,
+    startTime: null,
+    endTime: null,
+    events: [],
+    finalState: null
+};
+
+/* ---------------------------
+   UTILITIES
+----------------------------*/
+
 function now(){
-    return new Date().toLocaleTimeString();
+    return new Date().toISOString();
 }
 
-function log(msg){
+function log(msg,type="INFO"){
+
     const box = document.getElementById("log");
-    box.innerHTML += "<br>[" + now() + "] " + msg;
+    const time = new Date().toLocaleTimeString();
+
+    const entry = {
+        time: now(),
+        type: type,
+        message: msg
+    };
+
+    evidence.events.push(entry);
+
+    box.innerHTML += `<br>[${time}] ${msg}`;
     box.scrollTop = box.scrollHeight;
 }
 
+/* ---------------------------
+   NODE CONTROL
+----------------------------*/
+
 function setNode(id,state){
-    const el = document.getElementById(id);
-    el.className = "node " + state;
-
-    el.classList.add("shock");
-    setTimeout(()=>el.classList.remove("shock"),500);
+    document.getElementById(id).className = "node " + state;
 }
 
-function setStatus(state){
-    const el = document.getElementById("status");
-
-    el.innerText = state;
-
-    if(state==="HEALTHY") el.style.color="#00ff00";
-    if(state==="DEGRADED") el.style.color="#ffcc00";
-    if(state==="CRITICAL") el.style.color="#ff0000";
-}
-
-function updateImpact(i,s){
-    document.getElementById("impact").innerText = i;
-    document.getElementById("services").innerText = s;
-}
+/* ---------------------------
+   RESET
+----------------------------*/
 
 function resetSystem(){
+
+    evidence.scenarioId = "SCN-" + Math.floor(Math.random()*99999);
+    evidence.startTime = now();
+    evidence.events = [];
 
     setNode("core","healthy");
     setNode("payment","healthy");
     setNode("mobile","healthy");
 
-    setStatus("HEALTHY");
-
-    updateImpact("-","-");
+    document.getElementById("status").innerText = "HEALTHY";
+    document.getElementById("status").style.color = "#00ff00";
 
     document.getElementById("log").innerHTML = "System initialized.";
+    document.getElementById("panel").innerText = "Evidence reset.";
 
-    log("SYSTEM RESET COMPLETE");
+    log("SYSTEM RESET");
 }
 
-function failNode(node){
+/* ---------------------------
+   FAILURE INJECTION
+----------------------------*/
 
-    log(node.toUpperCase() + " MANUAL FAILURE");
+function fail(node){
+
+    log(node.toUpperCase() + " FAILURE INJECTED","FAIL");
 
     setNode(node,"failed");
 
-    if(node==="core") cascadeFromCore();
-    if(node==="payment") cascadeFromPayment();
-    if(node==="mobile") mobileOnlyImpact();
+    propagate(node);
+    evaluate();
 }
 
-function cascadeFromCore(){
+/* ---------------------------
+   PROPAGATION RULES
+----------------------------*/
 
-    setStatus("CRITICAL");
-    updateImpact("VERY HIGH","Core + downstream systems");
+function propagate(node){
 
-    setTimeout(()=>{
-        setNode("payment","degraded");
-        log("PAYMENT DEGRADED (dependency on CORE)");
-    },500);
+    if(node === "core"){
 
-    setTimeout(()=>{
-        setNode("mobile","degraded");
-        log("MOBILE DEGRADED (cascade from PAYMENT)");
-    },1100);
+        setTimeout(()=>{
+            setNode("payment","degraded");
+            log("PAYMENT DEGRADED (dependency on CORE)");
+        },500);
+
+        setTimeout(()=>{
+            setNode("mobile","degraded");
+            log("MOBILE DEGRADED (cascade from PAYMENT)");
+        },1000);
+    }
+
+    if(node === "payment"){
+
+        setTimeout(()=>{
+            setNode("mobile","degraded");
+            log("MOBILE DEGRADED (dependency on PAYMENT)");
+        },500);
+    }
 }
 
-function cascadeFromPayment(){
+/* ---------------------------
+   SYSTEM STATE
+----------------------------*/
 
-    setStatus("CRITICAL");
-    updateImpact("HIGH","Payment + mobile impacted");
+function evaluate(){
 
-    setTimeout(()=>{
-        setNode("mobile","degraded");
-        log("MOBILE DEGRADED (dependency on PAYMENT)");
-    },600);
+    const core = document.getElementById("core").className;
+    const payment = document.getElementById("payment").className;
+
+    let state = "HEALTHY";
+
+    if(core.includes("failed")) state = "CRITICAL";
+    else if(payment.includes("failed")) state = "DEGRADED";
+
+    document.getElementById("status").innerText = state;
+
+    if(state==="HEALTHY") document.getElementById("status").style.color="#00ff00";
+    if(state==="DEGRADED") document.getElementById("status").style.color="#ffcc00";
+    if(state==="CRITICAL") document.getElementById("status").style.color="#ff0000";
+
+    evidence.finalState = state;
 }
 
-function mobileOnlyImpact(){
+/* ---------------------------
+   SCENARIO RUNNER
+----------------------------*/
 
-    setStatus("DEGRADED");
-    updateImpact("MEDIUM","Single service impact");
-}
-
-function autoCascade(){
+function runCascade(){
 
     resetSystem();
 
-    log("AUTO CASCADE SIMULATION START");
+    log("SCENARIO START: CASCADE TEST");
+
+    setTimeout(()=>fail("core"),500);
 
     setTimeout(()=>{
-        failNode("core");
-    },500);
+        evidence.endTime = now();
+        generateEvidence();
+    },2500);
+}
+
+/* ---------------------------
+   EVIDENCE ENGINE
+----------------------------*/
+
+function generateEvidence(){
+
+    const pack = {
+        scenarioId: evidence.scenarioId,
+        startTime: evidence.startTime,
+        endTime: evidence.endTime,
+        totalEvents: evidence.events.length,
+        finalState: evidence.finalState,
+        events: evidence.events
+    };
+
+    document.getElementById("panel").innerText =
+        JSON.stringify(pack, null, 2);
+
+    log("EVIDENCE PACK GENERATED");
+}
+
+/* ---------------------------
+   EXPORT
+----------------------------*/
+
+function exportEvidence(){
+
+    const data = document.getElementById("panel").innerText;
+
+    const blob = new Blob([data], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sextant_evidence_pack.json";
+    a.click();
+
+    log("EVIDENCE EXPORTED");
 }
 
 </script>
