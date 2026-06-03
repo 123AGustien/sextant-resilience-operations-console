@@ -1,74 +1,57 @@
 <!DOCTYPE html><html>
 <head>
-    <title>Sextant Control Room</title><style>
-    body {
-        font-family: Arial;
-        background: #0b0f19;
-        color: #00ffcc;
-        text-align: center;
-    }
+<title>Sextant Control Room</title><style>
+body{
+    font-family:Arial;
+    background:#0b0f19;
+    color:#00ffcc;
+    text-align:center;
+}
 
-    button {
-        padding: 10px;
-        margin: 5px;
-        background: black;
-        color: #00ffcc;
-        border: 1px solid #00ffcc;
-        cursor: pointer;
-    }
+button{
+    padding:10px;
+    margin:5px;
+    background:black;
+    color:#00ffcc;
+    border:1px solid #00ffcc;
+    cursor:pointer;
+}
 
-    #output {
-        margin-top: 20px;
-        padding: 10px;
-        border: 1px solid #00ffcc;
-    }
+#output{
+    margin-top:20px;
+    padding:10px;
+    border:1px solid #00ffcc;
+}
 
-    #log {
-        margin-top: 20px;
-        border: 1px solid #00ffcc;
-        height: 150px;
-        overflow-y: auto;
-        padding: 10px;
-        text-align: left;
-    }
+#log{
+    margin-top:20px;
+    border:1px solid #00ffcc;
+    height:180px;
+    overflow-y:auto;
+    padding:10px;
+    text-align:left;
+}
 
-    #status {
-        font-weight: bold;
-        font-size: 20px;
-    }
-</style>
-
-</head><body><h1>SEXTANT CONTROL ROOM</h1><h2>
+#status{
+    font-weight:bold;
+    font-size:20px;
+}
+</style></head><body><h1>SEXTANT CONTROL ROOM</h1><h2>
 System Status:
-<span id="status">UNKNOWN</span>
-</h2><button onclick="runSim('normal')">Normal Operation</button>
-<button onclick="runSim('failure')">Core Banking Failure</button>
-<button onclick="runSim('cascade')">Cascade Failure</button>
-
-<div id="output">
-    Awaiting simulation...
+<span id="status">HEALTHY</span>
+</h2><button onclick="runSim('normal')">
+Normal Operation
+</button><button onclick="runSim('failure')">
+Core Banking Failure
+</button><button onclick="runSim('cascade')">
+Cascade Failure
+</button><div id="output">
+Awaiting simulation...
 </div><h3>Event Log</h3><div id="log">
-    No events recorded.
+System initialized.
 </div><script>
 
-const system = {
-    core_banking: {
-        status: "healthy",
-        dependsOn: []
-    },
-
-    payment_gateway: {
-        status: "healthy",
-        dependsOn: ["core_banking"]
-    },
-
-    mobile_banking: {
-        status: "healthy",
-        dependsOn: ["payment_gateway"]
-    }
-};
-
-function log(msg) {
+function log(msg){
 
     const logBox =
         document.getElementById("log");
@@ -77,182 +60,73 @@ function log(msg) {
         new Date().toLocaleTimeString();
 
     logBox.innerHTML +=
-        "[" + time + "] " +
-        msg +
-        "<br>";
+        "<br>[" + time + "] " + msg;
 
     logBox.scrollTop =
         logBox.scrollHeight;
 }
 
-function resetSystem() {
+function runSim(type){
 
-    for (let node in system) {
-        system[node].status =
-            "healthy";
+    const status =
+        document.getElementById("status");
+
+    const output =
+        document.getElementById("output");
+
+    if(type==="normal"){
+
+        status.innerText="HEALTHY";
+        status.style.color="#00ff00";
+
+        output.innerHTML=
+            "<h3>Simulation Result</h3>" +
+            "<p>State: HEALTHY</p>" +
+            "<p>Impact: LOW</p>";
+
+        log("NORMAL OPERATION");
+        return;
+    }
+
+    if(type==="failure"){
+
+        status.innerText="CRITICAL";
+        status.style.color="#ff0000";
+
+        output.innerHTML=
+            "<h3>Simulation Result</h3>" +
+            "<p>CORE BANKING FAILED</p>" +
+            "<p>PAYMENT GATEWAY DEGRADED</p>" +
+            "<p>MOBILE BANKING DEGRADED</p>" +
+            "<p>Impact: HIGH</p>";
+
+        log("CORE_BANKING FAILED");
+        log("PAYMENT_GATEWAY DEGRADED");
+        log("MOBILE_BANKING DEGRADED");
+
+        return;
+    }
+
+    if(type==="cascade"){
+
+        status.innerText="CRITICAL";
+        status.style.color="#ff0000";
+
+        output.innerHTML=
+            "<h3>Simulation Result</h3>" +
+            "<p>CORE BANKING FAILED</p>" +
+            "<p>PAYMENT GATEWAY FAILED</p>" +
+            "<p>MOBILE BANKING DEGRADED</p>" +
+            "<p>Impact: VERY HIGH</p>";
+
+        log("CASCADE FAILURE STARTED");
+        log("CORE_BANKING FAILED");
+        log("PAYMENT_GATEWAY FAILED");
+        log("MOBILE_BANKING DEGRADED");
+
+        return;
     }
 }
-
-function injectFailure(node) {
-
-    system[node].status =
-        "failed";
-
-    log(
-        node.toUpperCase() +
-        " FAILED"
-    );
-}
-
-function propagate() {
-
-    let changed = true;
-
-    while (changed) {
-
-        changed = false;
-
-        for (let node in system) {
-
-            for (
-                let dep of system[node].dependsOn
-            ) {
-
-                if (
-                    system[dep].status === "failed" &&
-                    system[node].status !== "failed"
-                ) {
-
-                    system[node].status =
-                        "degraded";
-
-                    log(
-                        node.toUpperCase() +
-                        " DEGRADED"
-                    );
-
-                    changed = true;
-                }
-            }
-        }
-    }
-}
-
-function computeState() {
-
-    const states =
-        Object.values(system)
-        .map(n => n.status);
-
-    if (
-        states.includes("failed")
-    ) {
-        return "CRITICAL";
-    }
-
-    if (
-        states.includes("degraded")
-    ) {
-        return "DEGRADED";
-    }
-
-    return "HEALTHY";
-}
-
-function render() {
-
-    const container =
-        document.getElementById(
-            "output"
-        );
-
-    const state =
-        computeState();
-
-    const statusEl =
-        document.getElementById(
-            "status"
-        );
-
-    statusEl.innerText =
-        state;
-
-    if (state === "HEALTHY") {
-        statusEl.style.color =
-            "#00ff00";
-    }
-
-    if (state === "DEGRADED") {
-        statusEl.style.color =
-            "#ffcc00";
-    }
-
-    if (state === "CRITICAL") {
-        statusEl.style.color =
-            "#ff0000";
-    }
-
-    container.innerHTML =
-        "<h3>Simulation Complete</h3>" +
-        "<p>System State: " +
-        state +
-        "</p>";
-}
-
-function runSim(type) {
-
-    resetSystem();
-
-    log(
-        "Simulation: " +
-        type.toUpperCase()
-    );
-
-    if (
-        type === "normal"
-    ) {
-
-        log(
-            "No failures injected"
-        );
-    }
-
-    if (
-        type === "failure"
-    ) {
-
-        injectFailure(
-            "core_banking"
-        );
-    }
-
-    if (
-        type === "cascade"
-    ) {
-
-        injectFailure(
-            "core_banking"
-        );
-
-        injectFailure(
-            "payment_gateway"
-        );
-    }
-
-    setTimeout(() => {
-
-        propagate();
-
-        render();
-
-        log(
-            "Simulation complete"
-        );
-
-    }, 800);
-}
-
-render();
 
 </script></body>
 </html>
