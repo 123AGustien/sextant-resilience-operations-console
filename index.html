@@ -110,6 +110,7 @@ function computeState() {
 
     if (states.includes("failed")) return "CRITICAL";
     if (states.includes("degraded")) return "DEGRADED";
+
     return "HEALTHY";
 }
 
@@ -122,9 +123,17 @@ function render() {
 
     statusEl.innerText = state;
 
-    if (state === "HEALTHY") statusEl.style.color = "#00ff00";
-    if (state === "DEGRADED") statusEl.style.color = "#ffcc00";
-    if (state === "CRITICAL") statusEl.style.color = "#ff0000";
+    if (state === "HEALTHY") {
+        statusEl.style.color = "#00ff00";
+    }
+
+    if (state === "DEGRADED") {
+        statusEl.style.color = "#ffcc00";
+    }
+
+    if (state === "CRITICAL") {
+        statusEl.style.color = "#ff0000";
+    }
 
     container.innerHTML =
         "<h3>Simulation Complete</h3>" +
@@ -136,12 +145,17 @@ function runSim(type) {
     resetSystem();
     log("Simulation: " + type.toUpperCase());
 
+    if (type === "normal") {
+        log("No failures injected");
+    }
+
     if (type === "failure") {
         injectFailure("db");
     }
 
     if (type === "cascade") {
         injectFailure("db");
+        injectFailure("auth");
     }
 
     setTimeout(() => {
