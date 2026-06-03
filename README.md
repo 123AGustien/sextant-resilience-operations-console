@@ -1,72 +1,72 @@
-🧭 Sextant Resilience Platform (v1)
+🧭 Sextant Resilience Platform (Enterprise Evaluation System v1)
 
 Deterministic infrastructure resilience simulation framework for testing system failure propagation, dependency breakdown, and recovery behavior in controlled environments.
 
 ---
 
-## 🎯 Purpose
+## 🚀 Launch Control Room
 
-This system is designed for:
+Tap below to open the live simulation:
 
-- SRE / Platform Engineering validation
-- Infrastructure resilience testing
-- CI/CD failure simulation
-- Regulated system behavior analysis (FinTech / enterprise environments)
+[![▶ Launch Control Room](https://img.shields.io/badge/LAUNCH-CONTROL%20ROOM-00ffcc?style=for-the-badge)](https://123agustien.github.io/sextant-resilience-operations-console/)
 
-It provides a deterministic simulation environment for reproducible engineering evaluation.
+---
+
+## 🎮 Quick Actions (Simulator Access)
+
+👉 Open System:
+https://123agustien.github.io/sextant-resilience-operations-console/
+
+---
+
+## 🎯 System Modes
+
+### 🟢 Normal Operation
+Simulates healthy infrastructure state
+
+### 🟡 Node Failure
+Simulates single-node degradation and recovery response
+
+### 🔴 Cascade Failure
+Simulates multi-node cascading system failure
+
+---
+
+## 🧠 Deterministic Engine
+
+- Same input → same output  
+- No randomness  
+- Fully reproducible simulation logic  
+- Audit-style evaluation design  
 
 ---
 
 ## ⚙️ System Architecture
 
-### 1. 🌐 Visual Simulation Layer (GitHub Pages)
-Interactive control room UI running in browser:
+### 🌐 Visual Layer (Active)
+- GitHub Pages UI simulator
+- Mobile-friendly control room
+- Button-based interaction system
 
-👉 https://123agustien.github.io/sextant-resilience-operations-console/
+### 🧠 Logic Layer (Offline)
+- `orchestrator.py`
+- `evidence_engine.py`
+- `replay_engine.py`
 
-Features:
-- Node failure simulation
-- Cascade failure simulation
-- Deterministic UI-based outputs
-- No installation required
-
----
-
-### 2. 🧠 Offline Simulation Engine (Python)
-
-Core logic implemented in Python modules:
-
-- `cognitive_core/orchestrator.py`
-- `cognitive_core/evidence_engine.py`
-- `cognitive_core/replay_engine.py`
-
-This engine runs locally using a Python runtime environment.
-
-Recommended tool:
-Pydroid 3
+Runs only with Python runtime (not on GitHub Pages)
 
 ---
 
-### 3. 🚫 Backend API (NOT IMPLEMENTED)
+## 🚫 Not Included (Yet)
 
-This project does NOT currently include:
-
-- REST API server
+- Backend API server
+- Docker execution layer
 - `/simulate` endpoint
-- Docker deployment
-- cloud backend execution
 
-These are future expansion options.
+These are future expansion layers.
 
 ---
 
-## 🧪 Example Simulation Model
+## 📡 Repository Entry Point
 
-Input:
-
-```json
-{
-  "scenario": "cascade_failure",
-  "nodes": 5,
-  "load": "high"
-}
+https://github.com/123AGustien/sextant-resilience-operations-console
