@@ -1,27 +1,135 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sextant Simulator</title>
-    <link rel="stylesheet" href="assets/styles.css">
+<title>Sextant Control Room</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0b0f19;
+    color: #e6f7ff;
+    text-align: center;
+}
+
+button {
+    margin: 8px;
+    padding: 10px;
+    background: black;
+    color: #2bd4ff;
+    border: 1px solid #2bd4ff;
+    cursor: pointer;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.node {
+    border: 1px solid #2bd4ff;
+    padding: 15px;
+    background: #111827;
+}
+
+.green { color: lime; }
+.amber { color: orange; }
+.red { color: red; }
+.critical { color: magenta; }
+
+pre {
+    text-align: left;
+    background: #111;
+    padding: 10px;
+    overflow: auto;
+}
+</style>
 </head>
 
 <body>
 
-<h2>SEXTANT SIMULATOR</h2>
+<h2>SEXTANT CONTROL ROOM</h2>
 
 <h3>Status: <span id="status">BOOTING</span></h3>
 
+<!-- BUTTONS -->
 <button onclick="runSim('normal')">Normal</button>
 <button onclick="runSim('failure')">Failure</button>
 <button onclick="runSim('cascade')">Cascade</button>
 
+<!-- NODE VISUALS -->
+<div class="grid">
+
+    <div class="node" id="fx">FX NODE</div>
+    <div class="node" id="bank">BANK NODE</div>
+    <div class="node" id="liq">LIQUIDITY NODE</div>
+    <div class="node" id="eq">EQUITY NODE</div>
+    <div class="node" id="conf">CONFIDENCE NODE</div>
+
+</div>
+
+<!-- OUTPUT -->
 <div id="output">Loading engine...</div>
 
-<!-- ENGINE LOAD (STRICT ORDER) -->
 <script src="models/fx_model.js"></script>
 <script src="models/contagion_model.js"></script>
 <script src="core_engine/simulation_engine.js"></script>
-<script src="ui/controller.js"></script>
+
+<script>
+
+function setNode(id, value) {
+
+    const el = document.getElementById(id);
+
+    value = value || 0;
+
+    let state =
+        value < 0.3 ? "green" :
+        value < 0.6 ? "amber" :
+        value < 0.85 ? "red" :
+        "critical";
+
+    el.className = "node " + state;
+    el.innerText = id.toUpperCase() + ": " + value.toFixed(2);
+}
+
+function runSim(type) {
+
+    const status = document.getElementById("status");
+    const output = document.getElementById("output");
+
+    let scenario = { name: "TEST" };
+
+    if (type === "cascade") {
+        scenario = {
+            name: "STRESS TEST",
+            oil_price: 110,
+            capital_flow: "outflow",
+            inflation_pressure: "rising"
+        };
+    }
+
+    const result = runSimulation(scenario);
+
+    window.lastResult = result;
+
+    status.innerText = result.final_state || "UNKNOWN";
+
+    output.innerHTML =
+        "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
+
+    const s = result?.system || {};
+
+    setNode("fx", s.fxStress);
+    setNode("bank", s.bankingStress);
+    setNode("liq", s.liquidityStress);
+    setNode("eq", s.equityStress);
+    setNode("conf", s.confidenceDrop);
+}
+
+</script>
 
 </body>
 </html>
