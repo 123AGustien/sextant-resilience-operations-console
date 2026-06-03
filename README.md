@@ -4,69 +4,77 @@ Deterministic infrastructure resilience simulation framework for testing system 
 
 ---
 
-## 🚀 Launch Control Room
+🚀 Launch Control Room
 
 Tap below to open the live simulation:
 
-[![▶ Launch Control Room](https://img.shields.io/badge/LAUNCH-CONTROL%20ROOM-00ffcc?style=for-the-badge)](https://123agustien.github.io/sextant-resilience-operations-console/)
+""▶ Launch Control Room" (https://img.shields.io/badge/LAUNCH-CONTROL%20ROOM-00ffcc?style=for-the-badge)" (https://123agustien.github.io/sextant-resilience-operations-console/)
 
 ---
 
-## 🎮 Quick Actions (Simulator Access)
+🎮 Quick Actions (Simulator Access)
 
 👉 Open System:
+
 https://123agustien.github.io/sextant-resilience-operations-console/
 
 ---
 
-## 🎯 System Modes
+🖥 Current Simulator Features
 
-### 🟢 Normal Operation
-Simulates healthy infrastructure state
-
-### 🟡 Node Failure
-Simulates single-node degradation and recovery response
-
-### 🔴 Cascade Failure
-Simulates multi-node cascading system failure
-
----
-
-## 🧠 Deterministic Engine
-
-- Same input → same output  
-- No randomness  
-- Fully reproducible simulation logic  
-- Audit-style evaluation design  
+- Normal Operation
+- Node Failure
+- Cascade Failure
+- Event Logging
+- System Status Monitoring
+- Visual Node Display
+- Deterministic Simulation Logic
 
 ---
 
-## ⚙️ System Architecture
+🌐 Deployment Model
 
-### 🌐 Visual Layer (Active)
-- GitHub Pages UI simulator
-- Mobile-friendly control room
-- Button-based interaction system
+Current Version:
 
-### 🧠 Logic Layer (Offline)
-- `orchestrator.py`
-- `evidence_engine.py`
-- `replay_engine.py`
+- GitHub Pages Hosted
+- Frontend Only
+- HTML / CSS / JavaScript
+- Mobile Compatible
 
-Runs only with Python runtime (not on GitHub Pages)
+No backend services are required for the current simulation environment.
 
 ---
 
-## 🚫 Not Included (Yet)
+🏗 Architecture
 
-- Backend API server
-- Docker execution layer
-- `/simulate` endpoint
+DB → AUTH → GATEWAY
 
-These are future expansion layers.
+Simulation demonstrates dependency propagation and resilience behavior within a controlled sandbox environment.
 
 ---
 
-## 📡 Repository Entry Point
+⚠️ Safety Boundary
+
+- Sandbox execution only
+- No production system access
+- No external infrastructure connectivity
+- No persistent storage
+- Engineering validation purposes only
+
+---
+
+📍 Current Development Phase
+
+✅ Phase 1 – Simulation Engine
+
+✅ Phase 2 – Visual Node Display
+
+🔲 Phase 3 – Replay Timeline (Future)
+
+🔲 Phase 4 – Scenario Library (Future)
+
+---
+
+📡 Repository Entry Point
 
 https://github.com/123AGustien/sextant-resilience-operations-console
