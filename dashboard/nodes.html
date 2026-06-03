@@ -76,6 +76,10 @@ function setNode(id, value) {
 
     const el = document.getElementById(id);
 
+    if (value === undefined || value === null || isNaN(value)) {
+        value = 0;
+    }
+
     let state =
         value < 0.3 ? "green" :
         value < 0.6 ? "amber" :
@@ -90,6 +94,11 @@ function run(type) {
 
     const status = document.getElementById("status");
 
+    if (typeof runSimulation !== "function") {
+        status.innerText = "ENGINE MISSING";
+        return;
+    }
+
     let scenario = { name: "NODE TEST" };
 
     if (type === "cascade") {
@@ -103,11 +112,23 @@ function run(type) {
 
     const result = runSimulation(scenario);
 
+    if (!result) {
+        status.innerText = "ENGINE ERROR";
+        return;
+    }
+
     window.lastResult = result;
 
-    status.innerText = result.final_state;
+    status.innerText = result.final_state || "UNKNOWN";
 
-    const s = result.system;
+    const s = result?.system || {
+        fxStress: 0,
+        bankingStress: 0,
+        liquidityStress: 0,
+        equityStress: 0,
+        confidenceDrop: 0,
+        systemState: "SAFE"
+    };
 
     setNode("fx", s.fxStress);
     setNode("bank", s.bankingStress);
