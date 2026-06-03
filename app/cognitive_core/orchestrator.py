@@ -1,20 +1,30 @@
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 
 class CognitiveOrchestrator:
     """
     Deterministic resilience simulation engine.
+    Stateful multi-agent system for cascade simulation.
     """
 
     def __init__(self):
         self.state = "HEALTHY"
-        self.memory = []
+        self.previous_state = None
+        self.memory: List[Dict[str, Any]] = []
 
+    # -----------------------------
+    # MAIN ENTRY
+    # -----------------------------
     def evaluate(self, event: Dict[str, Any]) -> Dict[str, Any]:
-        event_type = event.get("type", event.get("event"))
+
+        event_type = event["type"]
         node = event.get("node", "unknown")
 
-        # 1. State transition logic
+        self.previous_state = self.state
+
+        # -----------------------------
+        # STATE TRANSITION LOGIC
+        # -----------------------------
         if event_type == "node_failure":
             self.state = "DEGRADED"
             agents = self._run_agents(node, failure=True)
@@ -27,7 +37,9 @@ class CognitiveOrchestrator:
             self.state = "HEALTHY"
             agents = [{"name": "noop_agent", "result": "NO_ACTION"}]
 
-        # 2. Build deterministic response
+        # -----------------------------
+        # RESPONSE BUILD
+        # -----------------------------
         result = {
             "event": event,
             "simulation": {
@@ -37,18 +49,24 @@ class CognitiveOrchestrator:
             },
             "system_state": {
                 "current": self.state,
-                "previous": "HEALTHY",
+                "previous": self.previous_state,
                 "impact_level": self._impact_level()
             }
         }
 
-        # 3. store memory (audit-style)
+        # -----------------------------
+        # AUDIT MEMORY
+        # -----------------------------
         self.memory.append(result)
 
         return result
 
+    # -----------------------------
+    # AGENT LAYER
+    # -----------------------------
     def _run_agents(self, node: str, failure: bool = False, cascade: bool = False):
-        agents = [
+
+        return [
             {
                 "name": "sre_agent",
                 "result": "DEGRADED_STATE_DETECTED" if failure else "OK"
@@ -62,11 +80,14 @@ class CognitiveOrchestrator:
                 "result": "RECOVERY_STRATEGY_IDENTIFIED" if failure else "NO_ACTION_REQUIRED"
             }
         ]
-        return agents
 
+    # -----------------------------
+    # IMPACT LOGIC
+    # -----------------------------
     def _impact_level(self):
+
         if self.state == "HEALTHY":
             return "LOW"
-        if self.state == "DEGRADED":
+        elif self.state == "DEGRADED":
             return "MEDIUM"
         return "HIGH"
