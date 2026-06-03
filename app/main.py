@@ -8,13 +8,20 @@ app = FastAPI(
     description="Deterministic resilience simulation engine"
 )
 
-# API routes
-app.include_router(api_router)
+# -----------------------------
+# API Layer
+# -----------------------------
+app.include_router(api_router, prefix="/api_v1")
 
-# Dashboard routes
-app.include_router(dashboard_router)
+# -----------------------------
+# Dashboard Layer
+# -----------------------------
+app.include_router(dashboard_router, prefix="/dashboard")
 
 
+# -----------------------------
+# Health / Root Endpoint
+# -----------------------------
 @app.get("/")
 def root():
     return {
