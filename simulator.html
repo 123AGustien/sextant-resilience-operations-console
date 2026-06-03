@@ -3,11 +3,11 @@
 window.engine = {
     ready: false,
     healthy: false,
-    lastHeartbeat: null
+    lastHeartbeat: 0
 };
 
 // -----------------------------
-// BOOT SEQUENCE (SAFE INIT)
+// BOOT SEQUENCE
 // -----------------------------
 window.onload = function () {
 
@@ -15,42 +15,32 @@ window.onload = function () {
 
     setTimeout(() => {
 
-        try {
-
-            if (typeof runSimulation !== "function") {
-                output.innerHTML = "❌ Engine not loaded (simulation_engine.js missing)";
-                window.engine.ready = false;
-                window.engine.healthy = false;
-                return;
-            }
-
-            window.engine.ready = true;
-            window.engine.healthy = true;
-            window.engine.lastHeartbeat = Date.now();
-
-            output.innerHTML = "✅ System Ready (Unified Controller Active)";
-
-        } catch (e) {
-            output.innerHTML = "❌ Boot error: " + e.message;
-            window.engine.ready = false;
-            window.engine.healthy = false;
+        if (typeof runSimulation !== "function") {
+            output.innerHTML =
+                "❌ Engine missing: core_engine/simulation_engine.js";
+            return;
         }
+
+        window.engine.ready = true;
+        window.engine.healthy = true;
+        window.engine.lastHeartbeat = Date.now();
+
+        output.innerHTML =
+            "✅ SYSTEM READY — UNIFIED CONTROLLER ACTIVE";
 
     }, 300);
 };
 
 // -----------------------------
-// HEARTBEAT CHECK (ANTI-FREEZE)
+// HEARTBEAT
 // -----------------------------
-function engineHeartbeat() {
-    if (!window.engine.lastHeartbeat) return false;
-
-    const now = Date.now();
-    return (now - window.engine.lastHeartbeat) < 10000; // 10s safety window
+function engineAlive() {
+    return window.engine.lastHeartbeat &&
+           (Date.now() - window.engine.lastHeartbeat < 15000);
 }
 
 // -----------------------------
-// CORE SAFE RUN FUNCTION
+// SAFE RUN CONTROLLER
 // -----------------------------
 function runSim(type) {
 
@@ -58,23 +48,22 @@ function runSim(type) {
     const status = document.getElementById("status");
 
     // -------------------------
-    // SAFE MODE GATE
+    // SAFE MODE (NO ENGINE REQUIRED)
     // -------------------------
-    if (!window.engine.ready || !window.engine.healthy || !engineHeartbeat()) {
+    if (!window.engine.ready || !engineAlive()) {
+
+        status.innerText = "SAFE MODE";
 
         if (type === "cascade") {
-            status.innerText = "SAFE MODE";
-            output.innerHTML = "⚠️ Engine offline — fallback simulation active";
+            output.innerHTML = "⚠️ Fallback cascade simulation (no engine)";
         }
 
         if (type === "normal") {
-            status.innerText = "HEALTHY (SAFE)";
-            output.innerHTML = "System operating in fallback mode";
+            output.innerHTML = "System OK (fallback)";
         }
 
         if (type === "failure") {
-            status.innerText = "DEGRADED (SAFE)";
-            output.innerHTML = "Simulated failure (fallback mode)";
+            output.innerHTML = "Failure simulated (fallback)";
         }
 
         return;
@@ -83,22 +72,22 @@ function runSim(type) {
     // refresh heartbeat
     window.engine.lastHeartbeat = Date.now();
 
-    // -------------------------
-    // ENGINE MODE (PRIMARY PATH)
-    // -------------------------
     try {
 
+        // -------------------------
+        // CASCADE ENGINE MODE
+        // -------------------------
         if (type === "cascade") {
 
             const result = runSimulation({
-                name: "UNIFIED STRESS SCENARIO",
+                name: "SYNTHETIC FX STRESS 2026",
                 oil_price: 105,
                 capital_flow: "outflow",
                 inflation_pressure: "rising",
                 msci_sentiment: "negative"
             });
 
-            if (!result) throw new Error("Empty engine response");
+            if (!result) throw new Error("Engine returned empty result");
 
             window.lastSimulationResult = result;
 
@@ -111,31 +100,32 @@ function runSim(type) {
                 "#ffffff";
 
             output.innerHTML =
-                "<h3>UNIFIED ENGINE OUTPUT</h3>" +
-                "<pre style='white-space:pre-wrap;'>" +
-                JSON.stringify(result, null, 2) +
-                "</pre>";
+                "<h3>ENGINE OUTPUT</h3>" +
+                "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
             return;
         }
 
+        // -------------------------
+        // NORMAL MODE
+        // -------------------------
         if (type === "normal") {
             status.innerText = "HEALTHY";
-            output.innerHTML = "System OK";
+            output.innerHTML = "SYSTEM OK";
             return;
         }
 
+        // -------------------------
+        // FAILURE MODE
+        // -------------------------
         if (type === "failure") {
             status.innerText = "DEGRADED";
-            output.innerHTML = "Core failure simulated (safe execution)";
+            output.innerHTML = "CORE FAILURE SIMULATED";
             return;
         }
 
     } catch (e) {
 
-        // -------------------------
-        // CRASH RECOVERY LAYER
-        // -------------------------
         console.error(e);
 
         window.engine.ready = false;
@@ -143,14 +133,12 @@ function runSim(type) {
 
         status.innerText = "RECOVERY MODE";
         output.innerHTML =
-            "❌ Engine crash detected<br>" +
-            "Switched to safe fallback mode";
-
+            "❌ Engine crash detected → fallback activated";
     }
 }
 
 // -----------------------------
-// SAFE AUDIT EXPORT
+// EXPORT AUDIT
 // -----------------------------
 function exportAudit() {
 
@@ -162,7 +150,7 @@ function exportAudit() {
     const report = {
         report_id: "UNIFIED-" + Date.now(),
         timestamp: new Date().toISOString(),
-        system_state: window.engine,
+        engine_state: window.engine,
         simulation: window.lastSimulationResult
     };
 
