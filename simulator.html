@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Sextant Control Room</title>
+<title>Sextant Control Room v7</title>
 
 <style>
 body {
@@ -22,7 +22,7 @@ button {
 
 .panel {
     border: 1px solid #2bd4ff;
-    max-width: 600px;
+    max-width: 700px;
     margin: 15px auto;
     padding: 15px;
     background: #111827;
@@ -33,7 +33,7 @@ button {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    max-width: 600px;
+    max-width: 700px;
     margin: 20px auto;
 }
 
@@ -50,20 +50,21 @@ button {
 
 pre {
     text-align: left;
-    background: #111;
+    background: #0a0a0a;
     padding: 10px;
     overflow: auto;
+    font-size: 12px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>SEXTANT CONTROL ROOM</h2>
+<h2>SEXTANT CONTROL ROOM v7</h2>
 
 <h3>Status: <span id="status">BOOTING</span></h3>
 
-<!-- BUTTONS -->
+<!-- CONTROLS -->
 <button onclick="runSim('normal')">Normal</button>
 <button onclick="runSim('failure')">Failure</button>
 <button onclick="runSim('cascade')">Cascade</button>
@@ -76,38 +77,51 @@ pre {
     <div id="fx_pressure">Pressure: --</div>
     <div id="fx_regime">Regime: --</div>
 
-    <div style="height:10px;background:#111;margin-top:10px;border:1px solid #2bd4ff;">
+    <div style="height:10px;background:#111;border:1px solid #2bd4ff;margin-top:10px;">
         <div id="fx_bar" style="height:10px;width:0%;background:lime;"></div>
     </div>
 </div>
 
-<!-- NODE VISUALS -->
+<!-- NODES -->
 <div class="grid">
-
     <div class="node" id="fx">FX NODE</div>
     <div class="node" id="bank">BANK NODE</div>
     <div class="node" id="liq">LIQUIDITY NODE</div>
     <div class="node" id="eq">EQUITY NODE</div>
     <div class="node" id="conf">CONFIDENCE NODE</div>
-
 </div>
 
 <!-- OUTPUT -->
 <div class="panel">
     <h3>SIMULATION OUTPUT</h3>
-    <div id="output">Loading engine...</div>
+    <div id="output">Waiting...</div>
 </div>
 
+<!-- LOGS -->
+<div class="panel">
+    <h3>SIMULATION LOGS</h3>
+    <button onclick="exportPDF()">Export PDF Audit Report</button>
+    <div id="log_list"></div>
+</div>
+
+<!-- ENGINE FILES -->
 <script src="models/fx_model.js"></script>
 <script src="models/contagion_model.js"></script>
 <script src="core_engine/simulation_engine.js"></script>
 
 <script>
 
+// ==========================
+// MEMORY STORE
+// ==========================
+window.simulationLogs = [];
+
+// ==========================
+// NODE UPDATE
+// ==========================
 function setNode(id, value) {
 
     const el = document.getElementById(id);
-
     value = value || 0;
 
     let state =
@@ -120,6 +134,9 @@ function setNode(id, value) {
     el.innerText = id.toUpperCase() + ": " + value.toFixed(2);
 }
 
+// ==========================
+// MAIN SIMULATION
+// ==========================
 function runSim(type) {
 
     const status = document.getElementById("status");
@@ -140,20 +157,18 @@ function runSim(type) {
 
     window.lastResult = result;
 
+    // STORE LOG
+    window.simulationLogs.push({
+        timestamp: new Date().toISOString(),
+        scenario: scenario,
+        result: result
+    });
+
+    // STATUS
     status.innerText = result.final_state || "UNKNOWN";
 
     // OUTPUT PANEL
-    output.innerHTML =
-        "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
-
-    // SYSTEM NODES
-    const s = result?.system || {};
-
-    setNode("fx", s.fxStress);
-    setNode("bank", s.bankingStress);
-    setNode("liq", s.liquidityStress);
-    setNode("eq", s.equityStress);
-    setNode("conf", s.confidenceDrop);
+    output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
     // FX PANEL
     const fx = result?.fx || {};
@@ -170,11 +185,69 @@ function runSim(type) {
     let bar = Math.min((fx.pressure_score || 0) * 100, 100);
 
     document.getElementById("fx_bar").style.width = bar + "%";
-
     document.getElementById("fx_bar").style.background =
         bar < 40 ? "lime" :
         bar < 70 ? "orange" :
         "red";
+
+    // NODE UPDATE
+    const s = result?.system || {};
+
+    setNode("fx", s.fxStress);
+    setNode("bank", s.bankingStress);
+    setNode("liq", s.liquidityStress);
+    setNode("eq", s.equityStress);
+    setNode("conf", s.confidenceDrop);
+
+    // LOG UI
+    const logList = document.getElementById("log_list");
+
+    logList.innerHTML = window.simulationLogs.map((l, i) => `
+        <div style="border-bottom:1px solid #333;padding:5px;text-align:left;">
+            <b>#${i+1}</b> ${l.timestamp}<br>
+            ${l.scenario.name} → ${l.result.final_state}
+        </div>
+    `).join("");
+}
+
+// ==========================
+// PDF EXPORT (AUDIT REPORT)
+// ==========================
+function exportPDF() {
+
+    if (!window.simulationLogs.length) {
+        alert("No logs available");
+        return;
+    }
+
+    const report = window.simulationLogs.map(l => `
+========================
+TIME: ${l.timestamp}
+SCENARIO: ${l.scenario.name}
+STATE: ${l.result.final_state}
+
+FX:
+USD/IDR: ${l.result.fx?.usd_idr}
+PRESSURE: ${l.result.fx?.pressure_score}
+REGIME: ${l.result.fx?.regime}
+
+SYSTEM:
+FX: ${l.result.system?.fxStress}
+BANK: ${l.result.system?.bankingStress}
+LIQ: ${l.result.system?.liquidityStress}
+EQ: ${l.result.system?.equityStress}
+CONF: ${l.result.system?.confidenceDrop}
+`).join("\n");
+
+    const blob = new Blob([report], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "SEXTANT_AUDIT_REPORT.pdf";
+    a.click();
+
+    URL.revokeObjectURL(url);
 }
 
 </script>
