@@ -35,13 +35,13 @@ It is **not a predictive, advisory, or regulatory decision system**.
 
 ## 🚀 Live Demo
 
-- 🧭 Main Dashboard  
+🧭 Main Dashboard  
 https://123agustien.github.io/sextant-resilience-operations-console/
 
-- 🧪 Simulation Engine  
+🧪 Simulation Engine  
 https://123agustien.github.io/sextant-resilience-operations-console/simulator.html
 
-- 📦 GitHub Repository  
+📦 GitHub Repository  
 https://github.com/123AGustien/sextant-resilience-operations-console
 
 ---
@@ -64,6 +64,7 @@ Simulates how localized stress propagates into systemic impact.
 
 ### ✔ Synthetic FX Stress Module
 Uses scenario-based logic (not real market data) to model:
+
 - USD/IDR stress conditions  
 - macroeconomic pressure signals  
 - regime classification:
@@ -75,6 +76,7 @@ Uses scenario-based logic (not real market data) to model:
 ---
 
 ### ✔ Risk Scoring Framework
+
 Normalized system risk scoring:
 
 - LOW (0–29)  
@@ -85,6 +87,7 @@ Normalized system risk scoring:
 ---
 
 ### ✔ Audit-Style Reporting Engine
+
 Generates structured JSON outputs including:
 
 - scenario ID  
