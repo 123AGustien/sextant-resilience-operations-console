@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Sextant Control Room v4.2</title>
+<title>Sextant Control Room v4 FINAL</title>
 
 <style>
 body{
@@ -61,10 +61,12 @@ button{
     width:140px;
     cursor:pointer;
     user-select:none;
+    transition: all 0.4s ease;
 }
 
 .node:hover{
-    opacity:0.8;
+    opacity:0.85;
+    transform:scale(1.05);
 }
 
 .line{
@@ -73,9 +75,21 @@ button{
     background:#00ffcc;
 }
 
+/* STATES */
 .healthy{ color:#00ff00; }
 .degraded{ color:#ffcc00; }
 .failed{ color:#ff0000; }
+
+/* ANIMATION */
+.shock{
+    animation:pulse 0.5s ease-in-out 2;
+}
+
+@keyframes pulse{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.1);}
+    100%{transform:scale(1);}
+}
 </style>
 
 </head>
@@ -89,7 +103,7 @@ System Status:
 <span id="status">HEALTHY</span>
 </h2>
 
-<!-- CLICKABLE GRAPH -->
+<!-- DEPENDENCY GRAPH -->
 <div class="graph">
     <div id="core" class="node healthy" onclick="failNode('core')">
         CORE BANKING
@@ -108,8 +122,8 @@ System Status:
     </div>
 </div>
 
-<button onclick="runSim('normal')">Reset System</button>
-<button onclick="runSim('cascade')">Auto Cascade Test</button>
+<button onclick="resetSystem()">Reset System</button>
+<button onclick="autoCascade()">Run Cascade Simulation</button>
 
 <div id="output">Awaiting simulation...</div>
 
@@ -134,8 +148,12 @@ function log(msg){
     box.scrollTop = box.scrollHeight;
 }
 
-function setNode(id, state){
-    document.getElementById(id).className = "node " + state;
+function setNode(id,state){
+    const el = document.getElementById(id);
+    el.className = "node " + state;
+
+    el.classList.add("shock");
+    setTimeout(()=>el.classList.remove("shock"),500);
 }
 
 function setStatus(state){
@@ -153,7 +171,8 @@ function updateImpact(i,s){
     document.getElementById("services").innerText = s;
 }
 
-function reset(){
+function resetSystem(){
+
     setNode("core","healthy");
     setNode("payment","healthy");
     setNode("mobile","healthy");
@@ -163,90 +182,63 @@ function reset(){
     updateImpact("-","-");
 
     document.getElementById("log").innerHTML = "System initialized.";
+
+    log("SYSTEM RESET COMPLETE");
 }
 
 function failNode(node){
 
-    log(node.toUpperCase() + " MANUAL FAILURE INJECTED");
+    log(node.toUpperCase() + " MANUAL FAILURE");
 
     setNode(node,"failed");
 
-    propagate();
-
-    evaluate();
+    if(node==="core") cascadeFromCore();
+    if(node==="payment") cascadeFromPayment();
+    if(node==="mobile") mobileOnlyImpact();
 }
 
-function propagate(){
+function cascadeFromCore(){
 
-    if(document.getElementById("core").className.includes("failed")){
-        setTimeout(()=>{
-            setNode("payment","degraded");
-            log("PAYMENT DEGRADED DUE TO CORE FAILURE");
-        },400);
+    setStatus("CRITICAL");
+    updateImpact("VERY HIGH","Core + downstream systems");
 
-        setTimeout(()=>{
-            setNode("mobile","degraded");
-            log("MOBILE DEGRADED DUE TO DOWNSTREAM IMPACT");
-        },800);
-    }
+    setTimeout(()=>{
+        setNode("payment","degraded");
+        log("PAYMENT DEGRADED (dependency on CORE)");
+    },500);
 
-    if(document.getElementById("payment").className.includes("failed")){
-        setTimeout(()=>{
-            setNode("mobile","degraded");
-            log("MOBILE DEGRADED DUE TO PAYMENT FAILURE");
-        },400);
-    }
+    setTimeout(()=>{
+        setNode("mobile","degraded");
+        log("MOBILE DEGRADED (cascade from PAYMENT)");
+    },1100);
 }
 
-function evaluate(){
+function cascadeFromPayment(){
 
-    let core = document.getElementById("core").className;
-    let payment = document.getElementById("payment").className;
-    let mobile = document.getElementById("mobile").className;
+    setStatus("CRITICAL");
+    updateImpact("HIGH","Payment + mobile impacted");
 
-    if(core.includes("failed")){
-        setStatus("CRITICAL");
-        updateImpact("VERY HIGH","Core + downstream impacted");
-        return;
-    }
-
-    if(payment.includes("failed")){
-        setStatus("CRITICAL");
-        updateImpact("HIGH","Payment + mobile impacted");
-        return;
-    }
-
-    if(mobile.includes("failed")){
-        setStatus("DEGRADED");
-        updateImpact("MEDIUM","Mobile only impacted");
-        return;
-    }
-
-    setStatus("HEALTHY");
-    updateImpact("LOW","All services operational");
+    setTimeout(()=>{
+        setNode("mobile","degraded");
+        log("MOBILE DEGRADED (dependency on PAYMENT)");
+    },600);
 }
 
-function runSim(type){
+function mobileOnlyImpact(){
 
-    if(type==="normal"){
-        reset();
-        return;
-    }
+    setStatus("DEGRADED");
+    updateImpact("MEDIUM","Single service impact");
+}
 
-    if(type==="cascade"){
+function autoCascade(){
 
-        reset();
+    resetSystem();
 
-        log("AUTO CASCADE TEST START");
+    log("AUTO CASCADE SIMULATION START");
 
-        setTimeout(()=>setNode("core","failed"),300);
-
-        setTimeout(()=>propagate(),600);
-
-        setTimeout(()=>evaluate(),1200);
-
-        return;
-    }
+    setTimeout(()=>{
+        failNode("core");
+    },500);
 }
 
 </script>
