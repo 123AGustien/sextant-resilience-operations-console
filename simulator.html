@@ -1,142 +1,27 @@
-<script>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sextant Simulator</title>
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
 
-window.engine = {
-    ready: false,
-    lastHeartbeat: Date.now()
-};
+<body>
 
-// --------------------
-// BOOT SEQUENCE
-// --------------------
-window.onload = function () {
+<h2>SEXTANT SIMULATOR</h2>
 
-    const output = document.getElementById("output");
+<h3>Status: <span id="status">BOOTING</span></h3>
 
-    try {
+<button onclick="runSim('normal')">Normal</button>
+<button onclick="runSim('failure')">Failure</button>
+<button onclick="runSim('cascade')">Cascade</button>
 
-        if (typeof runSimulation !== "function") {
-            output.innerHTML =
-                "❌ ENGINE NOT LOADED → check /core_engine/simulation_engine.js";
-            return;
-        }
+<div id="output">Loading engine...</div>
 
-        window.engine.ready = true;
-        window.engine.lastHeartbeat = Date.now();
+<!-- ENGINE LOAD (STRICT ORDER) -->
+<script src="models/fx_model.js"></script>
+<script src="models/contagion_model.js"></script>
+<script src="core_engine/simulation_engine.js"></script>
+<script src="ui/controller.js"></script>
 
-        output.innerHTML =
-            "✅ SYSTEM READY — ENGINE ONLINE";
-
-    } catch (e) {
-        output.innerHTML = "❌ BOOT ERROR: " + e.message;
-    }
-};
-
-// --------------------
-// HEARTBEAT (SAFE)
-// --------------------
-function engineAlive() {
-    return window.engine.ready === true;
-}
-
-// --------------------
-// SAFE RUN CONTROLLER
-// --------------------
-function runSim(type) {
-
-    const output = document.getElementById("output");
-    const status = document.getElementById("status");
-
-    // SAFE MODE
-    if (!engineAlive()) {
-
-        status.innerText = "SAFE MODE";
-
-        output.innerHTML =
-            type === "cascade"
-                ? "⚠️ Cascade fallback mode (engine offline)"
-                : "System fallback mode";
-
-        return;
-    }
-
-    try {
-
-        if (type === "cascade") {
-
-            const result = runSimulation({
-                name: "SYNTHETIC STRESS SCENARIO",
-                oil_price: 105,
-                capital_flow: "outflow",
-                inflation_pressure: "rising"
-            });
-
-            if (!result) throw new Error("Empty engine response");
-
-            window.lastSimulationResult = result;
-
-            status.innerText = result.final_state || "UNKNOWN";
-
-            output.innerHTML =
-                "<h3>ENGINE OUTPUT</h3><pre>" +
-                JSON.stringify(result, null, 2) +
-                "</pre>";
-
-            return;
-        }
-
-        if (type === "normal") {
-            status.innerText = "HEALTHY";
-            output.innerHTML = "SYSTEM OK";
-            return;
-        }
-
-        if (type === "failure") {
-            status.innerText = "DEGRADED";
-            output.innerHTML = "CORE FAILURE SIMULATED";
-            return;
-        }
-
-    } catch (e) {
-
-        console.error(e);
-
-        window.engine.ready = false;
-
-        status.innerText = "RECOVERY MODE";
-        output.innerHTML =
-            "❌ ENGINE ERROR → SAFE MODE ACTIVATED";
-    }
-}
-
-// --------------------
-// AUDIT EXPORT
-// --------------------
-function exportAudit() {
-
-    if (!window.lastSimulationResult) {
-        alert("No simulation run");
-        return;
-    }
-
-    const report = {
-        report_id: "SEXTANT-" + Date.now(),
-        timestamp: new Date().toISOString(),
-        simulation: window.lastSimulationResult
-    };
-
-    const blob = new Blob(
-        [JSON.stringify(report, null, 2)],
-        { type: "application/json" }
-    );
-
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = report.report_id + ".json";
-    a.click();
-
-    URL.revokeObjectURL(url);
-}
-
-</script>
+</body>
+</html>
