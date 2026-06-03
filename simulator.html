@@ -25,6 +25,7 @@ button{
     margin-top:20px;
     padding:15px;
     border:1px solid #00ffcc;
+    min-height:120px;
 }
 
 #log{
@@ -60,7 +61,7 @@ System Status:
 
 <button onclick="runSim('normal')">Normal Operation</button>
 <button onclick="runSim('failure')">Core Banking Failure</button>
-<button onclick="runSim('cascade')">Cascade Failure</button>
+<button onclick="runSim('cascade')">Cascade Failure (ENGINE)</button>
 
 <div id="output">Awaiting simulation...</div>
 
@@ -72,6 +73,11 @@ System Status:
 
 <h3>Event Log</h3>
 <div id="log">System initialized.</div>
+
+<!-- ENGINE LAYER -->
+<script src="models/fx_model.js"></script>
+<script src="models/contagion_model.js"></script>
+<script src="core_engine/simulation_engine.js"></script>
 
 <script>
 
@@ -99,6 +105,50 @@ function runSim(type){
     const status = document.getElementById("status");
     const output = document.getElementById("output");
 
+    // ---------------------------
+    // ENGINE MODE (NEW SYSTEM)
+    // ---------------------------
+    if(type === "cascade"){
+
+        const scenario = {
+            name: "Indonesia FX Stress 2026",
+            oil_price: 105,
+            capital_flow: "outflow",
+            inflation_pressure: "rising",
+            msci_sentiment: "negative",
+            reserve_pressure: "high"
+        };
+
+        const result = runSimulation(scenario);
+
+        status.innerText = result.final_state;
+
+        status.style.color =
+            result.final_state === "GREEN" ? "#00ff00" :
+            result.final_state === "AMBER" ? "#ffcc00" :
+            result.final_state === "RED" ? "#ff0000" : "#8b0000";
+
+        setRisk(Math.min(100, result.system.fxStress * 60));
+
+        output.innerHTML =
+            "<h3>ENGINE SIMULATION RESULT</h3>" +
+            "<p><b>Scenario:</b> " + result.scenario + "</p>" +
+            "<p><b>USD/IDR:</b> " + result.fx.usd_idr + "</p>" +
+            "<p><b>FX Pressure:</b> " + result.fx.pressure_score + "</p>" +
+            "<p><b>Regime:</b> " + result.fx.regime + "</p>" +
+            "<p><b>System State:</b> " + result.final_state + "</p>" +
+            "<p><b>Interpretation:</b> " + result.interpretation + "</p>";
+
+        log("ENGINE MODE RUN");
+        log("FX: " + result.fx.usd_idr);
+        log("STATE: " + result.final_state);
+        return;
+    }
+
+    // ---------------------------
+    // LEGACY MODES (UNCHANGED)
+    // ---------------------------
+
     if(type === "normal"){
         status.innerText = "HEALTHY";
         status.style.color = "#00ff00";
@@ -122,24 +172,6 @@ function runSim(type){
 
         log("CORE_BANKING FAILED");
         log("PAYMENT_GATEWAY DEGRADED");
-        log("MOBILE_BANKING DEGRADED");
-        return;
-    }
-
-    if(type === "cascade"){
-        status.innerText = "CRITICAL";
-        status.style.color = "#ff0000";
-        setRisk(88);
-
-        output.innerHTML =
-            "<h3>Simulation Result</h3>" +
-            "<p>CORE BANKING FAILED</p>" +
-            "<p>PAYMENT GATEWAY FAILED</p>" +
-            "<p>MOBILE BANKING DEGRADED</p>";
-
-        log("CASCADE FAILURE STARTED");
-        log("CORE_BANKING FAILED");
-        log("PAYMENT_GATEWAY FAILED");
         log("MOBILE_BANKING DEGRADED");
         return;
     }
