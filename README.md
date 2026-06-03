@@ -25,7 +25,7 @@ It does **not execute, predict, or provide financial advice or regulatory decisi
 
 ## 🎯 Regulatory Positioning (OJK Sandbox Context)
 
-This project is conceptually aligned with **financial innovation sandbox frameworks under Indonesian financial regulation (OJK innovation supervision principles)**.
+This project is conceptually aligned with **financial innovation sandbox principles under OJK supervisory frameworks (Indonesia financial innovation environment)**.
 
 It reflects sandbox-relevant characteristics:
 
@@ -68,32 +68,66 @@ https://github.com/123AGustien/sextant-resilience-operations-console
 
 ## 🧪 Branch-Based Simulation Architecture
 
-The system is structured into isolated simulation environments:
-
-### 🧠 Core System (main)
-https://github.com/123AGustien/sextant-resilience-operations-console/tree/main  
-Baseline resilience engine for dependency and cascade modeling.
+The system is structured into isolated simulation environments for traceability, validation, and controlled experimentation.
 
 ---
 
-### ⚙️ FX Stress Simulation Upgrade (v7.1)
-https://github.com/123AGustien/sextant-resilience-operations-console/tree/v7.1-fx-upgrade  
+### 🧠 Core Simulation Engine (main branch)
+👉 https://github.com/123AGustien/sextant-resilience-operations-console/tree/main
+
+Baseline system containing:
+- dependency mapping engine
+- cascade failure simulation logic
+- foundational resilience model
+
+---
+
+### ⚙️ FX Stress Simulation Layer (v7.1 upgrade)
+👉 https://github.com/123AGustien/sextant-resilience-operations-console/tree/v7.1-fx-upgrade
+
 Enhanced simulation layer featuring:
-- advanced stress propagation logic
-- improved macro-financial scenario modeling
-- refined risk scoring sensitivity framework
+- FX stress propagation modelling
+- improved macro-financial scenario engine
+- refined risk scoring sensitivity model
+- expanded systemic shock simulation capability
 
 ---
 
 ### 🧱 Stable Simulation Baseline (v7.0)
-https://github.com/123AGustien/sextant-resilience-operations-console/tree/v7.0-stable  
-Validated reference model used for comparison, calibration, and audit consistency.
+👉 https://github.com/123AGustien/sextant-resilience-operations-console/tree/v7.0-stable
+
+Controlled reference model used for:
+- validation testing
+- audit consistency
+- baseline comparison across simulation versions
 
 ---
 
-### 🌐 Deployment Layer (GitHub Pages)
-https://github.com/123AGustien/sextant-resilience-operations-console/tree/gh-pages  
-Live browser-based simulation interface and UI rendering layer.
+### 🌐 Live Deployment Layer (gh-pages)
+👉 https://123agustien.github.io/sextant-resilience-operations-console/
+
+👉 https://123agustien.github.io/sextant-resilience-operations-console/simulator.html
+
+Provides:
+- browser-based simulation execution
+- interactive system visualization
+- live scenario triggering interface
+
+---
+
+## 🧪 Branch-to-Simulation Interpretation
+
+Each branch represents a controlled system state:
+
+- `main` → core deterministic simulation engine
+- `v7.1-fx-upgrade` → advanced stress-testing logic layer
+- `v7.0-stable` → validated baseline reference model
+- `gh-pages` → live execution interface
+
+This structure enables:
+- reproducibility of simulation states
+- auditability of model evolution
+- separation of experimental vs stable logic layers
 
 ---
 
@@ -101,11 +135,10 @@ Live browser-based simulation interface and UI rendering layer.
 
 ### ✔ Dependency Simulation Engine
 Models abstract systemic relationships between:
-
 - banking systems (synthetic representation)
 - liquidity layers
 - payment infrastructure concepts
-- market sentiment signals (non-real data)
+- market sentiment proxies (non-real data)
 
 ---
 
