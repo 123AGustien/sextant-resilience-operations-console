@@ -1,80 +1,67 @@
-🧭 Sextant Resilience Platform (Enterprise Evaluation System v1)
+# 🧭 Sextant Control Room
 
-Deterministic infrastructure resilience simulation framework for testing system failure propagation, dependency breakdown, and recovery behavior in controlled environments.
+## Operational Resilience Simulation & Audit Evidence Engine
 
----
-
-🚀 Launch Control Room
-
-Tap below to open the live simulation:
-
-""▶ Launch Control Room" (https://img.shields.io/badge/LAUNCH-CONTROL%20ROOM-00ffcc?style=for-the-badge)" (https://123agustien.github.io/sextant-resilience-operations-console/)
+A deterministic browser-based simulation system for modeling infrastructure failures, cascade propagation, risk scoring, and regulatory-style audit reporting.
 
 ---
 
-🎮 Quick Actions (Simulator Access)
+## 🚀 Live Demo
 
-👉 Open System:
-
-https://123agustien.github.io/sextant-resilience-operations-console/
+👉 https://123agustien.github.io/sextant-resilience-operations-console/
 
 ---
 
-🖥 Current Simulator Features
+## 🎬 How to Use (Institutional Demo Flow)
 
-- Normal Operation
-- Node Failure
-- Cascade Failure
-- Event Logging
-- System Status Monitoring
-- Visual Node Display
-- Deterministic Simulation Logic
+Click:
 
----
+👉 Run Institutional Demo
 
-🌐 Deployment Model
+The system will automatically simulate:
 
-Current Version:
-
-- GitHub Pages Hosted
-- Frontend Only
-- HTML / CSS / JavaScript
-- Mobile Compatible
-
-No backend services are required for the current simulation environment.
+1. Healthy system state
+2. Core banking failure injection
+3. Cascade failure across dependent systems
+4. Risk score calculation (0–100)
+5. Audit report generation (JSON structured output)
 
 ---
 
-🏗 Architecture
+## 📊 Core Capabilities
 
-DB → AUTH → GATEWAY
+### ✔ Dependency Simulation
+Models relationships between core banking, payment, and mobile services.
 
-Simulation demonstrates dependency propagation and resilience behavior within a controlled sandbox environment.
+### ✔ Cascade Failure Engine
+Simulates how a single failure propagates through dependent systems.
 
----
+### ✔ Risk Scoring Engine
+Quantifies system impact on a 0–100 scale:
+- Low (0–29)
+- Medium (30–59)
+- High (60–84)
+- Critical (85–100)
 
-⚠️ Safety Boundary
-
-- Sandbox execution only
-- No production system access
-- No external infrastructure connectivity
-- No persistent storage
-- Engineering validation purposes only
-
----
-
-📍 Current Development Phase
-
-✅ Phase 1 – Simulation Engine
-
-✅ Phase 2 – Visual Node Display
-
-🔲 Phase 3 – Replay Timeline (Future)
-
-🔲 Phase 4 – Scenario Library (Future)
+### ✔ Audit Evidence Generator
+Produces structured incident reports including:
+- Scenario ID
+- Timestamp
+- System state
+- Node-level impact
+- Risk classification
+- Interpretation summary
 
 ---
 
-📡 Repository Entry Point
+## 🧠 Example Output
 
-https://github.com/123AGustien/sextant-resilience-operations-console
+```json
+{
+  "reportId": "DEMO-12345",
+  "timestamp": "2026-06-03T...",
+  "systemState": "CRITICAL",
+  "riskScore": 85,
+  "riskLevel": "CRITICAL",
+  "interpretation": "System-wide cascading failure across core banking infrastructure."
+}
