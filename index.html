@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Sextant Control Room v5 Evidence Engine</title>
+<title>Sextant Control Room v6 Risk Engine</title>
 
 <style>
 body{
@@ -40,11 +40,10 @@ button{
     font-size:20px;
 }
 
-#panel{
+#riskBox{
     margin-top:20px;
     border:1px solid #00ffcc;
     padding:10px;
-    text-align:left;
 }
 
 /* GRAPH */
@@ -65,6 +64,11 @@ button{
 .healthy{ color:#00ff00; }
 .degraded{ color:#ffcc00; }
 .failed{ color:#ff0000; }
+
+.score{
+    font-size:26px;
+    font-weight:bold;
+}
 </style>
 
 </head>
@@ -85,62 +89,50 @@ System Status:
 </div>
 
 <button onclick="resetSystem()">Reset</button>
-<button onclick="runCascade()">Run Scenario</button>
-<button onclick="exportEvidence()">Export Evidence Pack</button>
+<button onclick="runScenario()">Run Scenario</button>
 
 <div id="output">Awaiting simulation...</div>
 
 <h3>Incident Log</h3>
 <div id="log">System initialized.</div>
 
-<h3>Evidence Panel</h3>
-<pre id="panel">No evidence generated.</pre>
+<h3>Risk Engine</h3>
+<div id="riskBox">
+Risk Score: <span id="score" class="score">0</span> / 100
+<br>
+Risk Level: <span id="level">LOW</span>
+</div>
 
 <script>
 
 /* ---------------------------
-   STATE + EVIDENCE STORE
+   STATE
 ----------------------------*/
 
-const evidence = {
-    scenarioId: null,
-    startTime: null,
-    endTime: null,
-    events: [],
-    finalState: null
+let state = {
+    core: "healthy",
+    payment: "healthy",
+    mobile: "healthy"
 };
 
 /* ---------------------------
-   UTILITIES
+   LOG
 ----------------------------*/
 
-function now(){
-    return new Date().toISOString();
-}
-
-function log(msg,type="INFO"){
-
+function log(msg){
     const box = document.getElementById("log");
     const time = new Date().toLocaleTimeString();
-
-    const entry = {
-        time: now(),
-        type: type,
-        message: msg
-    };
-
-    evidence.events.push(entry);
-
     box.innerHTML += `<br>[${time}] ${msg}`;
     box.scrollTop = box.scrollHeight;
 }
 
 /* ---------------------------
-   NODE CONTROL
+   NODE UPDATE
 ----------------------------*/
 
-function setNode(id,state){
-    document.getElementById(id).className = "node " + state;
+function setNode(id, status){
+    state[id] = status;
+    document.getElementById(id).className = "node " + status;
 }
 
 /* ---------------------------
@@ -149,9 +141,11 @@ function setNode(id,state){
 
 function resetSystem(){
 
-    evidence.scenarioId = "SCN-" + Math.floor(Math.random()*99999);
-    evidence.startTime = now();
-    evidence.events = [];
+    state = {
+        core:"healthy",
+        payment:"healthy",
+        mobile:"healthy"
+    };
 
     setNode("core","healthy");
     setNode("payment","healthy");
@@ -161,51 +155,94 @@ function resetSystem(){
     document.getElementById("status").style.color = "#00ff00";
 
     document.getElementById("log").innerHTML = "System initialized.";
-    document.getElementById("panel").innerText = "Evidence reset.";
+
+    updateRisk();
 
     log("SYSTEM RESET");
 }
 
 /* ---------------------------
-   FAILURE INJECTION
+   FAILURE + PROPAGATION
 ----------------------------*/
 
 function fail(node){
 
-    log(node.toUpperCase() + " FAILURE INJECTED","FAIL");
+    log(node.toUpperCase() + " FAILURE INJECTED");
 
     setNode(node,"failed");
 
-    propagate(node);
+    if(node==="core"){
+        setTimeout(()=>setNode("payment","degraded"),500);
+        setTimeout(()=>setNode("mobile","degraded"),1000);
+    }
+
+    if(node==="payment"){
+        setTimeout(()=>setNode("mobile","degraded"),500);
+    }
+
+    updateRisk();
     evaluate();
 }
 
 /* ---------------------------
-   PROPAGATION RULES
+   SCENARIO
 ----------------------------*/
 
-function propagate(node){
+function runScenario(){
 
-    if(node === "core"){
+    resetSystem();
 
-        setTimeout(()=>{
-            setNode("payment","degraded");
-            log("PAYMENT DEGRADED (dependency on CORE)");
-        },500);
+    log("SCENARIO: CASCADE TEST");
 
-        setTimeout(()=>{
-            setNode("mobile","degraded");
-            log("MOBILE DEGRADED (cascade from PAYMENT)");
-        },1000);
-    }
+    setTimeout(()=>fail("core"),500);
+}
 
-    if(node === "payment"){
+/* ---------------------------
+   RISK ENGINE (CORE)
+----------------------------*/
 
-        setTimeout(()=>{
-            setNode("mobile","degraded");
-            log("MOBILE DEGRADED (dependency on PAYMENT)");
-        },500);
-    }
+function calculateRisk(){
+
+    let score = 0;
+
+    if(state.core === "failed") score += 50;
+    if(state.payment === "failed") score += 30;
+    if(state.mobile === "failed") score += 20;
+
+    if(state.core === "degraded") score += 25;
+    if(state.payment === "degraded") score += 15;
+    if(state.mobile === "degraded") score += 10;
+
+    if(score > 100) score = 100;
+
+    return score;
+}
+
+function getLevel(score){
+
+    if(score < 30) return "LOW";
+    if(score < 60) return "MEDIUM";
+    if(score < 85) return "HIGH";
+    return "CRITICAL";
+}
+
+function updateRisk(){
+
+    const score = calculateRisk();
+    const level = getLevel(score);
+
+    document.getElementById("score").innerText = score;
+    document.getElementById("level").innerText = level;
+
+    if(level==="LOW") document.getElementById("level").style.color="#00ff00";
+    if(level==="MEDIUM") document.getElementById("level").style.color="#ffcc00";
+    if(level==="HIGH") document.getElementById("level").style.color="#ff8800";
+    if(level==="CRITICAL") document.getElementById("level").style.color="#ff0000";
+
+    document.getElementById("score").style.color =
+        (score < 30) ? "#00ff00" :
+        (score < 60) ? "#ffcc00" :
+        (score < 85) ? "#ff8800" : "#ff0000";
 }
 
 /* ---------------------------
@@ -214,80 +251,24 @@ function propagate(node){
 
 function evaluate(){
 
-    const core = document.getElementById("core").className;
-    const payment = document.getElementById("payment").className;
+    if(state.core === "failed"){
+        document.getElementById("status").innerText = "CRITICAL";
+        document.getElementById("status").style.color = "#ff0000";
+        return;
+    }
 
-    let state = "HEALTHY";
+    if(state.payment === "failed" || state.mobile === "failed"){
+        document.getElementById("status").innerText = "DEGRADED";
+        document.getElementById("status").style.color = "#ffcc00";
+        return;
+    }
 
-    if(core.includes("failed")) state = "CRITICAL";
-    else if(payment.includes("failed")) state = "DEGRADED";
-
-    document.getElementById("status").innerText = state;
-
-    if(state==="HEALTHY") document.getElementById("status").style.color="#00ff00";
-    if(state==="DEGRADED") document.getElementById("status").style.color="#ffcc00";
-    if(state==="CRITICAL") document.getElementById("status").style.color="#ff0000";
-
-    evidence.finalState = state;
+    document.getElementById("status").innerText = "HEALTHY";
+    document.getElementById("status").style.color = "#00ff00";
 }
 
-/* ---------------------------
-   SCENARIO RUNNER
-----------------------------*/
-
-function runCascade(){
-
-    resetSystem();
-
-    log("SCENARIO START: CASCADE TEST");
-
-    setTimeout(()=>fail("core"),500);
-
-    setTimeout(()=>{
-        evidence.endTime = now();
-        generateEvidence();
-    },2500);
-}
-
-/* ---------------------------
-   EVIDENCE ENGINE
-----------------------------*/
-
-function generateEvidence(){
-
-    const pack = {
-        scenarioId: evidence.scenarioId,
-        startTime: evidence.startTime,
-        endTime: evidence.endTime,
-        totalEvents: evidence.events.length,
-        finalState: evidence.finalState,
-        events: evidence.events
-    };
-
-    document.getElementById("panel").innerText =
-        JSON.stringify(pack, null, 2);
-
-    log("EVIDENCE PACK GENERATED");
-}
-
-/* ---------------------------
-   EXPORT
-----------------------------*/
-
-function exportEvidence(){
-
-    const data = document.getElementById("panel").innerText;
-
-    const blob = new Blob([data], {type:"application/json"});
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "sextant_evidence_pack.json";
-    a.click();
-
-    log("EVIDENCE EXPORTED");
-}
+/* INIT */
+resetSystem();
 
 </script>
 
