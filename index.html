@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Sextant Control Room</title>
+<title>Sextant Control Room v4</title>
 
 <style>
 body{
@@ -46,11 +46,25 @@ button{
     font-size:20px;
 }
 
+/* GRAPH */
+.graph{
+    margin-top:20px;
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    align-items:center;
+}
+
 .node{
-    display:inline-block;
-    padding:10px;
-    margin:10px;
     border:1px solid #00ffcc;
+    padding:10px;
+    width:140px;
+}
+
+.line{
+    width:40px;
+    height:2px;
+    background:#00ffcc;
 }
 
 .healthy{ color:#00ff00; }
@@ -69,10 +83,13 @@ System Status:
 <span id="status">HEALTHY</span>
 </h2>
 
-<div>
-<div class="node" id="core">CORE BANKING</div>
-<div class="node" id="payment">PAYMENT GATEWAY</div>
-<div class="node" id="mobile">MOBILE BANKING</div>
+<!-- GRAPH VISUAL -->
+<div class="graph">
+    <div id="core" class="node healthy">CORE BANKING</div>
+    <div class="line"></div>
+    <div id="payment" class="node healthy">PAYMENT</div>
+    <div class="line"></div>
+    <div id="mobile" class="node healthy">MOBILE</div>
 </div>
 
 <button onclick="runSim('normal')">Normal Operation</button>
@@ -97,24 +114,23 @@ function now(){
 }
 
 function log(msg){
-    const logBox = document.getElementById("log");
-    logBox.innerHTML += "<br>[" + now() + "] " + msg;
-    logBox.scrollTop = logBox.scrollHeight;
+    const box = document.getElementById("log");
+    box.innerHTML += "<br>[" + now() + "] " + msg;
+    box.scrollTop = box.scrollHeight;
 }
 
 function setNode(id, state){
-    const el = document.getElementById(id);
-    el.className = "node " + state;
+    document.getElementById(id).className = "node " + state;
 }
 
 function setStatus(state){
-    const status = document.getElementById("status");
+    const el = document.getElementById("status");
 
-    status.innerText = state;
+    el.innerText = state;
 
-    if(state==="HEALTHY") status.style.color="#00ff00";
-    if(state==="DEGRADED") status.style.color="#ffcc00";
-    if(state==="CRITICAL") status.style.color="#ff0000";
+    if(state==="HEALTHY") el.style.color="#00ff00";
+    if(state==="DEGRADED") el.style.color="#ffcc00";
+    if(state==="CRITICAL") el.style.color="#ff0000";
 }
 
 function updateImpact(i,s){
@@ -122,7 +138,7 @@ function updateImpact(i,s){
     document.getElementById("services").innerText = s;
 }
 
-function resetNodes(){
+function reset(){
     setNode("core","healthy");
     setNode("payment","healthy");
     setNode("mobile","healthy");
@@ -130,9 +146,8 @@ function resetNodes(){
 
 function runSim(type){
 
-    document.getElementById("log").innerHTML="System initialized.";
-
-    resetNodes();
+    document.getElementById("log").innerHTML = "System initialized.";
+    reset();
 
     log("SIMULATION START: " + type.toUpperCase());
 
@@ -142,7 +157,6 @@ function runSim(type){
         updateImpact("LOW","All services operational");
 
         log("NO FAILURE DETECTED");
-
         return;
     }
 
@@ -157,8 +171,8 @@ function runSim(type){
         updateImpact("HIGH","Payment + Mobile impacted");
 
         log("CORE BANKING FAILED");
-        log("PAYMENT GATEWAY DEGRADED");
-        log("MOBILE BANKING DEGRADED");
+        log("PAYMENT DEGRADED");
+        log("MOBILE DEGRADED");
 
         return;
     }
@@ -166,16 +180,23 @@ function runSim(type){
     if(type==="cascade"){
 
         setNode("core","failed");
-        setNode("payment","failed");
-        setNode("mobile","degraded");
+
+        setTimeout(()=>{
+            setNode("payment","failed");
+            log("PAYMENT FAILURE PROPAGATED");
+        },600);
+
+        setTimeout(()=>{
+            setNode("mobile","degraded");
+            log("MOBILE DEGRADED DUE TO CASCADE");
+        },1200);
 
         setStatus("CRITICAL");
 
-        updateImpact("VERY HIGH","Core + Payment impacted");
+        updateImpact("VERY HIGH","Core + Payment cascade failure");
 
         log("CORE BANKING FAILED");
-        log("PAYMENT GATEWAY FAILED");
-        log("MOBILE BANKING DEGRADED");
+        log("CASCADE PROPAGATION INITIATED");
 
         return;
     }
