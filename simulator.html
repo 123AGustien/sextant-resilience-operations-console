@@ -1,41 +1,100 @@
-<script>
-window.engineReady = false;
 
-window.onload = function(){
-    window.engineReady = true;
-    document.getElementById("output").innerHTML = "✅ System Ready";
+  <script>
+
+window.engine = {
+    ready: false,
+    healthy: false
 };
 
+// -----------------------------
+// BOOT SEQUENCE (SAFE INIT)
+// -----------------------------
+window.onload = function(){
+
+    setTimeout(() => {
+
+        const output = document.getElementById("output");
+
+        if(typeof runSimulation !== "function"){
+            output.innerHTML = "❌ Engine not loaded (simulation_engine.js missing)";
+            window.engine.ready = false;
+            window.engine.healthy = false;
+            return;
+        }
+
+        window.engine.ready = true;
+        window.engine.healthy = true;
+
+        output.innerHTML = "✅ System Ready (Unified Controller Active)";
+
+    }, 300);
+};
+
+// -----------------------------
+// CORE SAFE RUN FUNCTION
+// -----------------------------
 function runSim(type){
 
     const output = document.getElementById("output");
     const status = document.getElementById("status");
 
-    if(!window.engineReady){
-        output.innerHTML = "⏳ Engine still loading...";
+    // -------------------------
+    // SAFE MODE GATE
+    // -------------------------
+    if(!window.engine.ready || !window.engine.healthy){
+
+        if(type === "cascade"){
+            status.innerText = "SAFE MODE";
+            output.innerHTML = "⚠️ Engine not available — running safe fallback";
+        }
+
+        if(type === "normal"){
+            status.innerText = "HEALTHY (SAFE)";
+            output.innerHTML = "System operating in fallback mode";
+        }
+
+        if(type === "failure"){
+            status.innerText = "DEGRADED (SAFE)";
+            output.innerHTML = "Simulated failure (fallback mode)";
+        }
+
         return;
     }
 
+    // -------------------------
+    // ENGINE MODE (PRIMARY PATH)
+    // -------------------------
     try {
 
         if(type === "cascade"){
 
-            if(typeof runSimulation !== "function"){
-                output.innerHTML =
-                "❌ ENGINE NOT LOADED<br>Check simulation_engine.js";
-                return;
-            }
-
             const result = runSimulation({
-                name: "SAFE TEST",
-                oil_price: 100
+                name: "UNIFIED TEST SCENARIO",
+                oil_price: 105,
+                capital_flow: "outflow",
+                inflation_pressure: "rising"
             });
 
-            status.innerText = result?.final_state || "UNKNOWN";
+            if(!result){
+                throw new Error("Empty engine response");
+            }
+
+            window.lastSimulationResult = result;
+
+            status.innerText = result.final_state || "UNKNOWN";
+
+            status.style.color =
+                result.final_state === "GREEN" ? "#00ff00" :
+                result.final_state === "AMBER" ? "#ffcc00" :
+                result.final_state === "RED" ? "#ff0000" :
+                "#ffffff";
+
+            const fx = result.fx || {};
+            const sys = result.system || {};
+
             output.innerHTML =
-                "<h3>RUN OK</h3><pre>" +
-                JSON.stringify(result, null, 2) +
-                "</pre>";
+                "<h3>UNIFIED ENGINE OUTPUT</h3>" +
+                "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
             return;
         }
@@ -48,12 +107,56 @@ function runSim(type){
 
         if(type === "failure"){
             status.innerText = "DEGRADED";
-            output.innerHTML = "Simulated failure OK";
+            output.innerHTML = "Core failure simulated (safe mode off)";
             return;
         }
 
-    } catch(e){
-        output.innerHTML = "❌ ERROR: " + e.message;
+    } catch (e){
+
+        // -------------------------
+        // CRASH RECOVERY LAYER
+        // -------------------------
+        console.error(e);
+
+        window.engine.ready = false;
+        window.engine.healthy = false;
+
+        status.innerText = "RECOVERED";
+        output.innerHTML =
+            "❌ Engine crash detected<br>" +
+            "System automatically switched to safe mode";
+
     }
 }
-</script>    
+
+// -----------------------------
+// EXPORT SAFE AUDIT
+// -----------------------------
+function exportAudit(){
+
+    if(!window.lastSimulationResult){
+        alert("No simulation available");
+        return;
+    }
+
+    const report = {
+        report_id: "UNIFIED-" + Date.now(),
+        timestamp: new Date().toISOString(),
+        data: window.lastSimulationResult
+    };
+
+    const blob = new Blob([JSON.stringify(report, null, 2)], {
+        type: "application/json"
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = report.report_id + ".json";
+    a.click();
+
+    URL.revokeObjectURL(url);
+}
+
+</script>  
