@@ -1,20 +1,22 @@
-// ======================================================
-// SEXTANT RESILIENCE ENGINE
-// Stable Production Simulation Core (GitHub Pages Safe)
-// ======================================================
-
 function runSimulation(scenario) {
 
-    // -----------------------------
-    // INPUT SANITY CHECK
-    // -----------------------------
+    // ======================================================
+    // INPUT SAFETY LAYER
+    // ======================================================
     if (!scenario || typeof scenario !== "object") {
         return fallback("Invalid scenario input");
     }
 
-    // -----------------------------
-    // DEPENDENCY GUARD
-    // -----------------------------
+    const safeScenario = {
+        name: scenario.name || "Unnamed Scenario",
+        oil_price: scenario.oil_price ?? 100,
+        capital_flow: scenario.capital_flow || "neutral",
+        inflation_pressure: scenario.inflation_pressure || "stable"
+    };
+
+    // ======================================================
+    // DEPENDENCY GUARDS
+    // ======================================================
     if (typeof simulateUSDIDR !== "function") {
         return fallback("Missing simulateUSDIDR()");
     }
@@ -28,7 +30,11 @@ function runSimulation(scenario) {
         // ==================================================
         // STEP 1: FX MODEL
         // ==================================================
-        const fxResult = simulateUSDIDR(scenario) || {};
+        const fxResult = simulateUSDIDR(safeScenario) || {
+            usd_idr: 0,
+            pressure_score: 0,
+            regime: "SAFE_MODE"
+        };
 
         // ==================================================
         // STEP 2: CONTAGION MODEL
@@ -38,7 +44,7 @@ function runSimulation(scenario) {
         };
 
         // ==================================================
-        // STEP 3: STATE MAPPING ENGINE
+        // STEP 3: STATE MAPPING
         // ==================================================
         const stateMap = {
             STABLE: "GREEN",
@@ -48,14 +54,13 @@ function runSimulation(scenario) {
             SAFE: "GREEN"
         };
 
-        const finalState =
-            stateMap[systemResult.systemState] || "GREEN";
+        const finalState = stateMap[systemResult.systemState] || "GREEN";
 
         // ==================================================
-        // STEP 4: RESPONSE PACKAGING
+        // STEP 4: GUARANTEED RESPONSE CONTRACT
         // ==================================================
         return {
-            scenario: scenario.name || "Unnamed Scenario",
+            scenario: safeScenario.name,
 
             fx: {
                 usd_idr: fxResult.usd_idr ?? 0,
@@ -100,7 +105,7 @@ function getInterpretation(state) {
 }
 
 // ======================================================
-// SAFE FALLBACK LAYER (CRASH PROTECTION)
+// SAFE FALLBACK LAYER (ZERO CRASH GUARANTEE)
 // ======================================================
 function fallback(reason) {
 
