@@ -1,38 +1,16 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Sextant Control Room</title>
-</head>
-
 <body>
 
-<h2>SEXTANT CONTROL ROOM</h2>
+<h2>BUTTON TEST</h2>
 
-<button onclick="runSim('normal')">Normal Operation</button>
-<button onclick="runSim('failure')">Node Failure</button>
-<button onclick="runSim('cascade')">Cascade Failure</button>
+<button onclick="runSim()">TEST BUTTON</button>
 
-<div id="output">Awaiting simulation...</div>
+<div id="out"></div>
 
 <script>
-function runSim(type) {
-
-    let result = {};
-
-    if (type === "normal") {
-        result = { state: "HEALTHY", impact: "LOW" };
-    }
-
-    if (type === "failure") {
-        result = { state: "DEGRADED", impact: "MEDIUM" };
-    }
-
-    if (type === "cascade") {
-        result = { state: "CRITICAL", impact: "HIGH" };
-    }
-
-    document.getElementById("output").innerHTML =
-        "STATE: " + result.state + "<br>IMPACT: " + result.impact;
+function runSim() {
+    document.getElementById("out").innerHTML = "BUTTON WORKS ✅";
 }
 </script>
 
