@@ -1,16 +1,38 @@
-# app/api/routes.py
-
 from fastapi import APIRouter, Header, HTTPException
+from pydantic import BaseModel
+
 from app.api.auth import verify_api_key
 from app.cognitive_core.orchestrator import CognitiveOrchestrator
 
 router = APIRouter()
 
-engine = CognitiveOrchestrator()
+
+# ---------------------------
+# REQUEST MODEL
+# ---------------------------
+class EvaluationRequest(BaseModel):
+    scenario: str
+    nodes: int
+    load: str
+    fx_shock: float
+    liquidity_shock: float
 
 
+# ---------------------------
+# ENGINE FACTORY
+# ---------------------------
+def get_engine():
+    return CognitiveOrchestrator()
+
+
+# ---------------------------
+# ENDPOINT
+# ---------------------------
 @router.post("/evaluate")
-def evaluate(payload: dict, x_api_key: str = Header(None)):
+def evaluate(
+    payload: EvaluationRequest,
+    x_api_key: str = Header(None)
+):
 
     # ---------------------------
     # AUTH LAYER
@@ -21,9 +43,10 @@ def evaluate(payload: dict, x_api_key: str = Header(None)):
     # ---------------------------
     # EXECUTION LAYER
     # ---------------------------
-    result = engine.evaluate(payload)
+    engine = get_engine()
+    result = engine.evaluate(payload.dict())
 
     return {
-        "status": "SUCCESS",
+        "status": "success",
         "result": result
     }
