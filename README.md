@@ -1,77 +1,129 @@
-# 🧭 Sextant Control Room
-
+# 🧭 Sextant Control Room  
 ## Operational Resilience Simulation Platform  
-### Conceptual Research & Engineering Prototype
+### OJK Sandbox-Style Research & Engineering Prototype
 
 ---
 
 ## 📌 Overview
 
-Sextant Control Room is a **conceptual simulation and research prototype** designed to demonstrate:
+Sextant Control Room is a **conceptual simulation and research prototype** designed for **systemic risk modeling and operational resilience analysis**.
 
-- operational resilience modeling  
-- system dependency mapping  
-- cascade failure propagation  
-- synthetic macro-financial stress scenarios  
-- structured audit-style reporting  
+It demonstrates:
 
-The platform is built for **visualization and experimentation of systemic risk concepts**, not real-world financial execution.
+- financial system dependency mapping (synthetic)
+- cascade failure propagation modeling
+- macro-financial stress scenario simulation (non-market data)
+- institutional resilience visualization
+- audit-style structured reporting outputs
 
----
+This system is built strictly for:
+**research, education, and simulation purposes only**.
 
-## 🎯 Purpose
-
-This system is intended strictly for:
-
-- educational use  
-- research and prototyping  
-- resilience engineering demonstrations  
-- system architecture exploration  
-- scenario-based stress visualization  
-
-It is **not a predictive, advisory, or regulatory decision system**.
+It does **not execute, predict, or provide financial advice or regulatory decisions**.
 
 ---
 
-## 🚀 Live Demo
+## 🎯 Regulatory Positioning (OJK Sandbox Context)
 
-🧭 Main Dashboard  
+This project is conceptually aligned with **financial innovation sandbox frameworks under Indonesian financial regulation (OJK innovation supervision principles)**.
+
+It reflects sandbox-relevant characteristics:
+
+- experimental digital simulation environment
+- synthetic datasets only (no real financial data)
+- transparent model logic and outputs
+- research-grade systemic risk modeling
+- non-production, non-commercial architecture
+
+⚠️ This system is **not registered, licensed, or operated as a financial service provider**.
+
+---
+
+## 🧪 System Purpose
+
+This platform is intended for:
+
+- resilience engineering research
+- systemic risk simulation studies
+- academic and institutional experimentation
+- stress-testing scenario visualization
+- infrastructure dependency modeling
+
+It is **not intended for financial advisory, trading, or production financial use**.
+
+---
+
+## 🚀 Live Demo & Simulation Access
+
+🧭 **Main Dashboard (Web Interface)**  
 https://123agustien.github.io/sextant-resilience-operations-console/
 
-🧪 Simulation Engine  
+🧪 **Simulation Engine (Direct Access)**  
 https://123agustien.github.io/sextant-resilience-operations-console/simulator.html
 
-📦 GitHub Repository  
+📦 **Source Repository**  
 https://github.com/123AGustien/sextant-resilience-operations-console
+
+---
+
+## 🧪 Branch-Based Simulation Architecture
+
+The system is structured into isolated simulation environments:
+
+### 🧠 Core System (main)
+https://github.com/123AGustien/sextant-resilience-operations-console/tree/main  
+Baseline resilience engine for dependency and cascade modeling.
+
+---
+
+### ⚙️ FX Stress Simulation Upgrade (v7.1)
+https://github.com/123AGustien/sextant-resilience-operations-console/tree/v7.1-fx-upgrade  
+Enhanced simulation layer featuring:
+- advanced stress propagation logic
+- improved macro-financial scenario modeling
+- refined risk scoring sensitivity framework
+
+---
+
+### 🧱 Stable Simulation Baseline (v7.0)
+https://github.com/123AGustien/sextant-resilience-operations-console/tree/v7.0-stable  
+Validated reference model used for comparison, calibration, and audit consistency.
+
+---
+
+### 🌐 Deployment Layer (GitHub Pages)
+https://github.com/123AGustien/sextant-resilience-operations-console/tree/gh-pages  
+Live browser-based simulation interface and UI rendering layer.
 
 ---
 
 ## ⚙️ Core Capabilities
 
 ### ✔ Dependency Simulation Engine
-Models interconnections between:
-- banking systems  
-- payment infrastructure  
-- liquidity layers  
-- market sentiment signals  
+Models abstract systemic relationships between:
+
+- banking systems (synthetic representation)
+- liquidity layers
+- payment infrastructure concepts
+- market sentiment signals (non-real data)
 
 ---
 
 ### ✔ Cascade Failure Model
-Simulates how localized stress propagates into systemic impact.
+Simulates how localized stress events propagate into system-wide systemic impact.
 
 ---
 
 ### ✔ Synthetic FX Stress Module
-Uses scenario-based logic (not real market data) to model:
+Uses **scenario-based synthetic logic only (no real market data)**:
 
-- USD/IDR stress conditions  
-- macroeconomic pressure signals  
+- USD/IDR stress simulation
+- macroeconomic pressure modeling
 - regime classification:
-  - STABLE  
-  - WATCH  
-  - STRESS  
-  - CRITICAL  
+  - STABLE
+  - WATCH
+  - STRESS
+  - CRITICAL
 
 ---
 
@@ -79,10 +131,10 @@ Uses scenario-based logic (not real market data) to model:
 
 Normalized system risk scoring:
 
-- LOW (0–29)  
-- MEDIUM (30–59)  
-- HIGH (60–84)  
-- CRITICAL (85–100)  
+- LOW (0–29)
+- MEDIUM (30–59)
+- HIGH (60–84)
+- CRITICAL (85–100)
 
 ---
 
@@ -90,15 +142,15 @@ Normalized system risk scoring:
 
 Generates structured JSON outputs including:
 
-- scenario ID  
-- timestamp  
-- system state  
-- risk classification  
-- interpretation summary  
+- scenario ID
+- timestamp
+- system state
+- risk classification
+- interpretation summary
 
 ---
 
-## 🧪 Example Output
+## 🧪 Example Output (Synthetic Simulation)
 
 ```json
 {
