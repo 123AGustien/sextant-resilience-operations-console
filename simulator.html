@@ -2,7 +2,7 @@
 
 window.engine = {
     ready: false,
-    lastHeartbeat: 0
+    lastHeartbeat: Date.now()
 };
 
 // --------------------
@@ -12,7 +12,7 @@ window.onload = function () {
 
     const output = document.getElementById("output");
 
-    setTimeout(() => {
+    try {
 
         if (typeof runSimulation !== "function") {
             output.innerHTML =
@@ -26,14 +26,16 @@ window.onload = function () {
         output.innerHTML =
             "✅ SYSTEM READY — ENGINE ONLINE";
 
-    }, 300);
+    } catch (e) {
+        output.innerHTML = "❌ BOOT ERROR: " + e.message;
+    }
 };
 
 // --------------------
-// HEARTBEAT
+// HEARTBEAT (SAFE)
 // --------------------
 function engineAlive() {
-    return Date.now() - window.engine.lastHeartbeat < 15000;
+    return window.engine.ready === true;
 }
 
 // --------------------
@@ -45,25 +47,19 @@ function runSim(type) {
     const status = document.getElementById("status");
 
     // SAFE MODE
-    if (!window.engine.ready || !engineAlive()) {
+    if (!engineAlive()) {
 
         status.innerText = "SAFE MODE";
 
         output.innerHTML =
             type === "cascade"
-                ? "⚠️ Cascade fallback mode"
+                ? "⚠️ Cascade fallback mode (engine offline)"
                 : "System fallback mode";
 
         return;
     }
 
-    window.engine.lastHeartbeat = Date.now();
-
     try {
-
-        if (typeof runSimulation !== "function") {
-            throw new Error("ENGINE_RUNTIME_MISSING");
-        }
 
         if (type === "cascade") {
 
@@ -74,13 +70,14 @@ function runSim(type) {
                 inflation_pressure: "rising"
             });
 
+            if (!result) throw new Error("Empty engine response");
+
             window.lastSimulationResult = result;
 
             status.innerText = result.final_state || "UNKNOWN";
 
             output.innerHTML =
-                "<h3>ENGINE OUTPUT</h3>" +
-                "<pre>" +
+                "<h3>ENGINE OUTPUT</h3><pre>" +
                 JSON.stringify(result, null, 2) +
                 "</pre>";
 
@@ -101,11 +98,13 @@ function runSim(type) {
 
     } catch (e) {
 
+        console.error(e);
+
         window.engine.ready = false;
 
         status.innerText = "RECOVERY MODE";
         output.innerHTML =
-            "❌ ENGINE CRASH → SAFE MODE ACTIVATED";
+            "❌ ENGINE ERROR → SAFE MODE ACTIVATED";
     }
 }
 
@@ -122,8 +121,7 @@ function exportAudit() {
     const report = {
         report_id: "SEXTANT-" + Date.now(),
         timestamp: new Date().toISOString(),
-        simulation: window.lastSimulationResult,
-        engine: window.engine
+        simulation: window.lastSimulationResult
     };
 
     const blob = new Blob(
