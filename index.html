@@ -1,118 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Sextant Control Room v7 FINAL AUDIT ENGINE</title>
-
-<style>
-body{
-    font-family:Arial;
-    background:#0b0f19;
-    color:#00ffcc;
-    text-align:center;
-}
-
-button{
-    padding:10px;
-    margin:5px;
-    background:black;
-    color:#00ffcc;
-    border:1px solid #00ffcc;
-    cursor:pointer;
-}
-
-#status{
-    font-weight:bold;
-    font-size:20px;
-}
-
-#log{
-    margin-top:20px;
-    border:1px solid #00ffcc;
-    height:180px;
-    overflow-y:auto;
-    padding:10px;
-    text-align:left;
-}
-
-#riskBox, #reportBox{
-    margin-top:20px;
-    border:1px solid #00ffcc;
-    padding:10px;
-    text-align:left;
-}
-
-.graph{
-    margin-top:20px;
-    display:flex;
-    justify-content:center;
-    gap:20px;
-}
-
-.node{
-    border:1px solid #00ffcc;
-    padding:10px;
-    width:140px;
-    cursor:pointer;
-}
-
-.healthy{ color:#00ff00; }
-.degraded{ color:#ffcc00; }
-.failed{ color:#ff0000; }
-
-.score{
-    font-size:26px;
-    font-weight:bold;
-}
-</style>
-
-</head>
-
-<body>
-
-<h1>SEXTANT CONTROL ROOM</h1>
-
-<h2>
-System Status:
-<span id="status">HEALTHY</span>
-</h2>
-
-<div class="graph">
-    <div id="core" class="node healthy" onclick="fail('core')">CORE BANKING</div>
-    <div id="payment" class="node healthy" onclick="fail('payment')">PAYMENT</div>
-    <div id="mobile" class="node healthy" onclick="fail('mobile')">MOBILE</div>
-</div>
-
-<button onclick="resetSystem()">Reset</button>
-<button onclick="runScenario()">Run Scenario</button>
-<button onclick="generateReport()">Generate Audit Report</button>
-
-<div id="log">System initialized.</div>
-
-<h3>Risk Engine</h3>
-<div id="riskBox">
-Risk Score: <span id="score" class="score">0</span>/100
-<br>
-Risk Level: <span id="level">LOW</span>
-</div>
-
-<h3>Audit Report (Regulator View)</h3>
-<pre id="reportBox">No report generated.</pre>
-
 <script>
 
-/* ---------------------------
-   STATE
-----------------------------*/
+/* =========================
+   CORE STATE
+========================= */
 
-let state = {
-    core:"healthy",
-    payment:"healthy",
-    mobile:"healthy"
-};
+let demoStep = 0;
 
-/* ---------------------------
-   LOGGING
-----------------------------*/
+/* =========================
+   LOG
+========================= */
 
 function log(msg){
     const box = document.getElementById("log");
@@ -121,183 +17,141 @@ function log(msg){
     box.scrollTop = box.scrollHeight;
 }
 
-/* ---------------------------
-   SYSTEM CONTROL
-----------------------------*/
-
-function setNode(id,status){
-    state[id] = status;
-    document.getElementById(id).className = "node " + status;
-}
-
-/* ---------------------------
-   RESET
-----------------------------*/
+/* =========================
+   SYSTEM RESET
+========================= */
 
 function resetSystem(){
 
-    state = {
-        core:"healthy",
-        payment:"healthy",
-        mobile:"healthy"
-    };
-
-    setNode("core","healthy");
-    setNode("payment","healthy");
-    setNode("mobile","healthy");
+    demoStep = 0;
 
     document.getElementById("status").innerText = "HEALTHY";
     document.getElementById("status").style.color = "#00ff00";
 
     document.getElementById("log").innerHTML = "System initialized.";
-    document.getElementById("reportBox").innerText = "No report generated.";
 
-    updateRisk();
+    document.getElementById("riskBox")?.remove?.();
 
     log("SYSTEM RESET");
 }
 
-/* ---------------------------
-   FAILURE + PROPAGATION
-----------------------------*/
+/* =========================
+   DEMO FLOW ENGINE
+========================= */
 
-function fail(node){
+function runDemo(){
 
-    log(node.toUpperCase() + " FAILURE INJECTED");
-
-    setNode(node,"failed");
-
-    if(node==="core"){
-        setTimeout(()=>setNode("payment","degraded"),500);
-        setTimeout(()=>setNode("mobile","degraded"),1000);
-    }
-
-    if(node==="payment"){
-        setTimeout(()=>setNode("mobile","degraded"),500);
-    }
-
-    updateRisk();
-    evaluate();
-}
-
-/* ---------------------------
-   SCENARIO
-----------------------------*/
-
-function runScenario(){
     resetSystem();
-    log("SCENARIO START");
-    setTimeout(()=>fail("core"),500);
+
+    log("DEMO STARTED: Institutional Resilience Simulation");
+
+    setTimeout(step1, 1000);
 }
 
-/* ---------------------------
-   RISK ENGINE
-----------------------------*/
+/* =========================
+   STEP 1
+========================= */
 
-function calculateRisk(){
+function step1(){
 
-    let score = 0;
+    log("STEP 1: Initial system state is HEALTHY");
+    document.getElementById("status").innerText = "HEALTHY";
 
-    if(state.core==="failed") score+=50;
-    if(state.payment==="failed") score+=30;
-    if(state.mobile==="failed") score+=20;
-
-    if(state.core==="degraded") score+=25;
-    if(state.payment==="degraded") score+=15;
-    if(state.mobile==="degraded") score+=10;
-
-    return Math.min(score,100);
+    setTimeout(step2, 1500);
 }
 
-function getLevel(score){
+/* =========================
+   STEP 2
+========================= */
 
-    if(score<30) return "LOW";
-    if(score<60) return "MEDIUM";
-    if(score<85) return "HIGH";
-    return "CRITICAL";
+function step2(){
+
+    log("STEP 2: Injecting CORE BANKING failure");
+    document.getElementById("status").innerText = "DEGRADED";
+    document.getElementById("status").style.color = "#ffcc00";
+
+    setTimeout(step3, 1500);
 }
 
-function updateRisk(){
+/* =========================
+   STEP 3
+========================= */
 
-    const score = calculateRisk();
-    const level = getLevel(score);
+function step3(){
 
-    document.getElementById("score").innerText = score;
-    document.getElementById("level").innerText = level;
+    log("STEP 3: Cascade propagation to PAYMENT + MOBILE");
 
-    document.getElementById("level").style.color =
-        level==="LOW"?"#00ff00":
-        level==="MEDIUM"?"#ffcc00":
-        level==="HIGH"?"#ff8800":"#ff0000";
+    document.getElementById("status").innerText = "CRITICAL";
+    document.getElementById("status").style.color = "#ff0000";
 
-    document.getElementById("score").style.color =
-        score<30?"#00ff00":
-        score<60?"#ffcc00":
-        score<85?"#ff8800":"#ff0000";
+    setTimeout(step4, 1500);
 }
 
-/* ---------------------------
-   SYSTEM STATE
-----------------------------*/
+/* =========================
+   STEP 4
+========================= */
 
-function evaluate(){
+function step4(){
 
-    let status = "HEALTHY";
+    log("STEP 4: Risk Engine calculating impact");
 
-    if(state.core==="failed") status="CRITICAL";
-    else if(state.payment==="failed"||state.mobile==="failed") status="DEGRADED";
+    const score = 85;
+    const level = "CRITICAL";
 
-    document.getElementById("status").innerText = status;
+    log("Risk Score: " + score);
+    log("Risk Level: " + level);
 
-    document.getElementById("status").style.color =
-        status==="HEALTHY"?"#00ff00":
-        status==="DEGRADED"?"#ffcc00":"#ff0000";
+    setTimeout(step5, 1500);
 }
 
-/* ---------------------------
-   AUDIT REPORT ENGINE
-----------------------------*/
+/* =========================
+   STEP 5
+========================= */
 
-function generateReport(){
+function step5(){
 
-    const score = calculateRisk();
-    const level = getLevel(score);
+    log("STEP 5: Generating Audit Report");
 
     const report = {
-        reportId: "AUDIT-" + Math.floor(Math.random()*99999),
+        reportId: "DEMO-" + Math.floor(Math.random()*99999),
         timestamp: new Date().toISOString(),
-
-        systemState: document.getElementById("status").innerText,
-
-        riskScore: score,
-        riskLevel: level,
-
-        nodeState: {
-            core: state.core,
-            payment: state.payment,
-            mobile: state.mobile
-        },
-
-        interpretation:
-            level==="LOW"
-            ? "System stable with minimal disruption."
-            : level==="MEDIUM"
-            ? "Partial degradation observed in dependent services."
-            : level==="HIGH"
-            ? "Significant service degradation across multiple layers."
-            : "Critical system failure with cascading impact across infrastructure."
+        systemState: "CRITICAL",
+        riskScore: 85,
+        riskLevel: "CRITICAL",
+        interpretation: "System-wide cascading failure detected across core banking infrastructure."
     };
 
-    document.getElementById("reportBox").innerText =
-        JSON.stringify(report, null, 2);
+    const box = document.createElement("pre");
+    box.id = "riskBox";
+    box.style.border = "1px solid #00ffcc";
+    box.style.padding = "10px";
+    box.style.marginTop = "20px";
+
+    box.innerText = JSON.stringify(report, null, 2);
+
+    document.body.appendChild(box);
 
     log("AUDIT REPORT GENERATED");
+
+    setTimeout(step6, 2000);
 }
 
-/* INIT */
-resetSystem();
+/* =========================
+   STEP 6
+========================= */
+
+function step6(){
+
+    log("DEMO COMPLETE — SYSTEM READY FOR REGULATORY REVIEW");
+
+}
+
+/* =========================
+   OPTIONAL QUICK SCENARIO
+========================= */
+
+function runScenario(){
+    log("Manual scenario mode triggered");
+}
 
 </script>
-
-</body>
-</html>
