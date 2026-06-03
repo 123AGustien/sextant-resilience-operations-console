@@ -1,87 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Sextant Control Room — Institutional View</title>
+<title>Sextant Control Room</title>
 
 <style>
 body{
     font-family: Arial;
     background:#0b0f19;
     color:#e6f7ff;
-    margin:0;
-    padding:30px;
     text-align:center;
+    padding:40px;
 }
 
-/* HEADER */
 h1{
-    margin-bottom:5px;
-    letter-spacing:1px;
+    margin-bottom:10px;
 }
 
-.sub{
-    font-size:13px;
+.subtitle{
     opacity:0.7;
-    margin-bottom:25px;
+    font-size:14px;
+    margin-bottom:40px;
 }
 
-/* MAIN STATUS CARD */
-#statusCard{
+/* CARD */
+.card{
+    border:1px solid #2bd4ff;
     max-width:420px;
     margin:20px auto;
     padding:20px;
-    border:1px solid #2bd4ff;
     border-radius:6px;
-    font-size:22px;
-    font-weight:bold;
 }
 
 /* BUTTON */
-button{
-    padding:16px;
-    width:85%;
-    max-width:320px;
-    margin:15px auto;
+a.button{
     display:block;
-    background:#000;
+    margin:15px auto;
+    padding:15px;
+    width:80%;
+    max-width:300px;
+    background:black;
     color:#2bd4ff;
     border:1px solid #2bd4ff;
+    text-decoration:none;
     font-size:15px;
-    cursor:pointer;
     border-radius:4px;
 }
 
-/* OUTPUT PANEL */
-#panel{
-    max-width:420px;
-    margin:20px auto;
-    padding:15px;
-    border:1px solid #2bd4ff;
-    text-align:left;
-    font-size:14px;
-    min-height:80px;
-}
-
-/* LOG */
-#log{
-    max-width:420px;
-    margin:20px auto;
-    padding:10px;
-    border:1px solid #2bd4ff;
-    height:140px;
-    overflow-y:auto;
-    text-align:left;
-    font-size:12px;
-}
-
-/* COLORS */
-.green{ color:#00ff99; }
-.yellow{ color:#ffcc00; }
-.red{ color:#ff4d4d; }
-
+/* SMALL TEXT */
 .small{
     font-size:12px;
-    opacity:0.7;
+    opacity:0.6;
     margin-top:10px;
 }
 </style>
@@ -90,85 +58,34 @@ button{
 <body>
 
 <h1>SEXTANT CONTROL ROOM</h1>
-<div class="sub">Operational Resilience & Audit Simulation Engine</div>
-
-<div id="statusCard" class="green">
-SYSTEM STATUS: HEALTHY
+<div class="subtitle">
+Operational Resilience Simulation Platform
 </div>
 
-<button onclick="runDemo()">▶ RUN INSTITUTIONAL DEMO</button>
+<div class="card">
 
-<div id="panel">
-Waiting for simulation...
+<h3>Executive View</h3>
+
+<a class="button" href="simulator.html">
+▶ Launch Full Simulation Engine
+</a>
+
+<div class="small">
+Cascade failure + risk scoring + audit engine
 </div>
 
-<div class="small">Event Timeline</div>
-<div id="log">System initialized.</div>
+</div>
 
-<script>
+<div class="card">
 
-/* LOG */
-function log(msg){
-    const box = document.getElementById("log");
-    const time = new Date().toLocaleTimeString();
-    box.innerHTML += `<br>[${time}] ${msg}`;
-    box.scrollTop = box.scrollHeight;
-}
+<h3>System Overview</h3>
 
-/* STATUS */
-function setStatus(text, level){
-    const box = document.getElementById("statusCard");
+<p>
+This platform demonstrates how operational failures propagate across
+financial infrastructure systems and generate structured audit evidence.
+</p>
 
-    box.innerText = "SYSTEM STATUS: " + text;
-
-    box.className =
-        level === "green" ? "green" :
-        level === "yellow" ? "yellow" : "red";
-}
-
-/* DEMO FLOW */
-function runDemo(){
-
-    document.getElementById("panel").innerHTML =
-        "Initializing simulation...";
-
-    log("DEMO START");
-
-    setTimeout(() => {
-
-        setStatus("HEALTHY","green");
-        log("STEP 1: System stable");
-
-    }, 800);
-
-    setTimeout(() => {
-
-        setStatus("DEGRADED","yellow");
-        log("STEP 2: Core banking failure injected");
-
-    }, 2000);
-
-    setTimeout(() => {
-
-        setStatus("CRITICAL","red");
-        log("STEP 3: Cascade failure propagated");
-
-        document.getElementById("panel").innerHTML =
-            "Risk Score: 88 / 100<br>Risk Level: CRITICAL";
-
-    }, 3500);
-
-    setTimeout(() => {
-
-        document.getElementById("panel").innerHTML +=
-            "<br><br>Audit Report: GENERATED ✔";
-
-        log("STEP 4: Audit report generated");
-
-    }, 5000);
-}
-
-</script>
+</div>
 
 </body>
 </html>
