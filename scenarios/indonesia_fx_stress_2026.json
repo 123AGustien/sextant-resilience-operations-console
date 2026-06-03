@@ -1,0 +1,9 @@
+{
+  "scenario_name": "Indonesia FX Stress 2026",
+  "usd_idr": 18200,
+  "oil_price": 105,
+  "capital_flow": "outflow",
+  "inflation_pressure": "rising",
+  "msci_sentiment": "negative",
+  "reserve_pressure": "high"
+}
