@@ -1,212 +1,59 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Sextant Control Room - Simulator</title>
-
-<style>
-body{
-    font-family: Arial;
-    background:#0b0f19;
-    color:#00ffcc;
-    text-align:center;
-    padding:20px;
-}
-
-button{
-    padding:10px;
-    margin:5px;
-    background:black;
-    color:#00ffcc;
-    border:1px solid #00ffcc;
-    cursor:pointer;
-}
-
-#output{
-    margin-top:20px;
-    padding:15px;
-    border:1px solid #00ffcc;
-    min-height:120px;
-    text-align:left;
-}
-
-#log{
-    margin-top:20px;
-    border:1px solid #00ffcc;
-    height:180px;
-    overflow-y:auto;
-    padding:10px;
-    text-align:left;
-}
-
-#status{
-    font-weight:bold;
-    font-size:22px;
-}
-
-#riskBox{
-    margin-top:20px;
-    padding:10px;
-    border:1px solid #00ffcc;
-}
-</style>
-</head>
-
-<body>
-
-<h1>SEXTANT CONTROL ROOM</h1>
-
-<h2>
-System Status:
-<span id="status">HEALTHY</span>
-</h2>
-
-<button onclick="runSim('normal')">Normal Operation</button>
-<button onclick="runSim('failure')">Core Banking Failure</button>
-<button onclick="runSim('cascade')">Cascade Failure (ENGINE)</button>
-<button onclick="exportAudit()">Export Audit Report</button>
-
-<div id="output">Awaiting simulation...</div>
-
-<div id="riskBox">
-<h3>Risk Engine</h3>
-<p>Risk Score: <span id="risk">0</span> / 100</p>
-<p>Risk Level: <span id="level">LOW</span></p>
-</div>
-
-<h3>Event Log</h3>
-<div id="log">System initialized.</div>
-
-<!-- ENGINE LAYER -->
-<script src="models/fx_model.js"></script>
-<script src="models/contagion_model.js"></script>
-<script src="core_engine/simulation_engine.js"></script>
-
 <script>
+window.engineReady = false;
 
-function log(msg){
-    const logBox = document.getElementById("log");
-    const time = new Date().toLocaleTimeString();
-    logBox.innerHTML += "<br>[" + time + "] " + msg;
-    logBox.scrollTop = logBox.scrollHeight;
-}
-
-function setRisk(score){
-    document.getElementById("risk").innerText = score;
-
-    let level = "LOW";
-    if(score >= 30) level = "MEDIUM";
-    if(score >= 60) level = "HIGH";
-    if(score >= 85) level = "CRITICAL";
-
-    document.getElementById("level").innerText = level;
-}
+window.onload = function(){
+    window.engineReady = true;
+    document.getElementById("output").innerHTML = "✅ System Ready";
+};
 
 function runSim(type){
 
-    const status = document.getElementById("status");
     const output = document.getElementById("output");
+    const status = document.getElementById("status");
 
-    if(type === "cascade"){
-
-        const scenario = {
-            name: "Indonesia FX Stress 2026",
-            oil_price: 105,
-            capital_flow: "outflow",
-            inflation_pressure: "rising",
-            msci_sentiment: "negative",
-            reserve_pressure: "high"
-        };
-
-        const result = runSimulation(scenario);
-
-        window.lastSimulationResult = result;
-
-        status.innerText = result.final_state;
-
-        status.style.color =
-            result.final_state === "GREEN" ? "#00ff00" :
-            result.final_state === "AMBER" ? "#ffcc00" :
-            result.final_state === "RED" ? "#ff0000" : "#8b0000";
-
-        setRisk(Math.min(100, result.fx.pressure_score * 60));
-
-        output.innerHTML =
-            "<h3>SUPERVISORY STRESS REPORT</h3>" +
-            "<p><b>Scenario:</b> " + result.scenario + "</p>" +
-            "<p><b>USD/IDR:</b> " + result.fx.usd_idr + "</p>" +
-            "<p><b>FX Pressure:</b> " + result.fx.pressure_score + "</p>" +
-            "<p><b>Regime:</b> " + result.fx.regime + "</p>" +
-            "<p><b>Banking Stress:</b> " + result.system.bankingStress.toFixed(2) + "</p>" +
-            "<p><b>Liquidity Stress:</b> " + result.system.liquidityStress.toFixed(2) + "</p>" +
-            "<p><b>Equity Stress:</b> " + result.system.equityStress.toFixed(2) + "</p>" +
-            "<p><b>System State:</b> " + result.final_state + "</p>" +
-            "<p><b>Interpretation:</b><br>" + result.interpretation + "</p>";
-
-        log("ENGINE MODE RUN");
-        log("STATE: " + result.final_state);
-
+    if(!window.engineReady){
+        output.innerHTML = "⏳ Engine still loading...";
         return;
     }
 
-    if(type === "normal"){
-        status.innerText = "HEALTHY";
-        status.style.color = "#00ff00";
-        setRisk(5);
-        output.innerHTML = "<h3>Simulation Result</h3><p>All systems operational</p>";
-        log("NORMAL OPERATION");
-        return;
-    }
+    try {
 
-    if(type === "failure"){
-        status.innerText = "DEGRADED";
-        status.style.color = "#ffcc00";
-        setRisk(55);
+        if(type === "cascade"){
 
-        output.innerHTML =
-            "<h3>Simulation Result</h3>" +
-            "<p>CORE BANKING FAILED</p>" +
-            "<p>PAYMENT GATEWAY DEGRADED</p>" +
-            "<p>MOBILE BANKING DEGRADED</p>";
+            if(typeof runSimulation !== "function"){
+                output.innerHTML =
+                "❌ ENGINE NOT LOADED<br>Check simulation_engine.js";
+                return;
+            }
 
-        log("CORE_BANKING FAILED");
-        return;
+            const result = runSimulation({
+                name: "SAFE TEST",
+                oil_price: 100
+            });
+
+            status.innerText = result?.final_state || "UNKNOWN";
+            output.innerHTML =
+                "<h3>RUN OK</h3><pre>" +
+                JSON.stringify(result, null, 2) +
+                "</pre>";
+
+            return;
+        }
+
+        if(type === "normal"){
+            status.innerText = "HEALTHY";
+            output.innerHTML = "System OK";
+            return;
+        }
+
+        if(type === "failure"){
+            status.innerText = "DEGRADED";
+            output.innerHTML = "Simulated failure OK";
+            return;
+        }
+
+    } catch(e){
+        output.innerHTML = "❌ ERROR: " + e.message;
     }
 }
-
-function exportAudit(){
-
-    if(!window.lastSimulationResult){
-        alert("Please run a simulation first.");
-        return;
-    }
-
-    const report = {
-        report_id: "OJK-" + Date.now(),
-        timestamp: new Date().toISOString(),
-        scenario: window.lastSimulationResult.scenario,
-        fx: window.lastSimulationResult.fx,
-        system: window.lastSimulationResult.system,
-        classification: window.lastSimulationResult.final_state,
-        interpretation: window.lastSimulationResult.interpretation
-    };
-
-    const blob = new Blob([JSON.stringify(report, null, 2)], {
-        type: "application/json"
-    });
-
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = report.report_id + ".json";
-    a.click();
-
-    URL.revokeObjectURL(url);
-
-    log("AUDIT REPORT EXPORTED: " + report.report_id);
-}
-
-</script>
-
-</body>
-</html>
+</script>    
