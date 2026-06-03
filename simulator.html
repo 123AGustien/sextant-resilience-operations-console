@@ -26,6 +26,7 @@ button{
     padding:15px;
     border:1px solid #00ffcc;
     min-height:120px;
+    text-align:left;
 }
 
 #log{
@@ -62,6 +63,7 @@ System Status:
 <button onclick="runSim('normal')">Normal Operation</button>
 <button onclick="runSim('failure')">Core Banking Failure</button>
 <button onclick="runSim('cascade')">Cascade Failure (ENGINE)</button>
+<button onclick="exportAudit()">Export Audit Report</button>
 
 <div id="output">Awaiting simulation...</div>
 
@@ -84,7 +86,6 @@ System Status:
 function log(msg){
     const logBox = document.getElementById("log");
     const time = new Date().toLocaleTimeString();
-
     logBox.innerHTML += "<br>[" + time + "] " + msg;
     logBox.scrollTop = logBox.scrollHeight;
 }
@@ -121,6 +122,9 @@ function runSim(type){
 
         const result = runSimulation(scenario);
 
+        // SAVE FOR AUDIT EXPORT
+        window.lastSimulationResult = result;
+
         status.innerText = result.final_state;
 
         status.style.color =
@@ -128,14 +132,17 @@ function runSim(type){
             result.final_state === "AMBER" ? "#ffcc00" :
             result.final_state === "RED" ? "#ff0000" : "#8b0000";
 
-        // FIXED: use correct FX pressure
         setRisk(Math.min(100, result.fx.pressure_score * 60));
 
         output.innerHTML =
             "<h3>📊 SUPERVISORY STRESS REPORT</h3>" +
 
             "<p><b>Scenario:</b> " + result.scenario + "</p>" +
-            "<p><b>USD/IDR:</b> " + result.fx.usd_idr + "</p>" +
+            "<p><b>FX Pair:</b> USD/IDR</p>" +
+            "<p><b>Exchange Rate:</b> " + result.fx.usd_idr + "</p>" +
+
+            "<hr>" +
+
             "<p><b>FX Pressure Index:</b> " + result.fx.pressure_score + "</p>" +
             "<p><b>FX Regime:</b> " + result.fx.regime + "</p>" +
 
@@ -156,10 +163,6 @@ function runSim(type){
 
         return;
     }
-
-    // ---------------------------
-    // LEGACY MODES
-    // ---------------------------
 
     if(type === "normal"){
         status.innerText = "HEALTHY";
@@ -187,6 +190,46 @@ function runSim(type){
         log("MOBILE_BANKING DEGRADED");
         return;
     }
+}
+
+function exportAudit(){
+
+    if(!window.lastSimulationResult){
+        alert("Please run a simulation first.");
+        return;
+    }
+
+    const data = window.lastSimulationResult;
+
+    const report = {
+        report_id: "OJK-" + Date.now(),
+        timestamp: new Date().toISOString(),
+
+        scenario: data.scenario,
+
+        fx: data.fx,
+
+        system: data.system,
+
+        classification: data.final_state,
+
+        interpretation: data.interpretation
+    };
+
+    const blob = new Blob([JSON.stringify(report, null, 2)], {
+        type: "application/json"
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = report.report_id + ".json";
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+    log("AUDIT REPORT EXPORTED: " + report.report_id);
 }
 
 </script>
