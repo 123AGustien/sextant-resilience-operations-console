@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sextant Control Room</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #0b0f19;
+            color: #00ffcc;
+            text-align: center;
+        }
+
+        .box {
+            border: 1px solid #00ffcc;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 10px;
+            margin: 5px;
+            background: black;
+            color: #00ffcc;
+            border: 1px solid #00ffcc;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>SEXTANT CONTROL ROOM</h1>
+
+<div class="box">
+    <button onclick="runSim('normal')">Normal Operation</button>
+    <button onclick="runSim('failure')">Node Failure</button>
+    <button onclick="runSim('cascade')">Cascade Failure</button>
+</div>
+
+<div class="box" id="output">
+    Awaiting simulation...
+</div>
+
+<script>
+function runSim(type) {
+
+    let result = {};
+
+    if (type === "normal") {
+        result = {
+            state: "HEALTHY",
+            agents: ["noop_agent"],
+            impact: "LOW"
+        };
+    }
+
+    if (type === "failure") {
+        result = {
+            state: "DEGRADED",
+            agents: ["sre_agent", "recovery_agent"],
+            impact: "MEDIUM"
+        };
+    }
+
+    if (type === "cascade") {
+        result = {
+            state: "CRITICAL",
+            agents: ["sre_agent", "dependency_agent", "recovery_agent"],
+            impact: "HIGH"
+        };
+    }
+
+    document.getElementById("output").innerHTML = `
+        <h3>SIMULATION RESULT</h3>
+        <p><b>State:</b> ${result.state}</p>
+        <p><b>Agents:</b> ${result.agents.join(", ")}</p>
+        <p><b>Impact:</b> ${result.impact}</p>
+    `;
+}
+</script>
+
+</body>
+</html>
