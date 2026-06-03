@@ -1,15 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sextant Control Room — Institutional View</title>
+
+<style>
+body{
+    font-family: Arial;
+    background:#0b0f19;
+    color:#e6f7ff;
+    margin:0;
+    padding:30px;
+    text-align:center;
+}
+
+/* HEADER */
+h1{
+    margin-bottom:5px;
+    letter-spacing:1px;
+}
+
+.sub{
+    font-size:13px;
+    opacity:0.7;
+    margin-bottom:25px;
+}
+
+/* MAIN STATUS CARD */
+#statusCard{
+    max-width:420px;
+    margin:20px auto;
+    padding:20px;
+    border:1px solid #2bd4ff;
+    border-radius:6px;
+    font-size:22px;
+    font-weight:bold;
+}
+
+/* BUTTON */
+button{
+    padding:16px;
+    width:85%;
+    max-width:320px;
+    margin:15px auto;
+    display:block;
+    background:#000;
+    color:#2bd4ff;
+    border:1px solid #2bd4ff;
+    font-size:15px;
+    cursor:pointer;
+    border-radius:4px;
+}
+
+/* OUTPUT PANEL */
+#panel{
+    max-width:420px;
+    margin:20px auto;
+    padding:15px;
+    border:1px solid #2bd4ff;
+    text-align:left;
+    font-size:14px;
+    min-height:80px;
+}
+
+/* LOG */
+#log{
+    max-width:420px;
+    margin:20px auto;
+    padding:10px;
+    border:1px solid #2bd4ff;
+    height:140px;
+    overflow-y:auto;
+    text-align:left;
+    font-size:12px;
+}
+
+/* COLORS */
+.green{ color:#00ff99; }
+.yellow{ color:#ffcc00; }
+.red{ color:#ff4d4d; }
+
+.small{
+    font-size:12px;
+    opacity:0.7;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>SEXTANT CONTROL ROOM</h1>
+<div class="sub">Operational Resilience & Audit Simulation Engine</div>
+
+<div id="statusCard" class="green">
+SYSTEM STATUS: HEALTHY
+</div>
+
+<button onclick="runDemo()">▶ RUN INSTITUTIONAL DEMO</button>
+
+<div id="panel">
+Waiting for simulation...
+</div>
+
+<div class="small">Event Timeline</div>
+<div id="log">System initialized.</div>
+
 <script>
 
-/* =========================
-   CORE STATE
-========================= */
-
-let demoStep = 0;
-
-/* =========================
-   LOG
-========================= */
-
+/* LOG */
 function log(msg){
     const box = document.getElementById("log");
     const time = new Date().toLocaleTimeString();
@@ -17,141 +115,60 @@ function log(msg){
     box.scrollTop = box.scrollHeight;
 }
 
-/* =========================
-   SYSTEM RESET
-========================= */
+/* STATUS */
+function setStatus(text, level){
+    const box = document.getElementById("statusCard");
 
-function resetSystem(){
+    box.innerText = "SYSTEM STATUS: " + text;
 
-    demoStep = 0;
-
-    document.getElementById("status").innerText = "HEALTHY";
-    document.getElementById("status").style.color = "#00ff00";
-
-    document.getElementById("log").innerHTML = "System initialized.";
-
-    document.getElementById("riskBox")?.remove?.();
-
-    log("SYSTEM RESET");
+    box.className =
+        level === "green" ? "green" :
+        level === "yellow" ? "yellow" : "red";
 }
 
-/* =========================
-   DEMO FLOW ENGINE
-========================= */
-
+/* DEMO FLOW */
 function runDemo(){
 
-    resetSystem();
+    document.getElementById("panel").innerHTML =
+        "Initializing simulation...";
 
-    log("DEMO STARTED: Institutional Resilience Simulation");
+    log("DEMO START");
 
-    setTimeout(step1, 1000);
-}
+    setTimeout(() => {
 
-/* =========================
-   STEP 1
-========================= */
+        setStatus("HEALTHY","green");
+        log("STEP 1: System stable");
 
-function step1(){
+    }, 800);
 
-    log("STEP 1: Initial system state is HEALTHY");
-    document.getElementById("status").innerText = "HEALTHY";
+    setTimeout(() => {
 
-    setTimeout(step2, 1500);
-}
+        setStatus("DEGRADED","yellow");
+        log("STEP 2: Core banking failure injected");
 
-/* =========================
-   STEP 2
-========================= */
+    }, 2000);
 
-function step2(){
+    setTimeout(() => {
 
-    log("STEP 2: Injecting CORE BANKING failure");
-    document.getElementById("status").innerText = "DEGRADED";
-    document.getElementById("status").style.color = "#ffcc00";
+        setStatus("CRITICAL","red");
+        log("STEP 3: Cascade failure propagated");
 
-    setTimeout(step3, 1500);
-}
+        document.getElementById("panel").innerHTML =
+            "Risk Score: 88 / 100<br>Risk Level: CRITICAL";
 
-/* =========================
-   STEP 3
-========================= */
+    }, 3500);
 
-function step3(){
+    setTimeout(() => {
 
-    log("STEP 3: Cascade propagation to PAYMENT + MOBILE");
+        document.getElementById("panel").innerHTML +=
+            "<br><br>Audit Report: GENERATED ✔";
 
-    document.getElementById("status").innerText = "CRITICAL";
-    document.getElementById("status").style.color = "#ff0000";
+        log("STEP 4: Audit report generated");
 
-    setTimeout(step4, 1500);
-}
-
-/* =========================
-   STEP 4
-========================= */
-
-function step4(){
-
-    log("STEP 4: Risk Engine calculating impact");
-
-    const score = 85;
-    const level = "CRITICAL";
-
-    log("Risk Score: " + score);
-    log("Risk Level: " + level);
-
-    setTimeout(step5, 1500);
-}
-
-/* =========================
-   STEP 5
-========================= */
-
-function step5(){
-
-    log("STEP 5: Generating Audit Report");
-
-    const report = {
-        reportId: "DEMO-" + Math.floor(Math.random()*99999),
-        timestamp: new Date().toISOString(),
-        systemState: "CRITICAL",
-        riskScore: 85,
-        riskLevel: "CRITICAL",
-        interpretation: "System-wide cascading failure detected across core banking infrastructure."
-    };
-
-    const box = document.createElement("pre");
-    box.id = "riskBox";
-    box.style.border = "1px solid #00ffcc";
-    box.style.padding = "10px";
-    box.style.marginTop = "20px";
-
-    box.innerText = JSON.stringify(report, null, 2);
-
-    document.body.appendChild(box);
-
-    log("AUDIT REPORT GENERATED");
-
-    setTimeout(step6, 2000);
-}
-
-/* =========================
-   STEP 6
-========================= */
-
-function step6(){
-
-    log("DEMO COMPLETE — SYSTEM READY FOR REGULATORY REVIEW");
-
-}
-
-/* =========================
-   OPTIONAL QUICK SCENARIO
-========================= */
-
-function runScenario(){
-    log("Manual scenario mode triggered");
+    }, 5000);
 }
 
 </script>
+
+</body>
+</html>
