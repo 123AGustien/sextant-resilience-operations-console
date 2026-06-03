@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sextant Control Room v7</title>
+
+    <link rel="stylesheet" href="../assets/styles.css">
+
+    <style>
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .panel {
+            border: 1px solid #2bd4ff;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .status {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .green { color: lime; }
+        .amber { color: orange; }
+        .red { color: red; }
+        .critical { color: magenta; }
+
+        pre {
+            text-align: left;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>SEXTANT CONTROL ROOM v7</h2>
+
+<div class="grid">
+
+    <!-- STATUS PANEL -->
+    <div class="panel">
+        <h3>System Status</h3>
+        <div id="status" class="status green">GREEN</div>
+    </div>
+
+    <!-- ACTION PANEL -->
+    <div class="panel">
+        <h3>Simulation Controls</h3>
+
+        <button onclick="run('normal')">Normal</button>
+        <button onclick="run('failure')">Failure</button>
+        <button onclick="run('cascade')">Cascade</button>
+    </div>
+
+    <!-- OUTPUT PANEL -->
+    <div class="panel" style="grid-column: span 2;">
+        <h3>Simulation Output</h3>
+        <div id="output">Waiting...</div>
+    </div>
+
+</div>
+
+<!-- ENGINE LOAD (reuse existing system) -->
+<script src="../models/fx_model.js"></script>
+<script src="../models/contagion_model.js"></script>
+<script src="../core_engine/simulation_engine.js"></script>
+
+<script>
+
+function run(type) {
+
+    const status = document.getElementById("status");
+    const output = document.getElementById("output");
+
+    let scenario = { name: "CONTROL_ROOM_TEST" };
+
+    if (type === "cascade") {
+        scenario = {
+            name: "STRESS TEST",
+            oil_price: 110,
+            capital_flow: "outflow",
+            inflation_pressure: "rising"
+        };
+    }
+
+    const result = runSimulation(scenario);
+
+    window.lastResult = result;
+
+    // STATUS
+    status.innerText = result.final_state;
+
+    status.className =
+        "status " + result.final_state.toLowerCase();
+
+    // OUTPUT
+    output.innerHTML =
+        "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
+}
+
+</script>
+
+</body>
+</html>
