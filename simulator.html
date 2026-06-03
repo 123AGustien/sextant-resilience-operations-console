@@ -106,7 +106,7 @@ function runSim(type){
     const output = document.getElementById("output");
 
     // ---------------------------
-    // ENGINE MODE (NEW SYSTEM)
+    // ENGINE MODE
     // ---------------------------
     if(type === "cascade"){
 
@@ -128,25 +128,37 @@ function runSim(type){
             result.final_state === "AMBER" ? "#ffcc00" :
             result.final_state === "RED" ? "#ff0000" : "#8b0000";
 
-        setRisk(Math.min(100, result.system.fxStress * 60));
+        // FIXED: use correct FX pressure
+        setRisk(Math.min(100, result.fx.pressure_score * 60));
 
         output.innerHTML =
-            "<h3>ENGINE SIMULATION RESULT</h3>" +
+            "<h3>📊 SUPERVISORY STRESS REPORT</h3>" +
+
             "<p><b>Scenario:</b> " + result.scenario + "</p>" +
             "<p><b>USD/IDR:</b> " + result.fx.usd_idr + "</p>" +
-            "<p><b>FX Pressure:</b> " + result.fx.pressure_score + "</p>" +
-            "<p><b>Regime:</b> " + result.fx.regime + "</p>" +
-            "<p><b>System State:</b> " + result.final_state + "</p>" +
-            "<p><b>Interpretation:</b> " + result.interpretation + "</p>";
+            "<p><b>FX Pressure Index:</b> " + result.fx.pressure_score + "</p>" +
+            "<p><b>FX Regime:</b> " + result.fx.regime + "</p>" +
+
+            "<hr>" +
+
+            "<p><b>Banking Stress:</b> " + result.system.bankingStress.toFixed(2) + "</p>" +
+            "<p><b>Liquidity Stress:</b> " + result.system.liquidityStress.toFixed(2) + "</p>" +
+            "<p><b>Equity Stress:</b> " + result.system.equityStress.toFixed(2) + "</p>" +
+
+            "<hr>" +
+
+            "<p><b>System Classification:</b> " + result.final_state + "</p>" +
+            "<p><b>Interpretation:</b><br>" + result.interpretation + "</p>";
 
         log("ENGINE MODE RUN");
-        log("FX: " + result.fx.usd_idr);
+        log("USD/IDR: " + result.fx.usd_idr);
         log("STATE: " + result.final_state);
+
         return;
     }
 
     // ---------------------------
-    // LEGACY MODES (UNCHANGED)
+    // LEGACY MODES
     // ---------------------------
 
     if(type === "normal"){
