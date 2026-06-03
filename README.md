@@ -1,67 +1,119 @@
-# 🧭 Sextant Control Room
+---
 
-## Operational Resilience Simulation & Audit Evidence Engine
+# 🏷️ Version Information
 
-A deterministic browser-based simulation system for modeling infrastructure failures, cascade propagation, risk scoring, and regulatory-style audit reporting.
+## Sextant Control Room
+
+**Current Release:** v7.0.0  
+**Release Name:** Simulation Engine Stable  
+**Release Type:** Conceptual Research Prototype  
+**Status:** Active Development (Non-production System)
 
 ---
 
-## 🚀 Live Demo
+## 📦 System Overview (This Release)
 
-👉 https://123agustien.github.io/sextant-resilience-operations-console/
+This version of Sextant Control Room includes:
 
----
+### ✔ Core Simulation Engine
+- Rule-based deterministic simulation model
+- Scenario-driven system state evaluation
 
-## 🎬 How to Use (Institutional Demo Flow)
+### ✔ Dependency & Cascade Model
+- Multi-layer propagation of system stress
+- Banking → liquidity → equity transmission logic
 
-Click:
+### ✔ FX Stress Module (Synthetic)
+- USD/IDR scenario-based simulation
+- Macro pressure indicators (heuristic model)
 
-👉 Run Institutional Demo
+### ✔ Risk Scoring Framework
+- Normalized risk scale (0–100)
+- Categorized system states:
+  - LOW
+  - MEDIUM
+  - HIGH
+  - CRITICAL
 
-The system will automatically simulate:
+### ✔ Structured Reporting Engine
+- JSON-based scenario output generation
+- Timestamped simulation reports
+- Exportable audit-style records
 
-1. Healthy system state
-2. Core banking failure injection
-3. Cascade failure across dependent systems
-4. Risk score calculation (0–100)
-5. Audit report generation (JSON structured output)
-
----
-
-## 📊 Core Capabilities
-
-### ✔ Dependency Simulation
-Models relationships between core banking, payment, and mobile services.
-
-### ✔ Cascade Failure Engine
-Simulates how a single failure propagates through dependent systems.
-
-### ✔ Risk Scoring Engine
-Quantifies system impact on a 0–100 scale:
-- Low (0–29)
-- Medium (30–59)
-- High (60–84)
-- Critical (85–100)
-
-### ✔ Audit Evidence Generator
-Produces structured incident reports including:
-- Scenario ID
-- Timestamp
-- System state
-- Node-level impact
-- Risk classification
-- Interpretation summary
+### ✔ UI Simulation Dashboard
+- Interactive scenario execution panel
+- Real-time status updates
+- Event logging system
 
 ---
 
-## 🧠 Example Output
+## 🧪 Release Notes — v7.0.0
 
-```json
-{
-  "reportId": "DEMO-12345",
-  "timestamp": "2026-06-03T...",
-  "systemState": "CRITICAL",
-  "riskScore": 85,
-  "riskLevel": "CRITICAL",
-  "interpretation": "System-wide cascading failure across core banking infrastructure."
-}
+### Added
+- Integrated FX stress simulation model
+- Cascade failure propagation engine
+- System-wide risk classification layer
+- Audit report export functionality (JSON)
+
+### Improved
+- UI stability and simulation flow consistency
+- Scenario execution logic
+- Event logging clarity
+
+### Fixed
+- Simulation engine integration issues
+- Risk scoring synchronization
+- Export formatting consistency
+
+---
+
+## 📊 Architecture Summary
+
+The system is composed of:
+
+- Frontend UI Layer (HTML/CSS/JS)
+- Simulation Engine Layer (JavaScript modules)
+- FX Scenario Model (synthetic macro model)
+- Contagion Propagation Layer (system dependency model)
+- Reporting Layer (structured JSON export)
+
+---
+
+## ⚠️ Important Disclaimer
+
+This system is a conceptual simulation tool designed for educational and research purposes only.
+
+It does not represent or interface with real financial systems, regulatory frameworks, or live market data.
+
+It is not intended for financial forecasting, trading, or investment decision-making.
+
+---
+
+## 🏛 Intended Use
+
+- Operational resilience research
+- System dependency modeling
+- Scenario-based stress testing visualization
+- Academic and conceptual demonstration
+
+---
+
+## 🔖 Repository
+
+https://github.com/123AGustien/sextant-resilience-operations-console
+
+---
+
+## 📅 Version History
+
+- v7.0.0 — Stable Simulation Engine Release
+  - Full FX + contagion integration
+  - Audit export system
+  - UI dashboard stabilization
+
+---
+
+## 🧭 Author
+
+Don Herman Oswald Weerasekera  
+Sextant Protocol Doctrine – Resilience Engineering Framework
