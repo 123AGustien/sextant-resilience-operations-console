@@ -1,86 +1,108 @@
 # 🧭 Sextant Control Room
 
-## Operational Resilience Simulation & Structured Scenario Reporting Engine
+## Operational Resilience Simulation Platform  
+### Conceptual Research & Engineering Prototype
 
-Sextant Control Room is a conceptual simulation and research prototype designed to demonstrate operational resilience, system dependency modeling, and cascade failure propagation in financial infrastructure.
+---
 
-The system uses synthetic scenarios to illustrate how stress conditions may propagate across interconnected systems such as payment infrastructure, banking services, and macroeconomic variables.
+## 📌 Overview
+
+Sextant Control Room is a **conceptual simulation and research prototype** designed to demonstrate:
+
+- operational resilience modeling  
+- system dependency mapping  
+- cascade failure propagation  
+- synthetic macro-financial stress scenarios  
+- structured audit-style reporting  
+
+The platform is built for **visualization and experimentation of systemic risk concepts**, not real-world financial execution.
 
 ---
 
 ## 🎯 Purpose
 
-This platform is intended strictly for:
+This system is intended strictly for:
 
-- educational purposes
-- research and prototyping
-- visualization of systemic risk concepts
-- demonstration of resilience engineering principles
+- educational use  
+- research and prototyping  
+- resilience engineering demonstrations  
+- system architecture exploration  
+- scenario-based stress visualization  
+
+It is **not a predictive, advisory, or regulatory decision system**.
+
+---
+
+## 🚀 Live Demo
+
+- 🧭 Main Dashboard  
+https://123agustien.github.io/sextant-resilience-operations-console/
+
+- 🧪 Simulation Engine  
+https://123agustien.github.io/sextant-resilience-operations-console/simulator.html
+
+- 📦 GitHub Repository  
+https://github.com/123AGustien/sextant-resilience-operations-console
 
 ---
 
 ## ⚙️ Core Capabilities
 
-- Dependency Simulation Engine  
-- Cascade Propagation Model  
-- FX Stress Scenario Module (Synthetic)  
-- Risk Scoring Framework (0–100)  
-- Structured Scenario Reporting (JSON export)  
-- Interactive Simulation Dashboard  
+### ✔ Dependency Simulation Engine
+Models interconnections between:
+- banking systems  
+- payment infrastructure  
+- liquidity layers  
+- market sentiment signals  
 
 ---
 
-## 🧪 Release Notes — v7.0.0
-
-### Added
-- FX stress simulation engine
-- contagion propagation model
-- structured audit-style reporting
-- exportable JSON scenario output
-
-### Improved
-- simulation stability
-- UI execution flow
-- logging clarity
+### ✔ Cascade Failure Model
+Simulates how localized stress propagates into systemic impact.
 
 ---
 
-## 📊 Architecture
-
-- Frontend UI (HTML/CSS/JS)
-- Simulation Engine (JavaScript modules)
-- FX Scenario Model (synthetic)
-- Contagion Propagation Layer
-- Reporting & Export Layer
-
----
-
-## ⚠️ Disclaimer
-
-This system is a conceptual simulation tool for educational and research purposes only.
-
-It does not represent real financial systems, regulatory frameworks, or predictive models.
-
-It is not intended for financial forecasting or investment decisions.
+### ✔ Synthetic FX Stress Module
+Uses scenario-based logic (not real market data) to model:
+- USD/IDR stress conditions  
+- macroeconomic pressure signals  
+- regime classification:
+  - STABLE  
+  - WATCH  
+  - STRESS  
+  - CRITICAL  
 
 ---
 
-## 🏛 Intended Use
+### ✔ Risk Scoring Framework
+Normalized system risk scoring:
 
-- resilience engineering research  
-- system dependency modeling  
-- scenario-based stress testing  
-- academic demonstration  
-
----
-
-## 🔖 Repository
-
-https://github.com/123AGustien/sextant-resilience-operations-console
+- LOW (0–29)  
+- MEDIUM (30–59)  
+- HIGH (60–84)  
+- CRITICAL (85–100)  
 
 ---
 
-## 🧭 Author
+### ✔ Audit-Style Reporting Engine
+Generates structured JSON outputs including:
 
-Don Herman Oswald Weerasekera  
-Sextant Protocol Doctrine – Resilience Engineering Framework
+- scenario ID  
+- timestamp  
+- system state  
+- risk classification  
+- interpretation summary  
+
+---
+
+## 🧪 Example Output
+
+```json
+{
+  "reportId": "DEMO-12345",
+  "timestamp": "2026-06-03T...",
+  "systemState": "CRITICAL",
+  "riskScore": 85,
+  "riskLevel": "CRITICAL",
+  "interpretation": "System-wide cascading failure across simulated banking infrastructure."
+}
