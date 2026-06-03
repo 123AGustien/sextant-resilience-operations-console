@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Node Control Dashboard</title>
+
+    <link rel="stylesheet" href="../assets/styles.css">
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #0b0f19;
+            color: #e6f7ff;
+            text-align: center;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            max-width: 700px;
+            margin: auto;
+            margin-top: 30px;
+        }
+
+        .node {
+            border: 1px solid #2bd4ff;
+            padding: 20px;
+            border-radius: 6px;
+            background: #111827;
+            font-weight: bold;
+        }
+
+        .green { color: lime; }
+        .amber { color: orange; }
+        .red { color: red; }
+        .critical { color: magenta; }
+
+        button {
+            margin: 10px;
+            padding: 10px;
+            background: black;
+            color: #2bd4ff;
+            border: 1px solid #2bd4ff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>SEXTANT NODE DASHBOARD</h2>
+
+<p>Status: <span id="status">BOOTING</span></p>
+
+<button onclick="run('normal')">Normal</button>
+<button onclick="run('failure')">Failure</button>
+<button onclick="run('cascade')">Cascade</button>
+
+<div class="grid">
+
+    <div class="node" id="fx">FX NODE</div>
+    <div class="node" id="bank">BANK NODE</div>
+    <div class="node" id="liq">LIQUIDITY NODE</div>
+    <div class="node" id="eq">EQUITY NODE</div>
+    <div class="node" id="conf">CONFIDENCE NODE</div>
+
+</div>
+
+<script src="../models/fx_model.js"></script>
+<script src="../models/contagion_model.js"></script>
+<script src="../core_engine/simulation_engine.js"></script>
+
+<script>
+
+function setNode(id, value) {
+
+    const el = document.getElementById(id);
+
+    let state =
+        value < 0.3 ? "green" :
+        value < 0.6 ? "amber" :
+        value < 0.85 ? "red" :
+        "critical";
+
+    el.className = "node " + state;
+    el.innerText = id.toUpperCase() + ": " + value.toFixed(2);
+}
+
+function run(type) {
+
+    const status = document.getElementById("status");
+
+    let scenario = { name: "NODE TEST" };
+
+    if (type === "cascade") {
+        scenario = {
+            name: "STRESS EVENT",
+            oil_price: 110,
+            capital_flow: "outflow",
+            inflation_pressure: "rising"
+        };
+    }
+
+    const result = runSimulation(scenario);
+
+    window.lastResult = result;
+
+    status.innerText = result.final_state;
+
+    const s = result.system;
+
+    setNode("fx", s.fxStress);
+    setNode("bank", s.bankingStress);
+    setNode("liq", s.liquidityStress);
+    setNode("eq", s.equityStress);
+    setNode("conf", s.confidenceDrop);
+}
+
+</script>
+
+</body>
+</html>
