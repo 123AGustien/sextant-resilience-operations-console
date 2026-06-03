@@ -1,39 +1,58 @@
-
-  <script>
+<script>
 
 window.engine = {
     ready: false,
-    healthy: false
+    healthy: false,
+    lastHeartbeat: null
 };
 
 // -----------------------------
 // BOOT SEQUENCE (SAFE INIT)
 // -----------------------------
-window.onload = function(){
+window.onload = function () {
+
+    const output = document.getElementById("output");
 
     setTimeout(() => {
 
-        const output = document.getElementById("output");
+        try {
 
-        if(typeof runSimulation !== "function"){
-            output.innerHTML = "❌ Engine not loaded (simulation_engine.js missing)";
+            if (typeof runSimulation !== "function") {
+                output.innerHTML = "❌ Engine not loaded (simulation_engine.js missing)";
+                window.engine.ready = false;
+                window.engine.healthy = false;
+                return;
+            }
+
+            window.engine.ready = true;
+            window.engine.healthy = true;
+            window.engine.lastHeartbeat = Date.now();
+
+            output.innerHTML = "✅ System Ready (Unified Controller Active)";
+
+        } catch (e) {
+            output.innerHTML = "❌ Boot error: " + e.message;
             window.engine.ready = false;
             window.engine.healthy = false;
-            return;
         }
-
-        window.engine.ready = true;
-        window.engine.healthy = true;
-
-        output.innerHTML = "✅ System Ready (Unified Controller Active)";
 
     }, 300);
 };
 
 // -----------------------------
+// HEARTBEAT CHECK (ANTI-FREEZE)
+// -----------------------------
+function engineHeartbeat() {
+    if (!window.engine.lastHeartbeat) return false;
+
+    const now = Date.now();
+    return (now - window.engine.lastHeartbeat) < 10000; // 10s safety window
+}
+
+// -----------------------------
 // CORE SAFE RUN FUNCTION
 // -----------------------------
-function runSim(type){
+function runSim(type) {
 
     const output = document.getElementById("output");
     const status = document.getElementById("status");
@@ -41,19 +60,19 @@ function runSim(type){
     // -------------------------
     // SAFE MODE GATE
     // -------------------------
-    if(!window.engine.ready || !window.engine.healthy){
+    if (!window.engine.ready || !window.engine.healthy || !engineHeartbeat()) {
 
-        if(type === "cascade"){
+        if (type === "cascade") {
             status.innerText = "SAFE MODE";
-            output.innerHTML = "⚠️ Engine not available — running safe fallback";
+            output.innerHTML = "⚠️ Engine offline — fallback simulation active";
         }
 
-        if(type === "normal"){
+        if (type === "normal") {
             status.innerText = "HEALTHY (SAFE)";
             output.innerHTML = "System operating in fallback mode";
         }
 
-        if(type === "failure"){
+        if (type === "failure") {
             status.innerText = "DEGRADED (SAFE)";
             output.innerHTML = "Simulated failure (fallback mode)";
         }
@@ -61,23 +80,25 @@ function runSim(type){
         return;
     }
 
+    // refresh heartbeat
+    window.engine.lastHeartbeat = Date.now();
+
     // -------------------------
     // ENGINE MODE (PRIMARY PATH)
     // -------------------------
     try {
 
-        if(type === "cascade"){
+        if (type === "cascade") {
 
             const result = runSimulation({
-                name: "UNIFIED TEST SCENARIO",
+                name: "UNIFIED STRESS SCENARIO",
                 oil_price: 105,
                 capital_flow: "outflow",
-                inflation_pressure: "rising"
+                inflation_pressure: "rising",
+                msci_sentiment: "negative"
             });
 
-            if(!result){
-                throw new Error("Empty engine response");
-            }
+            if (!result) throw new Error("Empty engine response");
 
             window.lastSimulationResult = result;
 
@@ -89,29 +110,28 @@ function runSim(type){
                 result.final_state === "RED" ? "#ff0000" :
                 "#ffffff";
 
-            const fx = result.fx || {};
-            const sys = result.system || {};
-
             output.innerHTML =
                 "<h3>UNIFIED ENGINE OUTPUT</h3>" +
-                "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
+                "<pre style='white-space:pre-wrap;'>" +
+                JSON.stringify(result, null, 2) +
+                "</pre>";
 
             return;
         }
 
-        if(type === "normal"){
+        if (type === "normal") {
             status.innerText = "HEALTHY";
             output.innerHTML = "System OK";
             return;
         }
 
-        if(type === "failure"){
+        if (type === "failure") {
             status.innerText = "DEGRADED";
-            output.innerHTML = "Core failure simulated (safe mode off)";
+            output.innerHTML = "Core failure simulated (safe execution)";
             return;
         }
 
-    } catch (e){
+    } catch (e) {
 
         // -------------------------
         // CRASH RECOVERY LAYER
@@ -121,20 +141,20 @@ function runSim(type){
         window.engine.ready = false;
         window.engine.healthy = false;
 
-        status.innerText = "RECOVERED";
+        status.innerText = "RECOVERY MODE";
         output.innerHTML =
             "❌ Engine crash detected<br>" +
-            "System automatically switched to safe mode";
+            "Switched to safe fallback mode";
 
     }
 }
 
 // -----------------------------
-// EXPORT SAFE AUDIT
+// SAFE AUDIT EXPORT
 // -----------------------------
-function exportAudit(){
+function exportAudit() {
 
-    if(!window.lastSimulationResult){
+    if (!window.lastSimulationResult) {
         alert("No simulation available");
         return;
     }
@@ -142,12 +162,14 @@ function exportAudit(){
     const report = {
         report_id: "UNIFIED-" + Date.now(),
         timestamp: new Date().toISOString(),
-        data: window.lastSimulationResult
+        system_state: window.engine,
+        simulation: window.lastSimulationResult
     };
 
-    const blob = new Blob([JSON.stringify(report, null, 2)], {
-        type: "application/json"
-    });
+    const blob = new Blob(
+        [JSON.stringify(report, null, 2)],
+        { type: "application/json" }
+    );
 
     const url = URL.createObjectURL(blob);
 
@@ -159,4 +181,4 @@ function exportAudit(){
     URL.revokeObjectURL(url);
 }
 
-</script>  
+</script>
