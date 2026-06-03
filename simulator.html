@@ -2,13 +2,12 @@
 
 window.engine = {
     ready: false,
-    healthy: false,
     lastHeartbeat: 0
 };
 
-// -----------------------------
+// --------------------
 // BOOT SEQUENCE
-// -----------------------------
+// --------------------
 window.onload = function () {
 
     const output = document.getElementById("output");
@@ -17,107 +16,83 @@ window.onload = function () {
 
         if (typeof runSimulation !== "function") {
             output.innerHTML =
-                "❌ Engine missing: core_engine/simulation_engine.js";
+                "❌ ENGINE NOT LOADED → check /core_engine/simulation_engine.js";
             return;
         }
 
         window.engine.ready = true;
-        window.engine.healthy = true;
         window.engine.lastHeartbeat = Date.now();
 
         output.innerHTML =
-            "✅ SYSTEM READY — UNIFIED CONTROLLER ACTIVE";
+            "✅ SYSTEM READY — ENGINE ONLINE";
 
     }, 300);
 };
 
-// -----------------------------
+// --------------------
 // HEARTBEAT
-// -----------------------------
+// --------------------
 function engineAlive() {
-    return window.engine.lastHeartbeat &&
-           (Date.now() - window.engine.lastHeartbeat < 15000);
+    return Date.now() - window.engine.lastHeartbeat < 15000;
 }
 
-// -----------------------------
+// --------------------
 // SAFE RUN CONTROLLER
-// -----------------------------
+// --------------------
 function runSim(type) {
 
     const output = document.getElementById("output");
     const status = document.getElementById("status");
 
-    // -------------------------
-    // SAFE MODE (NO ENGINE REQUIRED)
-    // -------------------------
+    // SAFE MODE
     if (!window.engine.ready || !engineAlive()) {
 
         status.innerText = "SAFE MODE";
 
-        if (type === "cascade") {
-            output.innerHTML = "⚠️ Fallback cascade simulation (no engine)";
-        }
-
-        if (type === "normal") {
-            output.innerHTML = "System OK (fallback)";
-        }
-
-        if (type === "failure") {
-            output.innerHTML = "Failure simulated (fallback)";
-        }
+        output.innerHTML =
+            type === "cascade"
+                ? "⚠️ Cascade fallback mode"
+                : "System fallback mode";
 
         return;
     }
 
-    // refresh heartbeat
     window.engine.lastHeartbeat = Date.now();
 
     try {
 
-        // -------------------------
-        // CASCADE ENGINE MODE
-        // -------------------------
+        if (typeof runSimulation !== "function") {
+            throw new Error("ENGINE_RUNTIME_MISSING");
+        }
+
         if (type === "cascade") {
 
             const result = runSimulation({
-                name: "SYNTHETIC FX STRESS 2026",
+                name: "SYNTHETIC STRESS SCENARIO",
                 oil_price: 105,
                 capital_flow: "outflow",
-                inflation_pressure: "rising",
-                msci_sentiment: "negative"
+                inflation_pressure: "rising"
             });
-
-            if (!result) throw new Error("Engine returned empty result");
 
             window.lastSimulationResult = result;
 
             status.innerText = result.final_state || "UNKNOWN";
 
-            status.style.color =
-                result.final_state === "GREEN" ? "#00ff00" :
-                result.final_state === "AMBER" ? "#ffcc00" :
-                result.final_state === "RED" ? "#ff0000" :
-                "#ffffff";
-
             output.innerHTML =
                 "<h3>ENGINE OUTPUT</h3>" +
-                "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
+                "<pre>" +
+                JSON.stringify(result, null, 2) +
+                "</pre>";
 
             return;
         }
 
-        // -------------------------
-        // NORMAL MODE
-        // -------------------------
         if (type === "normal") {
             status.innerText = "HEALTHY";
             output.innerHTML = "SYSTEM OK";
             return;
         }
 
-        // -------------------------
-        // FAILURE MODE
-        // -------------------------
         if (type === "failure") {
             status.innerText = "DEGRADED";
             output.innerHTML = "CORE FAILURE SIMULATED";
@@ -126,32 +101,29 @@ function runSim(type) {
 
     } catch (e) {
 
-        console.error(e);
-
         window.engine.ready = false;
-        window.engine.healthy = false;
 
         status.innerText = "RECOVERY MODE";
         output.innerHTML =
-            "❌ Engine crash detected → fallback activated";
+            "❌ ENGINE CRASH → SAFE MODE ACTIVATED";
     }
 }
 
-// -----------------------------
-// EXPORT AUDIT
-// -----------------------------
+// --------------------
+// AUDIT EXPORT
+// --------------------
 function exportAudit() {
 
     if (!window.lastSimulationResult) {
-        alert("No simulation available");
+        alert("No simulation run");
         return;
     }
 
     const report = {
-        report_id: "UNIFIED-" + Date.now(),
+        report_id: "SEXTANT-" + Date.now(),
         timestamp: new Date().toISOString(),
-        engine_state: window.engine,
-        simulation: window.lastSimulationResult
+        simulation: window.lastSimulationResult,
+        engine: window.engine
     };
 
     const blob = new Blob(
