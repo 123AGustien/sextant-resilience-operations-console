@@ -20,6 +20,15 @@ button {
     cursor: pointer;
 }
 
+.panel {
+    border: 1px solid #2bd4ff;
+    max-width: 600px;
+    margin: 15px auto;
+    padding: 15px;
+    background: #111827;
+    border-radius: 6px;
+}
+
 .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -59,6 +68,19 @@ pre {
 <button onclick="runSim('failure')">Failure</button>
 <button onclick="runSim('cascade')">Cascade</button>
 
+<!-- FX PANEL -->
+<div class="panel">
+    <h3>FX PANEL (USD / IDR)</h3>
+
+    <div id="fx_value">USD/IDR: --</div>
+    <div id="fx_pressure">Pressure: --</div>
+    <div id="fx_regime">Regime: --</div>
+
+    <div style="height:10px;background:#111;margin-top:10px;border:1px solid #2bd4ff;">
+        <div id="fx_bar" style="height:10px;width:0%;background:lime;"></div>
+    </div>
+</div>
+
 <!-- NODE VISUALS -->
 <div class="grid">
 
@@ -71,7 +93,10 @@ pre {
 </div>
 
 <!-- OUTPUT -->
-<div id="output">Loading engine...</div>
+<div class="panel">
+    <h3>SIMULATION OUTPUT</h3>
+    <div id="output">Loading engine...</div>
+</div>
 
 <script src="models/fx_model.js"></script>
 <script src="models/contagion_model.js"></script>
@@ -117,9 +142,11 @@ function runSim(type) {
 
     status.innerText = result.final_state || "UNKNOWN";
 
+    // OUTPUT PANEL
     output.innerHTML =
         "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
+    // SYSTEM NODES
     const s = result?.system || {};
 
     setNode("fx", s.fxStress);
@@ -127,6 +154,27 @@ function runSim(type) {
     setNode("liq", s.liquidityStress);
     setNode("eq", s.equityStress);
     setNode("conf", s.confidenceDrop);
+
+    // FX PANEL
+    const fx = result?.fx || {};
+
+    document.getElementById("fx_value").innerText =
+        "USD/IDR: " + (fx.usd_idr ?? 0);
+
+    document.getElementById("fx_pressure").innerText =
+        "Pressure: " + (fx.pressure_score ?? 0);
+
+    document.getElementById("fx_regime").innerText =
+        "Regime: " + (fx.regime ?? "UNKNOWN");
+
+    let bar = Math.min((fx.pressure_score || 0) * 100, 100);
+
+    document.getElementById("fx_bar").style.width = bar + "%";
+
+    document.getElementById("fx_bar").style.background =
+        bar < 40 ? "lime" :
+        bar < 70 ? "orange" :
+        "red";
 }
 
 </script>
