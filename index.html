@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sextant Control Room v2</title>
+    <title>Sextant Control Room</title>
 
     <style>
         body {
@@ -20,42 +20,30 @@
             cursor: pointer;
         }
 
-        #status {
-            font-weight: bold;
-            font-size: 20px;
-        }
-
-        #nodes {
+        #output {
             margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .node {
-            border: 1px solid #00ffcc;
             padding: 10px;
-            width: 120px;
+            border: 1px solid #00ffcc;
         }
 
         #log {
             margin-top: 20px;
             border: 1px solid #00ffcc;
-            height: 200px;
+            height: 150px;
             overflow-y: auto;
             padding: 10px;
             text-align: left;
         }
 
-        .healthy { color: #00ff00; }
-        .degraded { color: #ffcc00; }
-        .failed { color: #ff0000; }
+        #status {
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
 
-<h1>SEXTANT CONTROL ROOM v2</h1>
+<h1>SEXTANT CONTROL ROOM</h1>
 
 <h2>System Status: <span id="status">UNKNOWN</span></h2>
 
@@ -63,25 +51,18 @@
 <button onclick="runSim('failure')">Node Failure</button>
 <button onclick="runSim('cascade')">Cascade Failure</button>
 
-<div id="nodes"></div>
+<div id="output">Awaiting simulation...</div>
 
 <h3>Event Log</h3>
-<div id="log"></div>
+<div id="log">No events recorded.</div>
 
 <script>
-/* -----------------------------
-   SYSTEM MODEL
-------------------------------*/
 
 const system = {
     db: { status: "healthy", dependsOn: [] },
     auth: { status: "healthy", dependsOn: ["db"] },
     gateway: { status: "healthy", dependsOn: ["auth"] }
 };
-
-/* -----------------------------
-   LOGGING
-------------------------------*/
 
 function log(msg) {
     const logBox = document.getElementById("log");
@@ -90,31 +71,19 @@ function log(msg) {
     logBox.scrollTop = logBox.scrollHeight;
 }
 
-/* -----------------------------
-   RESET SYSTEM
-------------------------------*/
-
 function resetSystem() {
     for (let node in system) {
         system[node].status = "healthy";
     }
-    log("System reset to HEALTHY state");
 }
-
-/* -----------------------------
-   FAILURE INJECTION
-------------------------------*/
 
 function injectFailure(node) {
     system[node].status = "failed";
-    log(`${node.toUpperCase()} FAILED`);
+    log(node.toUpperCase() + " FAILED");
 }
 
-/* -----------------------------
-   PROPAGATION ENGINE
-------------------------------*/
-
 function propagate() {
+
     let changed = true;
 
     while (changed) {
@@ -122,11 +91,12 @@ function propagate() {
 
         for (let node in system) {
             for (let dep of system[node].dependsOn) {
+
                 if (system[dep].status === "failed" &&
                     system[node].status !== "failed") {
 
                     system[node].status = "degraded";
-                    log(`${node.toUpperCase()} DEGRADED due to ${dep}`);
+                    log(node.toUpperCase() + " DEGRADED");
                     changed = true;
                 }
             }
@@ -134,11 +104,8 @@ function propagate() {
     }
 }
 
-/* -----------------------------
-   COMPUTE GLOBAL STATE
-------------------------------*/
-
 function computeState() {
+
     const states = Object.values(system).map(n => n.status);
 
     if (states.includes("failed")) return "CRITICAL";
@@ -146,26 +113,9 @@ function computeState() {
     return "HEALTHY";
 }
 
-/* -----------------------------
-   RENDER SYSTEM
-------------------------------*/
-
 function render() {
 
-    const container = document.getElementById("nodes");
-    container.innerHTML = "";
-
-    for (let node in system) {
-        const div = document.createElement("div");
-        div.className = "node " + system[node].status;
-
-        div.innerHTML = `
-            <h4>${node.toUpperCase()}</h4>
-            <p>${system[node].status}</p>
-        `;
-
-        container.appendChild(div);
-    }
+    const container = document.getElementById("output");
 
     const state = computeState();
     const statusEl = document.getElementById("status");
@@ -175,21 +125,16 @@ function render() {
     if (state === "HEALTHY") statusEl.style.color = "#00ff00";
     if (state === "DEGRADED") statusEl.style.color = "#ffcc00";
     if (state === "CRITICAL") statusEl.style.color = "#ff0000";
-}
 
-/* -----------------------------
-   SIMULATION ENGINE
-------------------------------*/
+    container.innerHTML =
+        "<h3>Simulation Complete</h3>" +
+        "<p>System State: " + state + "</p>";
+}
 
 function runSim(type) {
 
     resetSystem();
-    render();
-    log("Starting simulation: " + type.toUpperCase());
-
-    if (type === "normal") {
-        log("No failures injected");
-    }
+    log("Simulation: " + type.toUpperCase());
 
     if (type === "failure") {
         injectFailure("db");
@@ -199,26 +144,15 @@ function runSim(type) {
         injectFailure("db");
     }
 
-    // STEP 1
     setTimeout(() => {
         propagate();
         render();
-        log("Propagation step completed");
+        log("Simulation complete");
     }, 800);
-
-    // STEP 2 (stabilization check)
-    setTimeout(() => {
-        const state = computeState();
-        log("Final system state: " + state);
-    }, 1600);
 }
 
-/* -----------------------------
-   INIT
-------------------------------*/
-
 render();
-log("System initialized");
+
 </script>
 
 </body>
