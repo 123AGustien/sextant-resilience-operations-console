@@ -1,5 +1,7 @@
+exploration
 
-🧭 Sextant Control Room
+
+🧭 Sextaonxploration🧭 Sextant Control Room
 Operational Resilience Simulation Platform
 Version: v7.1 (Architectural Clarification Update)
 Type: Deterministic Simulation System
@@ -113,6 +115,36 @@ This repository is provided as a research-grade simulation platform for studying
 It is intended solely for:
 academic research
 simulation-based analysis
-resilience modelling
-conceptual system design exploration
+resilience modellindesigneptual system design explorationTautan Akses Resmi
+
+**Demo Utama (Dashboard)**  
+https://123agustien.github.io/sextant-resilience-operations-console
+
+**Simulator Teknis (Engine)**  
+https://123agustien.github.io/sextant-resilience-operations-console/simulator.html
+
+**Repositori GitHub**  
+https://github.com/123AGustien/sextant-resilience-operations-console
+
+---
+
+## 🌿 Arsitektur Branch
+
+**Main Branch (Core System)**  
+https://github.com/123AGustien/sextant-resilience-operations-console/tree/main  
+
+**FX Stress Upgrade (v7.1)**  
+https://github.com/123AGustien/sextant-resilience-operations-console/tree/v7.1-fx-upgrade  
+
+**Stable Baseline (v7.0)**  
+https://github.com/123AGustien/sextant-resilience-operations-console/tree/v7.0-stable  
+
+**Deployment Layer (gh-pages)**  
+https://github.com/123AGustien/sextant-resilience-operations-console/tree/gh-pages  
+
+---
+
+**Rilis Stabil**  
+https://github.com/123AGustien/sextant-resilience-operations-console/releases/tag/v7.0.0  
+
 END OF README
