@@ -5,11 +5,60 @@ let Phase8State = {
     timeline: {}
 };
 
+// -------------------------
+// SCENARIO LIBRARY (NEW)
+// -------------------------
+const Scenarios = {
+
+    bank_cascade: {
+        origin: "Bank_A",
+        shock: 0.8,
+        edges: {
+            "Bank_A": ["Bank_B"],
+            "Bank_B": ["Liquidity_Hub"],
+            "Liquidity_Hub": ["Bank_A"]
+        }
+    },
+
+    liquidity_stress: {
+        origin: "Liquidity_Hub",
+        shock: 0.7,
+        edges: {
+            "Liquidity_Hub": ["Bank_A", "Bank_B"],
+            "Bank_A": ["Bank_B"]
+        }
+    },
+
+    bank_failure: {
+        origin: "Bank_B",
+        shock: 0.9,
+        edges: {
+            "Bank_B": ["Liquidity_Hub"]
+        }
+    },
+
+    systemic_shock: {
+        origin: "Bank_A",
+        shock: 0.95,
+        edges: {
+            "Bank_A": ["Bank_B", "Liquidity_Hub"],
+            "Bank_B": ["Liquidity_Hub"],
+            "Liquidity_Hub": ["Bank_A", "Bank_B"]
+        }
+    }
+};
 
 // -------------------------
-// SIMPLE SIMULATION RUNNER (FRONTEND)
+// MAIN SIMULATION RUNNER
 // -------------------------
-function runSimulation() {
+function runSimulation(scenarioKey = "bank_cascade") {
+
+    const scenario = Scenarios[scenarioKey];
+
+    if (!scenario) {
+        console.error("Invalid scenario:", scenarioKey);
+        return Phase8State;
+    }
 
     // reset state
     Phase8State.nodes = {
@@ -20,29 +69,20 @@ function runSimulation() {
 
     Phase8State.interventions = [];
 
-    // -------------------------
-    // STEP 1: SHOCK INJECTION
-    // -------------------------
-    applyShock("Bank_A", 0.8);
+    // scenario config
+    const origin = scenario.origin;
+    const shock = scenario.shock;
 
-    // -------------------------
-    // STEP 2: CONTAGION PROPAGATION
-    // -------------------------
-    propagate("Bank_A", 0.8);
+    window.currentEdges = scenario.edges;
 
-    // -------------------------
-    // STEP 3: POLICY RESPONSE
-    // -------------------------
+    // execution pipeline
+    applyShock(origin, shock);
+    propagateDynamic(origin, shock);
     regulatoryResponse();
-
-    // -------------------------
-    // STEP 4: RISK CALCULATION
-    // -------------------------
     computeRisk();
 
     return Phase8State;
 }
-
 
 // -------------------------
 // SHOCK FUNCTION
@@ -59,9 +99,8 @@ function applyShock(nodeId, intensity) {
     else node.state = "STABLE";
 }
 
-
 // -------------------------
-// PROPAGATION (SIMPLE GRAPH)
+// LEGACY PROPAGATION (optional fallback)
 // -------------------------
 function propagate(origin, intensity) {
 
@@ -74,13 +113,25 @@ function propagate(origin, intensity) {
     let targets = edges[origin] || [];
 
     for (let t of targets) {
-
         let spread = intensity * 0.7;
-
         applyShock(t, spread);
     }
 }
 
+// -------------------------
+// SCENARIO-BASED PROPAGATION (NEW)
+// -------------------------
+function propagateDynamic(origin, intensity) {
+
+    const edges = window.currentEdges || {};
+
+    let targets = edges[origin] || [];
+
+    for (let t of targets) {
+        let spread = intensity * 0.7;
+        applyShock(t, spread);
+    }
+}
 
 // -------------------------
 // REGULATORY RESPONSE
@@ -111,7 +162,6 @@ function regulatoryResponse() {
     }
 }
 
-
 // -------------------------
 // RISK METRIC
 // -------------------------
@@ -123,5 +173,6 @@ function computeRisk() {
         total += Phase8State.nodes[id].risk;
     }
 
-    Phase8State.system_risk = total / Object.keys(Phase8State.nodes).length;
+    Phase8State.system_risk =
+        total / Object.keys(Phase8State.nodes).length;
 }
