@@ -49,3 +49,16 @@ function getSimulationReadout() {
         narrative: generateNarrative(systemStatus, avgRisk, critical)
     };
 }
+
+function generateNarrative(status, avgRisk, criticalCount) {
+
+    if (status === "STABLE") {
+        return "System operating within normal resilience thresholds. No cascade detected.";
+    }
+
+    if (status === "DEGRADED") {
+        return "Localized stress detected. System is absorbing shocks with elevated sensitivity.";
+    }
+
+    return "Systemic instability detected. Multiple nodes in critical state. Cascade propagation active.";
+}
