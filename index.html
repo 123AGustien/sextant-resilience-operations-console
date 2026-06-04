@@ -47,6 +47,14 @@ a.button{
 a.button:hover{
     background:#0f1a22;
 }
+
+.status-ok{
+    color: lime;
+}
+
+.status-bad{
+    color: red;
+}
 </style>
 </head>
 
@@ -58,12 +66,19 @@ a.button:hover{
 Operational Resilience Simulation Platform
 </div>
 
+<!-- SYSTEM STATUS CHECK -->
+<div class="card">
+    <h3>System Status</h3>
+    <p id="status">Checking engine...</p>
+</div>
+
 <!-- ENTRY POINT -->
 <div class="card">
 
 <h3>Executive Dashboard</h3>
 
-<a class="button" href="./simulator.html">
+<a class="button"
+   href="/sextant-resilience-operations-console/simulator.html?v=1">
 ▶ Launch Simulation Engine
 </a>
 
@@ -85,12 +100,14 @@ simulation of infrastructure failure and audit evidence generation.
 
 </div>
 
-<!-- 🟦 CONTROL ROOM (NEW V7 MODULE) -->
+<!-- CONTROL ROOM -->
 <div class="card">
 
 <h3>Visual Control Room v7</h3>
 
-<a class="button" href="./dashboard/control_room.html">
+<a class="button"
+   href="/sextant-resilience-operations-console/dashboard/control_room.html?v=1"
+   target="_blank">
 ▶ Open Visual Control Room
 </a>
 
@@ -99,6 +116,25 @@ Live system status + cascade visualization layer
 </p>
 
 </div>
+
+<!-- ENGINE HEALTH CHECK SCRIPT -->
+<script>
+(function () {
+    fetch('/sextant-resilience-operations-console/simulator.html?v=1')
+        .then(res => {
+            if (res.ok) {
+                document.getElementById("status").innerHTML =
+                    "<span class='status-ok'>ENGINE READY (STABLE)</span>";
+            } else {
+                throw new Error("Bad response");
+            }
+        })
+        .catch(() => {
+            document.getElementById("status").innerHTML =
+                "<span class='status-bad'>ENGINE OFFLINE (DEPLOYMENT ISSUE)</span>";
+        });
+})();
+</script>
 
 </body>
 </html>
