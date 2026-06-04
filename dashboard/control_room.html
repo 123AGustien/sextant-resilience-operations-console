@@ -66,7 +66,7 @@
 
 </div>
 
-<!-- ENGINE LOAD (reuse existing system) -->
+<!-- ================= ENGINE LOAD ================= -->
 <script src="../models/fx_model.js"></script>
 <script src="../models/contagion_model.js"></script>
 <script src="../core_engine/simulation_engine.js"></script>
@@ -78,30 +78,82 @@ function run(type) {
     const status = document.getElementById("status");
     const output = document.getElementById("output");
 
-    let scenario = { name: "CONTROL_ROOM_TEST" };
+    // ================================
+    // STEP 0 — Engine safety check
+    // ================================
+    if (typeof runSimulation !== "function") {
+        output.innerHTML = "❌ ERROR: simulation_engine.js not loaded";
+        console.error("[ControlRoom] runSimulation missing");
+        return;
+    }
+
+    // ================================
+    // STEP 1 — Scenario builder
+    // ================================
+    let scenario = {
+        name: "CONTROL_ROOM_TEST",
+        oil_price: 100,
+        capital_flow: "neutral",
+        inflation_pressure: "stable"
+    };
+
+    if (type === "failure") {
+        scenario = {
+            name: "FAILURE_TEST",
+            oil_price: 95,
+            capital_flow: "outflow",
+            inflation_pressure: "rising"
+        };
+    }
 
     if (type === "cascade") {
         scenario = {
-            name: "STRESS TEST",
+            name: "STRESS_TEST",
             oil_price: 110,
             capital_flow: "outflow",
             inflation_pressure: "rising"
         };
     }
 
-    const result = runSimulation(scenario);
+    // ================================
+    // STEP 2 — Execute simulation
+    // ================================
+    let result;
+
+    try {
+        result = runSimulation(scenario);
+    } catch (err) {
+        output.innerHTML = "❌ ENGINE CRASH: " + err.message;
+        console.error(err);
+        return;
+    }
+
+    if (!result) {
+        output.innerHTML = "❌ ERROR: null simulation result";
+        return;
+    }
 
     window.lastResult = result;
 
-    // STATUS
-    status.innerText = result.final_state;
+    // ================================
+    // STEP 3 — STATUS UPDATE (SAFE)
+    // ================================
+    const state = result.final_state || "UNKNOWN";
 
-    status.className =
-        "status " + result.final_state.toLowerCase();
+    status.innerText = state;
 
-    // OUTPUT
-    output.innerHTML =
-        "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
+    // prevent broken CSS class if undefined
+    status.className = "status " + state.toLowerCase();
+
+    // ================================
+    // STEP 4 — OUTPUT RENDER
+    // ================================
+    output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
+
+    // ================================
+    // STEP 5 — DEBUG LOG
+    // ================================
+    console.log("[Sextant]", result);
 }
 
 </script>
