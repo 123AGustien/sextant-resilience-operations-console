@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phase 8 Control Room</title>
+
+    <style>
+        body {
+            background: #0b0f14;
+            color: #d7e1ec;
+            font-family: Arial;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        .card {
+            background: #121923;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .critical { color: #ff4d4d; }
+        .warning { color: #ffb84d; }
+        .stable { color: #4dff88; }
+
+        .node {
+            margin: 6px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Phase 8 Institutional Control Room</h2>
+
+<div class="grid">
+
+    <div class="card">
+        <h3>System Nodes</h3>
+        <div id="nodes">Loading...</div>
+    </div>
+
+    <div class="card">
+        <h3>System Risk</h3>
+        <div id="risk">0.00</div>
+    </div>
+
+    <div class="card">
+        <h3>Regulatory Actions</h3>
+        <div id="actions">None</div>
+    </div>
+
+</div>
+
+<script>
+
+async function fetchData() {
+
+    // Placeholder endpoint (we connect API later)
+    const data = await fetch("/phase8/latest.json")
+        .then(r => r.json())
+        .catch(() => null);
+
+    if (!data) return;
+
+    // -------------------------
+    // NODES
+    // -------------------------
+    const nodesDiv = document.getElementById("nodes");
+    nodesDiv.innerHTML = "";
+
+    for (const [id, node] of Object.entries(data.nodes)) {
+
+        let cls = "stable";
+        if (node.state === "WARNING") cls = "warning";
+        if (node.state === "CRITICAL") cls = "critical";
+
+        nodesDiv.innerHTML += `
+            <div class="node ${cls}">
+                ${id} → ${node.state} (${node.health_score.toFixed(2)})
+            </div>
+        `;
+    }
+
+    // -------------------------
+    // RISK
+    // -------------------------
+    document.getElementById("risk").innerText =
+        data.system_risk.toFixed(3);
+
+    // -------------------------
+    // ACTIONS
+    // -------------------------
+    const actionsDiv = document.getElementById("actions");
+    actionsDiv.innerHTML = "";
+
+    for (const a of (data.interventions || [])) {
+        actionsDiv.innerHTML += `<div>${a.type}</div>`;
+    }
+}
+
+setInterval(fetchData, 2000);
+
+</script>
+
+</body>
+</html>
