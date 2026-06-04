@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sextant Control Room v7.2 (RP-04 Audit Mode)</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0b0f19;
+    color: #e6f7ff;
+    text-align: center;
+    position: relative;
+}
+
+button {
+    margin: 8px;
+    padding: 10px;
+    background: black;
+    color: #2bd4ff;
+    border: 1px solid #2bd4ff;
+    cursor: pointer;
+}
+
+.panel {
+    border: 1px solid #2bd4ff;
+    max-width: 800px;
+    margin: 15px auto;
+    padding: 15px;
+    background: #111827;
+    border-radius: 6px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.node {
+    border: 1px solid #2bd4ff;
+    padding: 15px;
+    background: #111827;
+    transition: 0.3s;
+}
+
+.green { color: lime; border-color: lime; }
+.amber { color: orange; border-color: orange; }
+.red { color: red; border-color: red; }
+.critical { color: magenta; border-color: magenta; }
+
+.pulse {
+    animation: pulseAnim 0.5s ease-in-out;
+}
+
+@keyframes pulseAnim {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+pre {
+    text-align: left;
+    background: #0a0a0a;
+    padding: 10px;
+    overflow: auto;
+    font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>SEXTANT CONTROL ROOM v7.2</h2>
+<h3>Status: <span id="status">BOOTING</span></h3>
+
+<!-- CONTROLS -->
+<button onclick="runSim('normal')">Normal</button>
+<button onclick="runSim('failure')">Failure</button>
+<button onclick="runSim('cascade')">Cascade</button>
+
+<!-- REPLAY SLIDER -->
+<div class="panel">
+    <h3>REGULATOR REPLAY MODE</h3>
+    <input type="range" id="replay" min="0" max="0" value="0" oninput="replayStep(this.value)">
+    <div id="replayInfo">No simulation loaded</div>
+</div>
+
+<!-- NODES -->
+<div class="grid">
+    <div class="node" id="rp04">RP-04 NODE</div>
+    <div class="node" id="fx">FX NODE</div>
+    <div class="node" id="bank">BANK NODE</div>
+    <div class="node" id="liq">LIQUIDITY NODE</div>
+    <div class="node" id="eq">EQUITY NODE</div>
+    <div class="node" id="conf">CONFIDENCE NODE</div>
+</div>
+
+<!-- OUTPUT -->
+<div class="panel">
+    <h3>LIVE OUTPUT</h3>
+    <div id="output">Waiting...</div>
+</div>
+
+<!-- LOGS -->
+<div class="panel">
+    <h3>AUDIT LOG</h3>
+    <div id="log_list"></div>
+</div>
+
+<script>
+
+window.auditTrail = [];
+
+/* =========================
+   NODE VISUAL STATE
+========================= */
+function setNode(id, value) {
+
+    const el = document.getElementById(id);
+    value = value || 0;
+
+    let state =
+        value < 0.3 ? "green" :
+        value < 0.6 ? "amber" :
+        value < 0.85 ? "red" :
+        "critical";
+
+    el.className = "node " + state;
+    el.innerText = id.toUpperCase() + ": " + value.toFixed(2);
+}
+
+/* =========================
+   PULSE
+========================= */
+function pulse(id) {
+    const el = document.getElementById(id);
+    el.classList.add("pulse");
+    setTimeout(() => el.classList.remove("pulse"), 500);
+}
+
+/* =========================
+   SIM ENGINE (AUDIT CAPTURE)
+========================= */
+function runSim(type) {
+
+    let scenario = { name: type.toUpperCase() };
+
+    const rp04 = {
+        stability: type === "cascade" ? 0.35 : 0.78,
+        pressure: type === "cascade" ? 0.9 : 0.3
+    };
+
+    const cascade = 1 - rp04.stability;
+
+    const system = {
+        fx: Math.random() * cascade,
+        bank: Math.random() * cascade,
+        liq: Math.random() * cascade,
+        eq: Math.random() * cascade,
+        conf: Math.random() * cascade
+    };
+
+    const snapshot = {
+        time: Date.now(),
+        scenario,
+        rp04,
+        system,
+        state: rp04.stability > 0.6 ? "STABLE" : "RISK"
+    };
+
+    auditTrail.push(snapshot);
+
+    document.getElementById("replay").max = auditTrail.length - 1;
+    document.getElementById("replay").value = auditTrail.length - 1;
+
+    render(snapshot);
+}
+
+/* =========================
+   REPLAY ENGINE
+========================= */
+function replayStep(index) {
+
+    const snap = auditTrail[index];
+    if (!snap) return;
+
+    document.getElementById("replayInfo").innerText =
+        "Viewing snapshot #" + index;
+
+    render(snap);
+}
+
+/* =========================
+   RENDER SYSTEM STATE
+========================= */
+function render(snap) {
+
+    document.getElementById("status").innerText = snap.state;
+
+    setNode("rp04", snap.rp04.stability);
+    setNode("fx", snap.system.fx);
+    setNode("bank", snap.system.bank);
+    setNode("liq", snap.system.liq);
+    setNode("eq", snap.system.eq);
+    setNode("conf", snap.system.conf);
+
+    pulse("rp04");
+    pulse("fx");
+    pulse("bank");
+    pulse("liq");
+    pulse("eq");
+    pulse("conf");
+
+    document.getElementById("output").innerHTML =
+        "<pre>" + JSON.stringify(snap, null, 2) + "</pre>";
+
+    document.getElementById("log_list").innerHTML =
+        auditTrail.map((l, i) => `
+            <div style="border-bottom:1px solid #333;padding:6px;text-align:left;">
+                <b>#${i}</b> ${new Date(l.time).toISOString()} — ${l.state}
+            </div>
+        `).join("");
+}
+
+</script>
+
+</body>
+</html>
