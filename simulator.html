@@ -1,256 +1,190 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Sextant Control Room v7</title>
+# 🧭 Sextant Control Room
+## Operational Resilience Simulation Platform
 
-<style>
-body {
-    font-family: Arial;
-    background: #0b0f19;
-    color: #e6f7ff;
-    text-align: center;
-}
+**Version:** v7.2 (Master Submission Pack)  
+**Status:** Stable Simulation Release  
+**Type:** Deterministic System  
+**Classification:** Non-Operational / Synthetic Data / Non-Production  
 
-button {
-    margin: 8px;
-    padding: 10px;
-    background: black;
-    color: #2bd4ff;
-    border: 1px solid #2bd4ff;
-    cursor: pointer;
-}
+---
 
-.panel {
-    border: 1px solid #2bd4ff;
-    max-width: 700px;
-    margin: 15px auto;
-    padding: 15px;
-    background: #111827;
-    border-radius: 6px;
-}
+# 🔗 Tautan Akses Resmi
 
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    max-width: 700px;
-    margin: 20px auto;
-}
+## 🌐 Live System
 
-.node {
-    border: 1px solid #2bd4ff;
-    padding: 15px;
-    background: #111827;
-}
+**Demo Utama (Dashboard)**  
+https://123agustien.github.io/sextant-resilience-operations-console  
 
-.green { color: lime; }
-.amber { color: orange; }
-.red { color: red; }
-.critical { color: magenta; }
+**Simulator Teknis (Engine)**  
+https://123agustien.github.io/sextant-resilience-operations-console/simulator.html  
 
-pre {
-    text-align: left;
-    background: #0a0a0a;
-    padding: 10px;
-    overflow: auto;
-    font-size: 12px;
-}
-</style>
-</head>
+**Repositori GitHub (Core System)**  
+https://github.com/123AGustien/sextant-resilience-operations-console  
 
-<body>
+---
 
-<h2>SEXTANT CONTROL ROOM v7</h2>
+# 🌿 Arsitektur Branch & Release Structure
 
-<h3>Status: <span id="status">BOOTING</span></h3>
+## Core Branches
 
-<!-- CONTROLS -->
-<button onclick="runSim('normal')">Normal</button>
-<button onclick="runSim('failure')">Failure</button>
-<button onclick="runSim('cascade')">Cascade</button>
+**Main Branch (Core System)**  
+https://github.com/123AGustien/sextant-resilience-operations-console/tree/main  
 
-<!-- FX PANEL -->
-<div class="panel">
-    <h3>FX PANEL (USD / IDR)</h3>
+**FX Stress Upgrade (v7.1)**  
+https://github.com/123AGustien/sextant-resilience-operations-console/tree/v7.1-fx-upgrade  
 
-    <div id="fx_value">USD/IDR: --</div>
-    <div id="fx_pressure">Pressure: --</div>
-    <div id="fx_regime">Regime: --</div>
+**Stable Baseline (v7.0)**  
+https://github.com/123AGustien/sextant-resilience-operations-console/tree/v7.0-stable  
 
-    <div style="height:10px;background:#111;border:1px solid #2bd4ff;margin-top:10px;">
-        <div id="fx_bar" style="height:10px;width:0%;background:lime;"></div>
-    </div>
-</div>
+**Deployment Layer (GitHub Pages)**  
+https://github.com/123AGustien/sextant-resilience-operations-console/tree/gh-pages  
 
-<!-- NODES -->
-<div class="grid">
-    <div class="node" id="fx">FX NODE</div>
-    <div class="node" id="bank">BANK NODE</div>
-    <div class="node" id="liq">LIQUIDITY NODE</div>
-    <div class="node" id="eq">EQUITY NODE</div>
-    <div class="node" id="conf">CONFIDENCE NODE</div>
-</div>
+---
 
-<!-- OUTPUT -->
-<div class="panel">
-    <h3>SIMULATION OUTPUT</h3>
-    <div id="output">Waiting...</div>
-</div>
+## 📦 Release Snapshot
 
-<!-- LOGS -->
-<div class="panel">
-    <h3>SIMULATION LOGS</h3>
-    <button onclick="exportPDF()">Export PDF Audit Report</button>
-    <div id="log_list"></div>
-</div>
+**Stable Release (v7.0.0)**  
+https://github.com/123AGustien/sextant-resilience-operations-console/releases/tag/v7.0.0  
 
-<!-- ENGINE FILES -->
-<script src="models/fx_model.js"></script>
-<script src="models/contagion_model.js"></script>
-<script src="core_engine/simulation_engine.js"></script>
+---
 
-<script>
+# 🧠 SYSTEM OVERVIEW
 
-// ==========================
-// MEMORY STORE
-// ==========================
-window.simulationLogs = [];
+The Sextant Control Room is a deterministic simulation platform designed to model:
 
-// ==========================
-// NODE UPDATE
-// ==========================
-function setNode(id, value) {
+- Systemic risk propagation  
+- Dependency failure cascades  
+- Financial stress simulation (synthetic)  
+- Observability delay effects  
+- Cross-domain resilience behaviour  
 
-    const el = document.getElementById(id);
-    value = value || 0;
+It operates as a **graph-based deterministic simulation engine**.
 
-    let state =
-        value < 0.3 ? "green" :
-        value < 0.6 ? "amber" :
-        value < 0.85 ? "red" :
-        "critical";
+---
 
-    el.className = "node " + state;
-    el.innerText = id.toUpperCase() + ": " + value.toFixed(2);
-}
+# ⚠️ SYSTEM CLASSIFICATION
 
-// ==========================
-// MAIN SIMULATION
-// ==========================
-function runSim(type) {
+All components are:
 
-    const status = document.getElementById("status");
-    const output = document.getElementById("output");
+- Simulation-based only  
+- Non-production systems  
+- Non-operational environments  
+- Synthetic datasets only  
+- No real financial or infrastructure interaction  
 
-    let scenario = { name: "TEST" };
+The system does NOT:
 
-    if (type === "cascade") {
-        scenario = {
-            name: "STRESS TEST",
-            oil_price: 110,
-            capital_flow: "outflow",
-            inflation_pressure: "rising"
-        };
-    }
+- Execute real financial transactions  
+- Connect to banking systems  
+- Process real user data  
+- Provide production trading or risk advice  
 
-    const result = runSimulation(scenario);
+---
 
-    window.lastResult = result;
+# 🧠 ARCHITECTURE OVERVIEW
 
-    // STORE LOG
-    window.simulationLogs.push({
-        timestamp: new Date().toISOString(),
-        scenario: scenario,
-        result: result
-    });
+## 1. Core Simulation Engine
+- Sextant Protocol (cascade engine)
+- RP-04 Stable Baseline (benchmark model)
 
-    // STATUS
-    status.innerText = result.final_state || "UNKNOWN";
+## 2. Observability Layer
+- SPD-R Google Cloud POC (monitoring simulation)
+- LENA Vehicle Data Core (event reconstruction)
 
-    // OUTPUT PANEL
-    output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
+## 3. Financial Resilience Layer (Synthetic)
+- Liquidity stress simulation  
+- Credit exposure propagation  
+- Macro shock modelling  
+- SME failure cascade modelling  
 
-    // FX PANEL
-    const fx = result?.fx || {};
+## 4. Control & Interface Layer
+- Sextant Control Room Dashboard (GitHub Pages)
 
-    document.getElementById("fx_value").innerText =
-        "USD/IDR: " + (fx.usd_idr ?? 0);
+---
 
-    document.getElementById("fx_pressure").innerText =
-        "Pressure: " + (fx.pressure_score ?? 0);
+# 🌊 SIMULATION MODEL
 
-    document.getElementById("fx_regime").innerText =
-        "Regime: " + (fx.regime ?? "UNKNOWN");
+Dependency → Stress → Failure → Cascade → Observability → Recovery → Stabilisation  
 
-    let bar = Math.min((fx.pressure_score || 0) * 100, 100);
+Key behaviours:
+- Dependency-weighted propagation  
+- Cross-domain coupling effects  
+- Observability delay distortion  
+- Systemic risk clustering  
+- Cascade amplification  
 
-    document.getElementById("fx_bar").style.width = bar + "%";
-    document.getElementById("fx_bar").style.background =
-        bar < 40 ? "lime" :
-        bar < 70 ? "orange" :
-        "red";
+---
 
-    // NODE UPDATE
-    const s = result?.system || {};
+# 📊 SYSTEM RISK MODEL
 
-    setNode("fx", s.fxStress);
-    setNode("bank", s.bankingStress);
-    setNode("liq", s.liquidityStress);
-    setNode("eq", s.equityStress);
-    setNode("conf", s.confidenceDrop);
+RI = (DS × PS × CD) / OD  
 
-    // LOG UI
-    const logList = document.getElementById("log_list");
+Where:
+- DS = Dependency Strength  
+- PS = Propagation Sensitivity  
+- CD = Coupling Density  
+- OD = Observability Delay  
 
-    logList.innerHTML = window.simulationLogs.map((l, i) => `
-        <div style="border-bottom:1px solid #333;padding:5px;text-align:left;">
-            <b>#${i+1}</b> ${l.timestamp}<br>
-            ${l.scenario.name} → ${l.result.final_state}
-        </div>
-    `).join("");
-}
+---
 
-// ==========================
-// PDF EXPORT (AUDIT REPORT)
-// ==========================
-function exportPDF() {
+# 🧩 SIMULATION MODES
 
-    if (!window.simulationLogs.length) {
-        alert("No logs available");
-        return;
-    }
+## Infrastructure Mode
+- System failure propagation
+- Dependency cascade simulation
 
-    const report = window.simulationLogs.map(l => `
-========================
-TIME: ${l.timestamp}
-SCENARIO: ${l.scenario.name}
-STATE: ${l.result.final_state}
+## Financial Mode (Synthetic)
+- Liquidity stress modelling
+- Credit risk propagation
 
-FX:
-USD/IDR: ${l.result.fx?.usd_idr}
-PRESSURE: ${l.result.fx?.pressure_score}
-REGIME: ${l.result.fx?.regime}
+## Observability Mode
+- Detection delay simulation
+- Blind spot analysis
 
-SYSTEM:
-FX: ${l.result.system?.fxStress}
-BANK: ${l.result.system?.bankingStress}
-LIQ: ${l.result.system?.liquidityStress}
-EQ: ${l.result.system?.equityStress}
-CONF: ${l.result.system?.confidenceDrop}
-`).join("\n");
+## Hybrid Mode
+- Cross-domain systemic coupling
 
-    const blob = new Blob([report], { type: "application/pdf" });
-    const url = URL.createObjectURL(blob);
+---
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "SEXTANT_AUDIT_REPORT.pdf";
-    a.click();
+# 📌 SYSTEM REPOSITORY ECOSYSTEM
 
-    URL.revokeObjectURL(url);
-}
+## Core Engine
+- Sextant Protocol  
+- RP-04 Cascade Engine (Baseline)
 
-</script>
+## Observability Layer
+- SPD-R Google Cloud POC  
+- LENA Vehicle Data Core  
 
-</body>
-</html>
+## Interface Layer
+- Sextant Control Room Dashboard  
+
+---
+
+# 📊 DESIGN PRINCIPLE
+
+A single deterministic engine powers all simulation modes using a unified dependency graph model.
+
+---
+
+# 📌 KEY INNOVATION
+
+This system models:
+
+- Cross-domain cascading failures  
+- Financial + infrastructure interaction effects  
+- Observability lag distortion  
+- Systemic fragility mapping  
+
+---
+
+# 📌 CLOSING STATEMENT
+
+This repository is intended for:
+
+- Academic research  
+- Simulation-based analysis  
+- Resilience modelling  
+- Conceptual system design exploration  
+
+END OF README
