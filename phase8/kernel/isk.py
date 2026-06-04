@@ -11,7 +11,7 @@ def apply_event(state, event):
     return state
 
 
-def propagate(state):
+from phase8.engine.propagation import propagate
     """
     Simple deterministic propagation rules
     """
