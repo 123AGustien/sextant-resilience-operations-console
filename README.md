@@ -1,196 +1,118 @@
-# 🧭 Sextant Control Room  
-## Operational Resilience Simulation Platform  
-### OJK Sandbox-Style Research & Engineering Prototype
 
----
-
-## 📌 Overview
-
-Sextant Control Room is a **conceptual simulation and research prototype** designed for **systemic risk modeling and operational resilience analysis**.
-
-It demonstrates:
-
-- financial system dependency mapping (synthetic)
-- cascade failure propagation modeling
-- macro-financial stress scenario simulation (non-market data)
-- institutional resilience visualization
-- audit-style structured reporting outputs
-
-This system is built strictly for:
-**research, education, and simulation purposes only**.
-
-It does **not execute, predict, or provide financial advice or regulatory decisions**.
-
----
-
-## 🎯 Regulatory Positioning (OJK Sandbox Context)
-
-This project is conceptually aligned with **financial innovation sandbox principles under OJK supervisory frameworks (Indonesia financial innovation environment)**.
-
-It reflects sandbox-relevant characteristics:
-
-- experimental digital simulation environment
-- synthetic datasets only (no real financial data)
-- transparent model logic and outputs
-- research-grade systemic risk modeling
-- non-production, non-commercial architecture
-
-⚠️ This system is **not registered, licensed, or operated as a financial service provider**.
-
----
-
-## 🧪 System Purpose
-
-This platform is intended for:
-
-- resilience engineering research
-- systemic risk simulation studies
-- academic and institutional experimentation
-- stress-testing scenario visualization
-- infrastructure dependency modeling
-
-It is **not intended for financial advisory, trading, or production financial use**.
-
----
-
-## 🚀 Live Demo & Simulation Access
-
-🧭 **Main Dashboard (Web Interface)**  
-https://123agustien.github.io/sextant-resilience-operations-console/
-
-🧪 **Simulation Engine (Direct Access)**  
-https://123agustien.github.io/sextant-resilience-operations-console/simulator.html
-
-📦 **Source Repository**  
-https://github.com/123AGustien/sextant-resilience-operations-console
-
----
-
-## 🧪 Branch-Based Simulation Architecture
-
-The system is structured into isolated simulation environments for traceability, validation, and controlled experimentation.
-
----
-
-### 🧠 Core Simulation Engine (main branch)
-👉 https://github.com/123AGustien/sextant-resilience-operations-console/tree/main
-
-Baseline system containing:
-- dependency mapping engine
-- cascade failure simulation logic
-- foundational resilience model
-
----
-
-### ⚙️ FX Stress Simulation Layer (v7.1 upgrade)
-👉 https://github.com/123AGustien/sextant-resilience-operations-console/tree/v7.1-fx-upgrade
-
-Enhanced simulation layer featuring:
-- FX stress propagation modelling
-- improved macro-financial scenario engine
-- refined risk scoring sensitivity model
-- expanded systemic shock simulation capability
-
----
-
-### 🧱 Stable Simulation Baseline (v7.0)
-👉 https://github.com/123AGustien/sextant-resilience-operations-console/tree/v7.0-stable
-
-Controlled reference model used for:
-- validation testing
-- audit consistency
-- baseline comparison across simulation versions
-
----
-
-### 🌐 Live Deployment Layer (gh-pages)
-👉 https://123agustien.github.io/sextant-resilience-operations-console/
-
-👉 https://123agustien.github.io/sextant-resilience-operations-console/simulator.html
-
-Provides:
-- browser-based simulation execution
-- interactive system visualization
-- live scenario triggering interface
-
----
-
-## 🧪 Branch-to-Simulation Interpretation
-
-Each branch represents a controlled system state:
-
-- `main` → core deterministic simulation engine
-- `v7.1-fx-upgrade` → advanced stress-testing logic layer
-- `v7.0-stable` → validated baseline reference model
-- `gh-pages` → live execution interface
-
-This structure enables:
-- reproducibility of simulation states
-- auditability of model evolution
-- separation of experimental vs stable logic layers
-
----
-
-## ⚙️ Core Capabilities
-
-### ✔ Dependency Simulation Engine
-Models abstract systemic relationships between:
-- banking systems (synthetic representation)
-- liquidity layers
-- payment infrastructure concepts
-- market sentiment proxies (non-real data)
-
----
-
-### ✔ Cascade Failure Model
-Simulates how localized stress events propagate into system-wide systemic impact.
-
----
-
-### ✔ Synthetic FX Stress Module
-Uses **scenario-based synthetic logic only (no real market data)**:
-
-- USD/IDR stress simulation
-- macroeconomic pressure modeling
-- regime classification:
-  - STABLE
-  - WATCH
-  - STRESS
-  - CRITICAL
-
----
-
-### ✔ Risk Scoring Framework
-
-Normalized system risk scoring:
-
-- LOW (0–29)
-- MEDIUM (30–59)
-- HIGH (60–84)
-- CRITICAL (85–100)
-
----
-
-### ✔ Audit-Style Reporting Engine
-
-Generates structured JSON outputs including:
-
-- scenario ID
-- timestamp
-- system state
-- risk classification
-- interpretation summary
-
----
-
-## 🧪 Example Output (Synthetic Simulation)
-
-```json
-{
-  "reportId": "DEMO-12345",
-  "timestamp": "2026-06-03T...",
-  "systemState": "CRITICAL",
-  "riskScore": 85,
-  "riskLevel": "CRITICAL",
-  "interpretation": "System-wide cascading failure across simulated banking infrastructure."
-}
+🧭 Sextant Control Room
+Operational Resilience Simulation Platform
+Version: v7.1 (Architectural Clarification Update)
+Type: Deterministic Simulation System
+Classification: Non-Operational / Synthetic Data / Non-Production
+1. 🧠 SYSTEM OVERVIEW
+The Sextant Control Room is a deterministic, graph-based simulation platform designed to model systemic risk propagation, dependency failure, and operational resilience across interconnected systems.
+It simulates how localized disruptions propagate through dependency networks, producing cascading effects across structural, operational, financial, and observability layers.
+The system is designed for research and demonstration purposes in:
+operational resilience modelling
+systemic risk analysis
+cascade failure propagation
+observability delay simulation
+synthetic financial stress modelling
+2. ⚠️ SYSTEM CLASSIFICATION
+All components in this system are:
+simulation-based only
+non-production systems
+non-operational environments
+not connected to live financial or infrastructure systems
+using synthetic datasets exclusively
+The system does NOT:
+execute real financial transactions
+interact with banking or infrastructure systems
+process real user data
+provide production risk or trading decisions
+3. 🧠 ARCHITECTURE OVERVIEW
+The system follows a 4-layer simulation architecture:
+3.1 CORE SIMULATION ENGINE LAYER
+Responsible for deterministic dependency graph execution and cascade propagation modelling.
+Core Engine:
+Sextant Protocol
+→ Primary cascade simulation engine (dependency-driven failure propagation)
+Baseline Reference:
+RP-04 Stable Baseline Release
+→ Calibration model for stress testing and system benchmarking
+3.2 📊 OBSERVABILITY & TRACEABILITY LAYER
+Responsible for system visibility, monitoring simulation, and event reconstruction.
+spd-r-google-cloud-poc
+→ Risk signal detection, monitoring delay modelling, observability simulation
+lena-vehicle-data-core
+→ Historical system state reconstruction and replay analysis
+3.3 💰 FINANCIAL RESILIENCE SIMULATION LAYER (SYNTHETIC ONLY)
+A simulation layer modelling financial-style systemic stress propagation.
+Capabilities include:
+liquidity stress simulation
+credit exposure propagation
+SME failure cascade modelling
+macro-financial shock scenarios
+This layer is fully synthetic and operates independently of real financial systems.
+3.4 🖥️ CONTROL & INTERFACE LAYER
+User-facing simulation dashboard and control system.
+Sextant Resilience Operations Console (GitHub Pages)
+→ Scenario execution, cascade visualization, system monitoring interface
+4. 🌊 SIMULATION BEHAVIOUR MODEL
+The system operates through a deterministic lifecycle:
+Dependency → Stress → Failure → Cascade → Observability → Recovery → Stabilisation
+Key dynamics:
+dependency-weighted propagation
+cross-domain interaction effects
+delayed failure visibility
+systemic risk clustering
+multi-layer cascade amplification
+5. 📊 SYSTEM RISK MODEL (CONCEPTUAL)
+Systemic risk is calculated using:
+Dependency Strength (DS)
+Propagation Sensitivity (PS)
+Coupling Density (CD)
+Observability Delay (OD)
+Risk Index:
+RI = (DS × PS × CD) / OD
+This enables comparative systemic fragility evaluation across scenarios.
+6. 🧩 SIMULATION MODES
+The system operates through a single engine with multiple scenario modes:
+🧠 Infrastructure Cascade Mode
+operational system failure modelling
+dependency breakdown propagation
+💰 Financial Resilience Mode
+liquidity stress propagation
+credit and exposure cascade simulation
+📡 Observability Mode
+detection delay simulation
+blind spot and visibility gap modelling
+🔁 Hybrid Mode
+cross-domain financial + infrastructure coupling
+systemic amplification effects
+7. 🌊 SYSTEM DESIGN PRINCIPLE
+The Sextant Control Room follows a unified design principle:
+Single deterministic engine with multi-domain simulation layers and scenario-based execution modes.
+All simulation outputs originate from a shared dependency graph model.
+8. 📊 KEY INNOVATION
+Unlike traditional stress testing systems that evaluate isolated scenarios, this platform models:
+cascading dependency-driven systemic failure propagation across multiple interacting domains.
+This enables:
+cross-sector risk simulation
+systemic fragility mapping
+observability delay analysis
+financial + infrastructure interaction modelling
+9. 📌 REPOSITORY ECOSYSTEM
+🧠 Core Engine
+Sextant Protocol
+RP-04 Stable Baseline Release (benchmark system)
+📊 Observability Layer
+spd-r-google-cloud-poc
+lena-vehicle-data-core
+💰 Financial Simulation Layer
+Sextant Financial Resilience Mode (synthetic scenario extension)
+🖥️ Interface Layer
+Sextant Control Room Dashboard (GitHub Pages)
+10. 📌 CLOSING STATEMENT
+This repository is provided as a research-grade simulation platform for studying operational resilience, systemic risk propagation, and cascade failure dynamics in complex interconnected systems.
+It is intended solely for:
+academic research
+simulation-based analysis
+resilience modelling
+conceptual system design exploration
+END OF README
