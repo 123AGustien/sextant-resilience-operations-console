@@ -1,7 +1,7 @@
 # 🧭 Sextant Control Room  
 ## Operational Resilience Simulation Platform  
 
-**Version:** v7.1.0 (Operational Resilience Simulation Platform)  
+**Version:** v7.1.0  
 **Status:** Stable Simulation Release  
 **Type:** Deterministic System  
 **Classification:** Non-Operational / Synthetic Data / Non-Production  
@@ -10,80 +10,56 @@
 
 # 1. 🧠 SYSTEM OVERVIEW
 
-The Sextant Control Room is a deterministic, graph-based simulation platform designed to model systemic risk propagation, dependency failure, and operational resilience across interconnected systems.
+The Sextant Control Room is a deterministic, graph-based simulation platform designed to model:
 
-It simulates how localized disruptions propagate through dependency networks, producing cascading effects across structural, operational, financial, and observability layers.
+- systemic risk propagation  
+- dependency failure cascades  
+- operational resilience dynamics  
+- cross-domain interaction effects  
 
-The system functions as a deterministic digital twin simulation environment for systemic risk analysis.
+It functions as a deterministic simulation environment for systemic risk analysis.
 
 ---
 
 # 2. ⚠️ SYSTEM CLASSIFICATION
 
-All components in this system are:
+All components are:
 
 - simulation-based only  
 - non-production systems  
 - non-operational environments  
-- not connected to live financial or infrastructure systems  
-- using synthetic datasets exclusively  
+- synthetic datasets only  
+- not connected to live financial systems  
 
 The system does NOT:
 
 - execute real financial transactions  
-- interact with banking or infrastructure systems  
 - process real user data  
-- provide production risk or trading decisions  
+- interact with banking infrastructure  
+- provide production risk decisions  
 
 ---
 
-# 3. 🧠 ARCHITECTURE OVERVIEW
+# 3. 🧠 CORE SIMULATION ENGINE
 
-The system follows a 4-layer deterministic simulation architecture.
+Sextant Protocol
 
----
+## RP-04 Stable Baseline
 
-## 3.1 CORE SIMULATION ENGINE LAYER
+The system is powered by a deterministic cascade engine.
 
-- Sextant Protocol  
-→ Primary deterministic cascade failure engine
+RP-04 is responsible for:
 
-- RP-04 Stable Baseline Release  
-→ Benchmark and calibration model
-
----
-
-## 3.2 📊 OBSERVABILITY & TRACEABILITY LAYER
-
-- SPD-R Google Cloud POC  
-→ Observability simulation, monitoring delay modelling
-
-- LENA Vehicle Data Core  
-→ Event reconstruction and system traceability
-
----
-
-## 3.3 💰 FINANCIAL RESILIENCE SIMULATION LAYER (SYNTHETIC ONLY)
-
-Simulation-only financial stress modelling layer:
-
-- Liquidity stress propagation  
-- Credit exposure modelling  
-- SME failure cascade simulation  
-- Macro-financial shock scenarios  
-
----
-
-## 3.4 🖥️ CONTROL & INTERFACE LAYER
-
-- Sextant Resilience Operations Console (GitHub Pages)  
-→ Scenario execution, visualization, monitoring interface  
+- dependency graph execution  
+- deterministic cascade propagation  
+- severity state transitions  
+- reproducible simulation outputs  
 
 ---
 
 # 4. 🌊 SIMULATION BEHAVIOUR MODEL
 
-> Dependency → Stress → Failure → Cascade → Observability → Recovery → Stabilisation  
+Dependency → Stress → Failure → Cascade → Observability → Recovery → Stabilisation  
 
 Key dynamics:
 
@@ -91,11 +67,10 @@ Key dynamics:
 - cross-domain interaction effects  
 - delayed failure detection  
 - systemic risk clustering  
-- cascade amplification effects  
 
 ---
 
-# 5. 📊 SYSTEM RISK MODEL (CONCEPTUAL)
+# 5. 📊 SYSTEM RISK MODEL
 
 RI = (DS × PS × CD) / OD  
 
@@ -110,105 +85,69 @@ Where:
 
 # 6. 🧩 SIMULATION MODES
 
-## Infrastructure Mode
-- Operational failure modelling  
-- Dependency cascade propagation  
-
-## Financial Mode
-- Liquidity stress simulation  
-- Credit risk cascade modelling  
-
-## Observability Mode
-- Detection delay simulation  
-- Visibility gap modelling  
-
-## Hybrid Mode
-- Cross-domain coupling  
-- Systemic amplification effects  
+- Infrastructure Mode → dependency cascade simulation  
+- Financial Mode → synthetic stress modelling  
+- Observability Mode → detection delay modelling  
+- Hybrid Mode → cross-domain amplification  
 
 ---
 
-# 7. 🌊 SYSTEM DESIGN PRINCIPLE
+# 7. 🌿 ARSITEKTUR BRANCH
 
-A single deterministic engine executes all simulation modes through a shared dependency graph model, ensuring consistent systemic propagation logic across domains.
-
----
-
-# 8. 📊 KEY INNOVATION
-
-This platform models:
-
-- Cascading dependency-driven systemic failures  
-- Cross-domain interaction effects  
-- Observability delay distortions  
-- Financial + infrastructure coupling dynamics  
-
-Enabling:
-
-- Systemic fragility mapping  
-- Cross-sector risk simulation  
-- Resilience benchmarking  
-- Observability gap analysis  
-
----
-
-# 9. 🌿 ARSITEKTUR BRANCH & RELEASE STRUCTURE
-
-## Main Branch (Core System)
+- Main Branch (Core System)  
 https://github.com/123AGustien/sextant-resilience-operations-console/tree/main  
 
-## FX Stress Upgrade (v7.1)
+- FX Stress Upgrade (v7.1)  
 https://github.com/123AGustien/sextant-resilience-operations-console/tree/v7.1-fx-upgrade  
 
-## Stable Baseline (v7.0)
+- Stable Baseline (v7.0)  
 https://github.com/123AGustien/sextant-resilience-operations-console/tree/v7.0-stable  
 
-## Deployment Layer (GitHub Pages)
+- Deployment Layer (gh-pages)  
 https://github.com/123AGustien/sextant-resilience-operations-console/tree/gh-pages  
 
-## Release Snapshot
+- Release Snapshot (v7.0.0)  
 https://github.com/123AGustien/sextant-resilience-operations-console/releases/tag/v7.0.0  
 
 ---
 
-# 10. 📌 SYSTEM REPOSITORY MAP
+# 8. 🔗 SYSTEM ACCESS LINKS
 
-## Core Engine
-Sextant Protocol  
+## Demo & Simulator
 
-## Observability Layer
-- SPD-R Google Cloud POC  
-- LENA Vehicle Data Core  
+- Demo Dashboard  
+https://123agustien.github.io/sextant-resilience-operations-console  
 
-## Financial Simulation Layer
-- Synthetic resilience simulation module  
-
-## Interface Layer
-- Control Room Dashboard (GitHub Pages)  
+- Simulator Engine  
+https://123agustien.github.io/sextant-resilience-operations-console/simulator.html  
 
 ---
 
-# 11. 🔗 SYSTEM ACCESS LINKS
-
-## Live System
-https://123agustien.github.io/sextant-resilience-operations-console  
-https://123agustien.github.io/sextant-resilience-operations-console/simulator.html  
-
 ## Repository
+
+- Main Repository  
 https://github.com/123AGustien/sextant-resilience-operations-console  
 
 ---
 
-# 12. 📌 CLOSING STATEMENT
+# 9. 📌 SYSTEM ARCHITECTURE SUMMARY
 
-This repository is provided as a research-grade simulation platform for studying operational resilience, systemic risk propagation, and cascade failure dynamics in complex interconnected systems.
+- INDEX → system structure definition  
+- RP-04 → deterministic cascade engine  
+- CONSOLE → visualization + execution interface  
 
-It is intended solely for:
+---
 
-- academic research  
-- simulation-based analysis  
-- resilience modelling  
-- conceptual system design exploration  
+# 10. 📌 CLOSING STATEMENT
+
+This repository is a research-grade simulation platform for:
+
+- operational resilience modelling  
+- systemic risk propagation analysis  
+- cascade failure simulation  
+- dependency-based system behaviour  
+
+All outputs are synthetic and for evaluation purposes only.
 
 ---
 
