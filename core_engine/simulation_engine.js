@@ -1,6 +1,7 @@
-// ======================================================
-// SEXTANT CONTROL ROOM - SIMULATION ENGINE v8 CORE
-// ======================================================
+/* ======================================================
+   SEXTANT SIMULATION ENGINE v8 CORE (STABLE TAG)
+   RESTORED - CONTROL ROOM COMPATIBLE
+====================================================== */
 
 function runSimulation(scenario) {
 
@@ -19,7 +20,7 @@ function runSimulation(scenario) {
     };
 
     // ======================================================
-    // PHASE 8 DETERMINISTIC RUN ID
+    // RUN ID (DETERMINISTIC TRACE)
     // ======================================================
     const run_id =
         "SIM-" +
@@ -28,7 +29,7 @@ function runSimulation(scenario) {
         Date.now();
 
     // ======================================================
-    // DEPENDENCY GUARDS
+    // DEPENDENCY CHECKS
     // ======================================================
     if (typeof simulateUSDIDR !== "function") {
         return fallback("Missing simulateUSDIDR()");
@@ -49,24 +50,18 @@ function runSimulation(scenario) {
             regime: "SAFE_MODE"
         };
 
-        // Clamp pressure (IMPORTANT for stability)
-        fxResult.pressure_score = Math.max(0, Math.min(1, fxResult.pressure_score || 0));
+        // HARD CLAMP (SYSTEM STABILITY RULE)
+        fxResult.pressure_score =
+            Math.max(0, Math.min(1, fxResult.pressure_score || 0));
 
         // ==================================================
         // STEP 2: CONTAGION MODEL
         // ==================================================
-        const systemResult = propagateShock(fxResult) || {
-            fxStress: 0,
-            bankingStress: 0,
-            liquidityStress: 0,
-            equityStress: 0,
-            confidenceDrop: 0,
-            systemState: "SAFE"
-        };
+        const systemResult = propagateShock(fxResult);
 
         // ==================================================
-        // STATE MAPPING
-        // ======================================================
+        // STATE MAP
+        // ==================================================
         const stateMap = {
             STABLE: "GREEN",
             WATCH: "AMBER",
@@ -75,11 +70,12 @@ function runSimulation(scenario) {
             SAFE: "GREEN"
         };
 
-        const finalState = stateMap[systemResult.systemState] || "GREEN";
+        const finalState =
+            stateMap[systemResult.systemState] || "GREEN";
 
-        // ======================================================
-        // PHASE 8 BASELINE STATE VECTOR
-        // ======================================================
+        // ==================================================
+        // BASELINE STATE VECTOR (PHASE 8 CORE)
+        // ==================================================
         const baseline = {
             SHI: 98.5,
             RPS: fxResult.pressure_score / 100,
@@ -88,11 +84,11 @@ function runSimulation(scenario) {
             EAF: fxResult.pressure_score / 1000
         };
 
-        // ======================================================
-        // RESPONSE CONTRACT
-        // ======================================================
+        // ==================================================
+        // RESPONSE CONTRACT (CONTROL ROOM FEED)
+        // ==================================================
         return {
-            run_id: run_id,
+            run_id,
 
             scenario: safeScenario.name,
 
@@ -117,7 +113,7 @@ function runSimulation(scenario) {
 }
 
 // ======================================================
-// CONTAGION MODEL (SAFE DEFAULT IMPLEMENTATION)
+// CONTAGION MODEL (STABLE DEFAULT)
 // ======================================================
 function propagateShock(fxResult) {
 
@@ -127,8 +123,8 @@ function propagateShock(fxResult) {
         fxStress: pressure,
         bankingStress: Math.min(1, pressure * 0.85),
         liquidityStress: Math.min(1, pressure * 0.65),
-        equityStress: Math.min(1, pressure * 0.5),
-        confidenceDrop: Math.min(1, pressure * 0.7),
+        equityStress: Math.min(1, pressure * 0.50),
+        confidenceDrop: Math.min(1, pressure * 0.70),
 
         systemState:
             pressure > 0.85 ? "CRITICAL" :
@@ -162,7 +158,7 @@ function getInterpretation(state) {
 }
 
 // ======================================================
-// SAFE FALLBACK LAYER (ZERO CRASH GUARANTEE)
+// SAFE FALLBACK (ZERO CRASH GUARANTEE)
 // ======================================================
 function fallback(reason) {
 
@@ -200,3 +196,8 @@ function fallback(reason) {
         interpretation: "SAFE MODE ACTIVE → " + reason
     };
 }
+
+// ======================================================
+// GLOBAL EXPORT (CRITICAL FOR CONTROL ROOM)
+// ======================================================
+window.runSimulation = runSimulation;
