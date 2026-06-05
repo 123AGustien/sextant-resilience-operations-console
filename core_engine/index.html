@@ -42,10 +42,8 @@
 
 <div id="status">READY</div>
 
-<!-- ✅ THIS IS YOUR SCREEN MODEL (IMPORTANT) -->
 <pre id="output">Waiting...</pre>
 
-<!-- GRAPH LAYER -->
 <div id="riskGraph"></div>
 
 <script src="../core_engine/simulation_engine.js"></script>
@@ -65,7 +63,7 @@ function run(type) {
         stress: type === "cascade" ? 0.9 : 0.6
     });
 
-    // SCREEN MODEL (TEXT OUTPUT)
+    // SCREEN MODEL
     document.getElementById("output").innerText =
         JSON.stringify(result, null, 2);
 
@@ -74,15 +72,15 @@ function run(type) {
     status.innerText = result.final_state;
     status.className = result.final_state;
 
-    // GRAPH FEED
-    window.RiskGraph?.push(result);
+    // GRAPH FEED (CLEAN FIX)
+    window.RiskGraph?.push({
+        impact: (result.fx?.pressure_score ?? 0) * 100
+    });
 }
 
-function bootGraph() {
+window.addEventListener("load", () => {
     window.RiskGraph?.push({ impact: 0 });
-}
-
-window.addEventListener("load", bootGraph);
+});
 
 </script>
 
