@@ -201,3 +201,10 @@ function fallback(reason) {
 // GLOBAL EXPORT (CRITICAL FOR CONTROL ROOM)
 // ======================================================
 window.runSimulation = runSimulation;
+// ======================================================
+// GLOBAL EXPORT (CONTROL ROOM COMPATIBILITY LAYER)
+// ======================================================
+window.runSimulation = runSimulation;
+window.propagateShock = propagateShock;
+window.getInterpretation = getInterpretation;
+window.fallback = fallback;
