@@ -1,5 +1,5 @@
 /* =========================================================
-   SEXTANT RISK GRAPH v3 (STABLE LIVE VERSION)
+   SEXTANT RISK GRAPH v3.1 (STABLE DEPLOYMENT FIX)
 ========================================================= */
 
 window.RiskGraph = (function () {
@@ -28,7 +28,17 @@ window.RiskGraph = (function () {
         canvas.style.border = "1px solid #2bd4ff";
         canvas.style.background = "#0b0f14";
 
-        document.getElementById("riskGraph").appendChild(canvas);
+        // ===============================
+        // SAFE ATTACHMENT (FIX)
+        // ===============================
+        const container = document.getElementById("riskGraph");
+
+        if (container) {
+            container.appendChild(canvas);
+        } else {
+            console.warn("[RiskGraph] #riskGraph not found → attaching to body");
+            document.body.appendChild(canvas);
+        }
 
         ctx = canvas.getContext("2d");
     }
