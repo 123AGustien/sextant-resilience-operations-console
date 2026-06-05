@@ -1,22 +1,15 @@
 /* =========================================================
-   SEXTANT RISK GRAPH vFINAL
-   - Stable DOM attach
-   - Safe mobile rendering
-   - Auto-init on first push
+   SEXTANT RISK GRAPH vFINAL FIX
+   - Actually binds to your simulation engine
+   - Draws real-time canvas graph
+   - Works with control_room.html
 ========================================================= */
 
 window.RiskGraph = (function () {
 
-    let canvas = null;
-    let ctx = null;
+    let canvas, ctx;
 
-    const data = {
-        fx: [],
-        bank: [],
-        liq: [],
-        eq: [],
-        conf: []
-    };
+    const data = [];
 
     function init() {
 
@@ -49,23 +42,18 @@ window.RiskGraph = (function () {
 
         if (!result) return;
 
-        const sys = result.system || {};
+        // unified risk value (THIS is why your old graph failed)
+        const value =
+            result.impact ??
+            result.system?.fxStress ??
+            result.system?.bankingStress ??
+            0;
 
-        data.fx.push(sys.fxStress || 0);
-        data.bank.push(sys.bankingStress || 0);
-        data.liq.push(sys.liquidityStress || 0);
-        data.eq.push(sys.equityStress || 0);
-        data.conf.push(sys.confidenceDrop || 0);
+        data.push(value);
 
-        trimAll();
+        if (data.length > 60) data.shift();
+
         draw();
-    }
-
-    function trimAll() {
-        const max = 50;
-        Object.keys(data).forEach(k => {
-            if (data[k].length > max) data[k].shift();
-        });
     }
 
     function draw() {
@@ -76,42 +64,38 @@ window.RiskGraph = (function () {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         drawGrid();
-
-        drawLine(data.fx, "#2bd4ff");
-        drawLine(data.bank, "#ff4d4d");
-        drawLine(data.liq, "#ffa500");
-        drawLine(data.eq, "#b388ff");
-        drawLine(data.conf, "#00ff88");
+        drawLine();
 
         ctx.fillStyle = "#d7f3ff";
-        ctx.fillText("Risk Graph (live)", 10, 15);
+        ctx.fillText("Risk Impact (Live Simulation)", 10, 15);
     }
 
     function drawGrid() {
+
         ctx.strokeStyle = "#1c2a33";
         ctx.lineWidth = 1;
 
         for (let i = 0; i < 10; i++) {
             ctx.beginPath();
             ctx.moveTo(0, i * 24);
-            ctx.lineTo(900, i * 24);
+            ctx.lineTo(canvas.width, i * 24);
             ctx.stroke();
         }
     }
 
-    function drawLine(arr, color) {
+    function drawLine() {
 
-        if (!arr.length) return;
+        if (!data.length) return;
 
-        ctx.strokeStyle = color;
+        ctx.strokeStyle = "#2bd4ff";
         ctx.lineWidth = 2;
 
         ctx.beginPath();
 
-        for (let i = 0; i < arr.length; i++) {
+        for (let i = 0; i < data.length; i++) {
 
-            const x = (i / 50) * canvas.width;
-            const y = canvas.height - (arr[i] * canvas.height);
+            const x = (i / 60) * canvas.width;
+            const y = canvas.height - (data[i] / 100) * canvas.height;
 
             if (i === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
