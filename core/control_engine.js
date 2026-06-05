@@ -1,4 +1,4 @@
-      /* ======================================================
+/* ======================================================
    SEXTANT SIMULATION ENGINE v8.1 STABLE EXPORT
 ====================================================== */
 
@@ -25,10 +25,6 @@ function runSimulation(scenario) {
         return fallback("Missing simulateUSDIDR()");
     }
 
-    if (typeof propagateShock !== "function") {
-        return fallback("Missing propagateShock()");
-    }
-
     try {
 
         const fxResult = simulateUSDIDR(safeScenario) || {
@@ -42,8 +38,7 @@ function runSimulation(scenario) {
 
         const systemResult = propagateShock(fxResult);
 
-        const finalState =
-            systemResult.systemState || "STABLE";
+        const finalState = systemResult.systemState || "STABLE";
 
         return {
             run_id,
@@ -70,6 +65,7 @@ function propagateShock(fxResult) {
         liquidityStress: Math.min(1, p * 0.65),
         equityStress: Math.min(1, p * 0.5),
         confidenceDrop: Math.min(1, p * 0.7),
+
         systemState:
             p > 0.85 ? "CRITICAL" :
             p > 0.60 ? "STRESS" :
@@ -99,8 +95,8 @@ function fallback(reason) {
     };
 }
 
-/* GLOBAL EXPORT */
+/* GLOBAL EXPORT (CRITICAL) */
 window.runSimulation = runSimulation;
 window.propagateShock = propagateShock;
 window.getInterpretation = getInterpretation;
-window.fallback = fallback;  
+window.fallback = fallback;
