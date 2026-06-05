@@ -4,12 +4,9 @@
     <div id="riskGraph"></div>
 </div>
 
-<!-- ENGINE -->
-<script src="../core/control_engine.js"></script>
 <script src="../assets/risk_graph.js"></script>
 
 <script>
-
 let autoLoop = null;
 
 function run(type) {
@@ -27,15 +24,15 @@ function run(type) {
         stress: type === "cascade" ? 0.9 : type === "failure" ? 0.7 : 0
     });
 
-    const state = result?.state || "UNKNOWN";
-
-    status.innerText = state;
-    status.className = "status " + state.toLowerCase();
+    status.innerText = result?.state || "UNKNOWN";
+    status.className = "status " + (result?.state || "unknown").toLowerCase();
 
     output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
-    // SAFE GRAPH PUSH
-    window.RiskGraph?.push(result);
+    // GRAPH FEED
+    if (window.RiskGraph) {
+        window.RiskGraph.push(result);
+    }
 }
 
 function startAuto() {
@@ -47,5 +44,4 @@ function stopAuto() {
     clearInterval(autoLoop);
     autoLoop = null;
 }
-
 </script>
