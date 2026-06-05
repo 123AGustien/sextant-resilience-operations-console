@@ -1,90 +1,86 @@
-/* ========================================================
-   SEXTANT RISK GRAPH MODULE (Phase 8/9 Light)
-   - Lightweight state graphing
-   - Mobile-safe (no heavy libraries)
-   - Works with control_room.html
-======================================================== */
+/* =========================================================
+   SEXTANT RISK GRAPH v2 (REAL CHART)
+   - Canvas line graph
+   - Mobile safe
+   - Live updates from simulation engine
+========================================================= */
 
 window.RiskGraph = (function () {
 
-    let history = [];
+    let data = [];
 
-    /* ---------------------------
-       Push simulation snapshot
-    ----------------------------*/
+    let canvas, ctx;
+
+    function init() {
+
+        if (document.getElementById("riskCanvas")) return;
+
+        canvas = document.createElement("canvas");
+        canvas.id = "riskCanvas";
+        canvas.width = 900;
+        canvas.height = 200;
+        canvas.style.marginTop = "20px";
+        canvas.style.border = "1px solid #2bd4ff";
+        canvas.style.background = "#0b0f14";
+
+        document.body.appendChild(canvas);
+
+        ctx = canvas.getContext("2d");
+    }
+
     function push(snapshot) {
 
         if (!snapshot) return;
 
-        const state = snapshot.final_state || "UNKNOWN";
+        const value =
+            snapshot.impact ||
+            snapshot.system?.fxStress ||
+            0;
 
-        const entry = {
-            time: Date.now(),
-            state: state,
-            fx: snapshot?.fx?.usd_idr || 0,
-            liquidity: snapshot?.system?.liquidityStress || 0,
-            banking: snapshot?.system?.bankingStress || 0
-        };
+        data.push(value);
 
-        history.push(entry);
+        if (data.length > 50) data.shift();
 
-        // keep last 20 points only (mobile safe)
-        if (history.length > 20) {
-            history.shift();
-        }
-
-        render();
+        draw();
     }
 
-    /* ---------------------------
-       Render simple graph (DOM)
-    ----------------------------*/
-    function render() {
+    function draw() {
 
-        let container = document.getElementById("riskGraph");
+        init();
 
-        if (!container) {
-            container = document.createElement("div");
-            container.id = "riskGraph";
-            container.style.marginTop = "20px";
-            container.style.padding = "10px";
-            container.style.border = "1px solid #2bd4ff";
-            container.style.fontSize = "12px";
-            container.style.textAlign = "left";
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            document.body.appendChild(container);
+        // background grid
+        ctx.strokeStyle = "#1c2a33";
+        for (let i = 0; i < 10; i++) {
+            ctx.beginPath();
+            ctx.moveTo(0, i * 20);
+            ctx.lineTo(canvas.width, i * 20);
+            ctx.stroke();
         }
 
-        let html = "<b>RISK HISTORY (last 20)</b><br><br>";
+        // line
+        ctx.strokeStyle = "#2bd4ff";
+        ctx.beginPath();
 
-        history.forEach((h, i) => {
+        for (let i = 0; i < data.length; i++) {
 
-            let color = "lime";
-            if (h.state === "RED") color = "red";
-            if (h.state === "RISK") color = "orange";
-            if (h.state === "CRITICAL") color = "magenta";
+            let x = (i / 50) * canvas.width;
+            let y = canvas.height - (data[i] / 100) * canvas.height;
 
-            html += `
-                <div style="margin-bottom:4px;">
-                    <span style="color:${color};">
-                        ${i + 1}. ${h.state}
-                    </span>
-                    | FX: ${h.fx}
-                    | LIQ: ${h.liquidity}
-                    | BANK: ${h.banking}
-                </div>
-            `;
-        });
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
 
-        container.innerHTML = html;
+        ctx.stroke();
+
+        // label
+        ctx.fillStyle = "#d7f3ff";
+        ctx.fillText("Risk Impact Trend (live)", 10, 15);
     }
 
-    /* ---------------------------
-       Public API
-    ----------------------------*/
     return {
-        push,
-        getHistory: () => history
+        push
     };
 
 })();
