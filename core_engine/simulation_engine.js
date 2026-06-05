@@ -1,6 +1,6 @@
 /* ======================================================
-   SEXTANT SIMULATION ENGINE v8 CORE (STABLE TAG)
-   RESTORED - CONTROL ROOM COMPATIBLE
+   SEXTANT SIMULATION ENGINE v8 CORE (STABLE TAG FIXED)
+   CONTROL ROOM COMPATIBLE - CLEAN EXPORT LAYER
 ====================================================== */
 
 function runSimulation(scenario) {
@@ -20,7 +20,7 @@ function runSimulation(scenario) {
     };
 
     // ======================================================
-    // RUN ID (DETERMINISTIC TRACE)
+    // RUN ID
     // ======================================================
     const run_id =
         "SIM-" +
@@ -42,7 +42,7 @@ function runSimulation(scenario) {
     try {
 
         // ==================================================
-        // STEP 1: FX MODEL
+        // FX MODEL
         // ==================================================
         const fxResult = simulateUSDIDR(safeScenario) || {
             usd_idr: 0,
@@ -50,12 +50,11 @@ function runSimulation(scenario) {
             regime: "SAFE_MODE"
         };
 
-        // HARD CLAMP (SYSTEM STABILITY RULE)
         fxResult.pressure_score =
             Math.max(0, Math.min(1, fxResult.pressure_score || 0));
 
         // ==================================================
-        // STEP 2: CONTAGION MODEL
+        // CONTAGION MODEL
         // ==================================================
         const systemResult = propagateShock(fxResult);
 
@@ -74,7 +73,7 @@ function runSimulation(scenario) {
             stateMap[systemResult.systemState] || "GREEN";
 
         // ==================================================
-        // BASELINE STATE VECTOR (PHASE 8 CORE)
+        // BASELINE VECTOR
         // ==================================================
         const baseline = {
             SHI: 98.5,
@@ -85,13 +84,11 @@ function runSimulation(scenario) {
         };
 
         // ==================================================
-        // RESPONSE CONTRACT (CONTROL ROOM FEED)
+        // CONTROL ROOM OUTPUT CONTRACT
         // ==================================================
         return {
             run_id,
-
             scenario: safeScenario.name,
-
             baseline_state: baseline,
 
             fx: {
@@ -101,9 +98,7 @@ function runSimulation(scenario) {
             },
 
             system: systemResult,
-
             final_state: finalState,
-
             interpretation: getInterpretation(finalState)
         };
 
@@ -112,9 +107,9 @@ function runSimulation(scenario) {
     }
 }
 
-// ======================================================
-// CONTAGION MODEL (STABLE DEFAULT)
-// ======================================================
+/* ======================================================
+   CONTAGION MODEL (STABLE CORE)
+====================================================== */
 function propagateShock(fxResult) {
 
     const pressure = fxResult.pressure_score ?? 0;
@@ -134,9 +129,9 @@ function propagateShock(fxResult) {
     };
 }
 
-// ======================================================
-// INTERPRETATION LAYER
-// ======================================================
+/* ======================================================
+   INTERPRETATION LAYER
+====================================================== */
 function getInterpretation(state) {
 
     switch (state) {
@@ -157,14 +152,13 @@ function getInterpretation(state) {
     }
 }
 
-// ======================================================
-// SAFE FALLBACK (ZERO CRASH GUARANTEE)
-// ======================================================
+/* ======================================================
+   SAFE FALLBACK LAYER
+====================================================== */
 function fallback(reason) {
 
     return {
         run_id: "FALLBACK",
-
         scenario: "FALLBACK",
 
         baseline_state: {
@@ -192,18 +186,13 @@ function fallback(reason) {
         },
 
         final_state: "GREEN",
-
         interpretation: "SAFE MODE ACTIVE → " + reason
     };
 }
 
-// ======================================================
-// GLOBAL EXPORT (CRITICAL FOR CONTROL ROOM)
-// ======================================================
-window.runSimulation = runSimulation;
-// ======================================================
-// GLOBAL EXPORT (CONTROL ROOM COMPATIBILITY LAYER)
-// ======================================================
+/* ======================================================
+   GLOBAL EXPORT (CONTROL ROOM LINK LAYER)
+====================================================== */
 window.runSimulation = runSimulation;
 window.propagateShock = propagateShock;
 window.getInterpretation = getInterpretation;
