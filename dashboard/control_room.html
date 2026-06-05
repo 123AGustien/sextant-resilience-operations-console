@@ -44,8 +44,10 @@
             white-space: pre-wrap;
         }
 
+        /* IMPORTANT: graph container */
         #riskGraph {
-            margin-top: 10px;
+            max-width: 900px;
+            margin: 10px auto;
         }
     </style>
 </head>
@@ -54,55 +56,41 @@
 
 <h2>SEXTANT CONTROL ROOM</h2>
 
-<!-- STATUS -->
 <div class="panel">
     Status:
     <span id="status" class="status green">GREEN</span>
 </div>
 
-<!-- CONTROLS -->
 <div class="panel">
     <button onclick="run('normal')">Normal</button>
     <button onclick="run('failure')">Failure</button>
     <button onclick="run('cascade')">Cascade</button>
 </div>
 
-<!-- AUTO -->
 <div class="panel">
     <button onclick="startAuto()">AUTO ON</button>
     <button onclick="stopAuto()">AUTO OFF</button>
 </div>
 
-<!-- OUTPUT -->
 <div class="panel">
     <h3>Simulation Output</h3>
     <div id="output">Waiting...</div>
 </div>
 
-<!-- GRAPH PANEL (IMPORTANT: fixed container) -->
-<div class="panel">
-    <h3>Risk Graph</h3>
-    <div id="riskGraph"></div>
-</div>
+<!-- ✅ GRAPH GOES HERE -->
+<div id="riskGraph"></div>
 
-<!-- ENGINE -->
 <script src="../core/control_engine.js"></script>
-
-<!-- GRAPH MODULE -->
 <script src="../assets/risk_graph.js"></script>
 
 <script>
+
 let autoLoop = null;
 
 function run(type) {
 
     const status = document.getElementById("status");
     const output = document.getElementById("output");
-
-    if (typeof runSimulation !== "function") {
-        output.innerHTML = "❌ ENGINE NOT LOADED";
-        return;
-    }
 
     let scenario = { type };
 
@@ -111,15 +99,14 @@ function run(type) {
 
     const result = runSimulation(scenario);
 
-    // status
     const state = result?.state || result?.final_state || "UNKNOWN";
+
     status.innerText = state;
     status.className = "status " + state.toLowerCase();
 
-    // output
     output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
-    // graph update
+    // ✅ THIS IS THE CRITICAL LINE
     if (window.RiskGraph) {
         RiskGraph.push(result);
     }
@@ -128,15 +115,14 @@ function run(type) {
 function startAuto() {
     if (autoLoop) return;
 
-    autoLoop = setInterval(() => {
-        run("cascade");
-    }, 3000);
+    autoLoop = setInterval(() => run("cascade"), 3000);
 }
 
 function stopAuto() {
     clearInterval(autoLoop);
     autoLoop = null;
 }
+
 </script>
 
 </body>
