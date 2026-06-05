@@ -1,5 +1,81 @@
-<script>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sextant Control Room</title>
 
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #0b0f14;
+            color: #d7f3ff;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .panel {
+            border: 1px solid #2bd4ff;
+            padding: 15px;
+            margin: 10px auto;
+            border-radius: 8px;
+            background: #111826;
+            max-width: 900px;
+        }
+
+        .status { font-size: 26px; font-weight: bold; }
+        .green { color: lime; }
+        .amber { color: orange; }
+        .red { color: red; }
+
+        button {
+            margin: 5px;
+            padding: 10px 14px;
+        }
+
+        pre {
+            font-size: 12px;
+            text-align: left;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>SEXTANT CONTROL ROOM</h2>
+
+<div class="panel">
+    Status:
+    <span id="status" class="status green">GREEN</span>
+</div>
+
+<div class="panel">
+    <button onclick="run('normal')">Normal</button>
+    <button onclick="run('failure')">Failure</button>
+    <button onclick="run('cascade')">Cascade</button>
+</div>
+
+<div class="panel">
+    <button onclick="startAuto()">AUTO ON</button>
+    <button onclick="stopAuto()">AUTO OFF</button>
+</div>
+
+<div class="panel">
+    <h3>Simulation Output</h3>
+    <div id="output">Waiting...</div>
+</div>
+
+<!-- GRAPH CONTAINER -->
+<div class="panel">
+    <h3>Risk Graph</h3>
+    <div id="riskGraph"></div>
+</div>
+
+<!-- ENGINE -->
+<script src="../core/control_engine.js"></script>
+<script src="../assets/risk_graph.js"></script>
+
+<script>
 let autoLoop = null;
 
 function run(type) {
@@ -17,21 +93,16 @@ function run(type) {
         stress: type === "cascade" ? 0.9 : type === "failure" ? 0.7 : 0
     });
 
-    // STATUS
-    const state = result?.state || result?.final_state || "UNKNOWN";
+    const state = result?.state || "UNKNOWN";
+
     status.innerText = state;
     status.className = "status " + state.toLowerCase();
 
-    // OUTPUT
     output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
-    // GRAPH (HARD SAFE)
-    try {
-        if (window.RiskGraph?.push) {
-            RiskGraph.push(result);
-        }
-    } catch (e) {
-        console.error("Graph error:", e);
+    // GRAPH SAFE PUSH
+    if (window.RiskGraph?.push) {
+        RiskGraph.push(result);
     }
 }
 
@@ -44,5 +115,7 @@ function stopAuto() {
     clearInterval(autoLoop);
     autoLoop = null;
 }
-
 </script>
+
+</body>
+</html>
