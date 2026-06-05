@@ -1,3 +1,7 @@
+      /* ======================================================
+   SEXTANT SIMULATION ENGINE v8.1 STABLE EXPORT
+====================================================== */
+
 function runSimulation(scenario) {
 
     if (!scenario || typeof scenario !== "object") {
@@ -5,7 +9,7 @@ function runSimulation(scenario) {
     }
 
     const safeScenario = {
-        name: scenario.name || "Unnamed Scenario",
+        name: scenario.name || scenario.type || "Unnamed Scenario",
         oil_price: scenario.oil_price ?? 100,
         capital_flow: scenario.capital_flow || "neutral",
         inflation_pressure: scenario.inflation_pressure || "stable"
@@ -38,38 +42,16 @@ function runSimulation(scenario) {
 
         const systemResult = propagateShock(fxResult);
 
-        const stateMap = {
-            STABLE: "GREEN",
-            WATCH: "AMBER",
-            STRESS: "RED",
-            CRITICAL: "CRITICAL",
-            SAFE: "GREEN"
-        };
-
         const finalState =
-            stateMap[systemResult.systemState] || "GREEN";
-
-        const baseline = {
-            SHI: 98.5,
-            RPS: fxResult.pressure_score / 100,
-            EVR: Math.round(fxResult.pressure_score * 120),
-            AIC: systemResult.systemState === "CRITICAL" ? 0.6 : 1.0,
-            EAF: fxResult.pressure_score / 1000
-        };
+            systemResult.systemState || "STABLE";
 
         return {
             run_id,
             scenario: safeScenario.name,
-            baseline_state: baseline,
-
-            fx: {
-                usd_idr: fxResult.usd_idr ?? 0,
-                pressure_score: fxResult.pressure_score ?? 0,
-                regime: fxResult.regime || "UNKNOWN"
-            },
-
+            fx: fxResult,
             system: systemResult,
             final_state: finalState,
+            impact: Math.round(fxResult.pressure_score * 100),
             interpretation: getInterpretation(finalState)
         };
 
@@ -80,56 +62,45 @@ function runSimulation(scenario) {
 
 function propagateShock(fxResult) {
 
-    const pressure = fxResult.pressure_score ?? 0;
+    const p = fxResult.pressure_score ?? 0;
 
     return {
-        fxStress: pressure,
-        bankingStress: Math.min(1, pressure * 0.85),
-        liquidityStress: Math.min(1, pressure * 0.65),
-        equityStress: Math.min(1, pressure * 0.50),
-        confidenceDrop: Math.min(1, pressure * 0.70),
-
+        fxStress: p,
+        bankingStress: Math.min(1, p * 0.85),
+        liquidityStress: Math.min(1, p * 0.65),
+        equityStress: Math.min(1, p * 0.5),
+        confidenceDrop: Math.min(1, p * 0.7),
         systemState:
-            pressure > 0.85 ? "CRITICAL" :
-            pressure > 0.60 ? "STRESS" :
-            pressure > 0.30 ? "WATCH" :
+            p > 0.85 ? "CRITICAL" :
+            p > 0.60 ? "STRESS" :
+            p > 0.30 ? "WATCH" :
             "STABLE"
     };
 }
 
 function getInterpretation(state) {
-
-    switch (state) {
-        case "GREEN":
-            return "System stable";
-
-        case "AMBER":
-            return "Early stress detected";
-
-        case "RED":
-            return "Systemic stress active";
-
-        case "CRITICAL":
-            return "Critical breakdown";
-
-        default:
-            return "Unknown state";
-    }
+    return {
+        STABLE: "System stable",
+        WATCH: "Early stress detected",
+        STRESS: "System stress active",
+        CRITICAL: "Critical breakdown"
+    }[state] || "Unknown";
 }
 
 function fallback(reason) {
     return {
         run_id: "FALLBACK",
         scenario: "FALLBACK",
-        baseline_state: { SHI: 98.5, RPS: 0, EVR: 0, AIC: 1.0, EAF: 0 },
-        fx: { usd_idr: 0, pressure_score: 0, regime: "SAFE_MODE" },
-        system: { systemState: "SAFE", note: reason },
-        final_state: "GREEN",
+        fx: { pressure_score: 0 },
+        system: { systemState: "STABLE", note: reason },
+        final_state: "STABLE",
+        impact: 0,
         interpretation: reason
     };
 }
 
+/* GLOBAL EXPORT */
 window.runSimulation = runSimulation;
 window.propagateShock = propagateShock;
 window.getInterpretation = getInterpretation;
-window.fallback = fallback;
+window.fallback = fallback;  
