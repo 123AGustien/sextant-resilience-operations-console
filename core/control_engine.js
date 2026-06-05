@@ -1,121 +1,135 @@
-/* =========================================================
-   SEXTANT CONTROL ROOM CORE ENGINE v1 (STABLE)
-========================================================= */
+function runSimulation(scenario) {
 
-let autoLoop = null;
-
-/* -------------------------
-   STATE STORAGE (SAFE)
-------------------------- */
-function saveState(data) {
-    try {
-        localStorage.setItem("SEXTANT_STATE", JSON.stringify(data));
-    } catch (e) {
-        console.warn("Storage failed:", e);
+    if (!scenario || typeof scenario !== "object") {
+        return fallback("Invalid scenario input");
     }
-}
 
-function loadState() {
-    try {
-        return JSON.parse(localStorage.getItem("SEXTANT_STATE") || "null");
-    } catch (e) {
-        return null;
-    }
-}
-
-/* -------------------------
-   MAIN RUN FUNCTION
-------------------------- */
-function run(type) {
-
-    const status = document.getElementById("status");
-    const output = document.getElementById("output");
-
-    if (!status || !output) return;
-
-    const scenario = {
-        type,
-        stress: type === "cascade" ? 0.9 :
-                type === "failure" ? 0.6 : 0
+    const safeScenario = {
+        name: scenario.name || "Unnamed Scenario",
+        oil_price: scenario.oil_price ?? 100,
+        capital_flow: scenario.capital_flow || "neutral",
+        inflation_pressure: scenario.inflation_pressure || "stable"
     };
 
-    const result = simulate(scenario);
+    const run_id =
+        "SIM-" +
+        safeScenario.name.replace(/\s+/g, "-").toUpperCase() +
+        "-" +
+        Date.now();
 
-    saveState(result);
+    if (typeof simulateUSDIDR !== "function") {
+        return fallback("Missing simulateUSDIDR()");
+    }
 
-    // UI STATE UPDATE
-    status.innerText = result.state || "GREEN";
-    status.className = "status " + (result.state || "green").toLowerCase();
+    if (typeof propagateShock !== "function") {
+        return fallback("Missing propagateShock()");
+    }
 
-    output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
+    try {
 
-    // 🔥 GRAPH HOOK (IMPORTANT)
-    if (window.RiskGraph && typeof window.RiskGraph.push === "function") {
-        window.RiskGraph.push(result);
+        const fxResult = simulateUSDIDR(safeScenario) || {
+            usd_idr: 0,
+            pressure_score: 0,
+            regime: "SAFE_MODE"
+        };
+
+        fxResult.pressure_score =
+            Math.max(0, Math.min(1, fxResult.pressure_score || 0));
+
+        const systemResult = propagateShock(fxResult);
+
+        const stateMap = {
+            STABLE: "GREEN",
+            WATCH: "AMBER",
+            STRESS: "RED",
+            CRITICAL: "CRITICAL",
+            SAFE: "GREEN"
+        };
+
+        const finalState =
+            stateMap[systemResult.systemState] || "GREEN";
+
+        const baseline = {
+            SHI: 98.5,
+            RPS: fxResult.pressure_score / 100,
+            EVR: Math.round(fxResult.pressure_score * 120),
+            AIC: systemResult.systemState === "CRITICAL" ? 0.6 : 1.0,
+            EAF: fxResult.pressure_score / 1000
+        };
+
+        return {
+            run_id,
+            scenario: safeScenario.name,
+            baseline_state: baseline,
+
+            fx: {
+                usd_idr: fxResult.usd_idr ?? 0,
+                pressure_score: fxResult.pressure_score ?? 0,
+                regime: fxResult.regime || "UNKNOWN"
+            },
+
+            system: systemResult,
+            final_state: finalState,
+            interpretation: getInterpretation(finalState)
+        };
+
+    } catch (e) {
+        return fallback("Engine crash: " + e.message);
     }
 }
 
-/* -------------------------
-   SIMULATION CORE (STABLE)
-------------------------- */
-function simulate(scenario) {
+function propagateShock(fxResult) {
 
-    const stress = scenario.stress ?? 0;
-
-    let impact = 100 - (stress * 60);
-
-    let state = "GREEN";
-
-    if (impact < 70) state = "AMBER";
-    if (impact < 50) state = "RED";
+    const pressure = fxResult.pressure_score ?? 0;
 
     return {
-        input: scenario,
-        impact: Math.max(0, Math.min(100, impact)),
-        state,
-        timestamp: Date.now()
+        fxStress: pressure,
+        bankingStress: Math.min(1, pressure * 0.85),
+        liquidityStress: Math.min(1, pressure * 0.65),
+        equityStress: Math.min(1, pressure * 0.50),
+        confidenceDrop: Math.min(1, pressure * 0.70),
+
+        systemState:
+            pressure > 0.85 ? "CRITICAL" :
+            pressure > 0.60 ? "STRESS" :
+            pressure > 0.30 ? "WATCH" :
+            "STABLE"
     };
 }
 
-/* -------------------------
-   AUTO LOOP (SAFE GUARD)
-------------------------- */
-function startAuto() {
-    if (autoLoop) return;
+function getInterpretation(state) {
 
-    autoLoop = setInterval(() => {
-        run("cascade");
-    }, 4000);
+    switch (state) {
+        case "GREEN":
+            return "System stable";
+
+        case "AMBER":
+            return "Early stress detected";
+
+        case "RED":
+            return "Systemic stress active";
+
+        case "CRITICAL":
+            return "Critical breakdown";
+
+        default:
+            return "Unknown state";
+    }
 }
 
-function stopAuto() {
-    if (!autoLoop) return;
-    clearInterval(autoLoop);
-    autoLoop = null;
+function fallback(reason) {
+    return {
+        run_id: "FALLBACK",
+        scenario: "FALLBACK",
+        baseline_state: { SHI: 98.5, RPS: 0, EVR: 0, AIC: 1.0, EAF: 0 },
+        fx: { usd_idr: 0, pressure_score: 0, regime: "SAFE_MODE" },
+        system: { systemState: "SAFE", note: reason },
+        final_state: "GREEN",
+        interpretation: reason
+    };
 }
 
-/* -------------------------
-   RESTORE STATE (MOBILE SAFE)
-------------------------- */
-window.addEventListener("load", () => {
-
-    const saved = loadState();
-    if (!saved) return;
-
-    const output = document.getElementById("output");
-    const status = document.getElementById("status");
-
-    if (output) {
-        output.innerHTML = "<pre>" + JSON.stringify(saved, null, 2) + "</pre>";
-    }
-
-    if (status) {
-        status.innerText = saved.state || "GREEN";
-        status.className = "status " + (saved.state || "green").toLowerCase();
-    }
-
-    // restore graph feed
-    if (window.RiskGraph && saved) {
-        window.RiskGraph.push(saved);
-    }
-});
+window.runSimulation = runSimulation;
+window.propagateShock = propagateShock;
+window.getInterpretation = getInterpretation;
+window.fallback = fallback;
