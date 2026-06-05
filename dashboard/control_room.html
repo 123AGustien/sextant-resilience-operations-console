@@ -9,14 +9,17 @@
             text-align: center;
             background: #0b0f14;
             color: #d7f3ff;
+            margin: 0;
+            padding: 10px;
         }
 
         .panel {
             border: 1px solid #2bd4ff;
             padding: 15px;
-            margin: 10px;
+            margin: 10px auto;
             border-radius: 8px;
             background: #111826;
+            max-width: 900px;
         }
 
         .status {
@@ -27,10 +30,12 @@
         .green { color: lime; }
         .amber { color: orange; }
         .red { color: red; }
+        .critical { color: magenta; }
 
         button {
             margin: 5px;
-            padding: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
         }
 
         pre {
@@ -45,27 +50,92 @@
 
 <h2>SEXTANT CONTROL ROOM</h2>
 
+<!-- STATUS -->
 <div class="panel">
-    <div>Status: <span id="status" class="status green">GREEN</span></div>
+    <div>Status:
+        <span id="status" class="status green">GREEN</span>
+    </div>
 </div>
 
+<!-- CONTROLS -->
 <div class="panel">
     <button onclick="run('normal')">Normal</button>
     <button onclick="run('failure')">Failure</button>
     <button onclick="run('cascade')">Cascade</button>
 </div>
 
+<!-- AUTO -->
 <div class="panel">
     <button onclick="startAuto()">AUTO ON</button>
     <button onclick="stopAuto()">AUTO OFF</button>
 </div>
 
+<!-- OUTPUT -->
 <div class="panel">
-    <h3>Output</h3>
+    <h3>Simulation Output</h3>
     <div id="output">Waiting...</div>
 </div>
 
+<!-- RISK GRAPH CONTAINER (auto-created if missing) -->
+<div id="riskGraph"></div>
+
+<!-- ENGINE -->
 <script src="../core/control_engine.js"></script>
+
+<!-- OPTIONAL GRAPH MODULE -->
+<script src="../assets/risk_graph.js"></script>
+
+<script>
+let autoLoop = null;
+
+function run(type) {
+
+    const status = document.getElementById("status");
+    const output = document.getElementById("output");
+
+    if (typeof runSimulation !== "function") {
+        output.innerHTML = "❌ ENGINE NOT LOADED";
+        return;
+    }
+
+    let scenario = { type };
+
+    if (type === "failure") scenario = { stress: 0.7 };
+    if (type === "cascade") scenario = { stress: 0.9 };
+
+    const result = runSimulation(scenario);
+
+    // STATUS UPDATE
+    const state = result?.final_state || "UNKNOWN";
+    status.innerText = state;
+    status.className = "status " + state.toLowerCase();
+
+    // OUTPUT
+    output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
+
+    // GRAPH HOOK (SAFE)
+    if (window.RiskGraph) {
+        RiskGraph.push(result);
+    }
+}
+
+/* =========================
+   AUTO LOOP (SAFE CONTROL)
+========================= */
+function startAuto() {
+
+    if (autoLoop) return;
+
+    autoLoop = setInterval(() => {
+        run("cascade");
+    }, 3000);
+}
+
+function stopAuto() {
+    clearInterval(autoLoop);
+    autoLoop = null;
+}
+</script>
 
 </body>
 </html>
