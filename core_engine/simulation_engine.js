@@ -1,3 +1,14 @@
+function simulateUSDIDR(scenario) {
+    const stress = scenario?.inflation_pressure === "high" ? 0.8 : 0.3;
+
+    return {
+        usd_idr: 17000 + Math.random() * 200,
+        pressure_score: stress + (Math.random() * 0.2),
+        regime: "SIMULATION"
+    };
+}
+
+
 /* ======================================================
    SEXTANT SIMULATION ENGINE v8.1 STABLE EXPORT
 ====================================================== */
