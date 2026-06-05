@@ -1,117 +1,152 @@
+
+
 <!--
 ========================================================
 SEXTANT CONTROL ROOM
-Institutional Simulation Layer v7 → v8 → v9 (FULL STACK)
+Institutional Simulation Layer v7 → v8 → v9 (FINAL BUILD)
 
 SYSTEM STATUS:
-LIVE — DETERMINISTIC SIMULATION ENGINE
+LIVE — DETERMINISTIC FRONTEND SIMULATION ENGINE
 
 --------------------------------------------------------
-VERSION ARCHITECTURE
+ARCHITECTURE OVERVIEW
 --------------------------------------------------------
-v7: Manual UI-driven simulation (buttons + run())
-v8: State + risk propagation + system scoring
-v9: Gateway layer + auto-refresh + live loop control
+
+v7 — UI Control Layer
+- Manual scenario execution
+- Button-driven simulation (Normal / Failure / Cascade)
+
+v8 — State Intelligence Layer
+- localStorage persistence
+- system state restore
+- risk propagation output tracking
+
+v9 — Gateway & Runtime Layer
+- auto-refresh simulation loop
+- live cascade execution
+- optional continuous stress engine
 
 --------------------------------------------------------
-DEPLOYMENT
+DEPLOYMENT ENVIRONMENT
 --------------------------------------------------------
-Platform: GitHub Pages
+
+Platform: GitHub Pages (static hosting)
 Branch: main
-URL:
+
+Live URL:
 https://123agustien.github.io/sextant-resilience-operations-console/
 
 --------------------------------------------------------
-CORE ENTRY POINTS
+CORE SYSTEM ENTRY POINTS
 --------------------------------------------------------
 
 Simulation Engine:
 https://123agustien.github.io/sextant-resilience-operations-console/simulator.html
 
-Control Room (v7 core UI):
+Control Room (Primary UI):
 https://123agustien.github.io/sextant-resilience-operations-console/dashboard/control_room.html
 
-Phase 9 Gateway (routing layer):
+Phase 9 Gateway Layer:
 https://123agustien.github.io/sextant-resilience-operations-console/phase9_gateway.html
 
 --------------------------------------------------------
-MODULE ARCHITECTURE
+ENGINE DEPENDENCIES
 --------------------------------------------------------
 
-Core Engine:
-- simulation_engine.js
-
-Macro Models:
-- fx_model.js
-- contagion_model.js
-
-System Layers:
-- core_engine/
-- evidence_engine/
-- institutional/
+Required Modules:
+- simulation_engine.js (core deterministic engine)
+- fx_model.js (FX stress modeling)
+- contagion_model.js (system propagation logic)
 
 --------------------------------------------------------
-FEATURES (ACTIVE)
+SIMULATION MODEL
+--------------------------------------------------------
+
+Input:
+- Scenario object (stress, FX, macro conditions)
+
+Processing:
+- FX stress calculation
+- Banking pressure propagation
+- Liquidity cascade modeling
+- Equity sensitivity adjustment
+- Confidence decay function
+
+Output:
+- final_state (GREEN / STABLE / RISK / CRITICAL)
+- structured JSON simulation result
+- system metrics vector
+
+--------------------------------------------------------
+ACTIVE FEATURES
 --------------------------------------------------------
 
 ✔ Deterministic simulation engine (no backend)
-✔ Scenario-based stress testing
-✔ FX + Banking + Liquidity propagation model
-✔ System state classification (GREEN / RISK / RED)
-✔ JSON structured output
-✔ GitHub Pages live deployment
+✔ Scenario-based stress injection
+✔ FX + banking + liquidity contagion model
+✔ Structured JSON output
+✔ Real-time UI rendering
+✔ State persistence via localStorage
+✔ Mobile-compatible execution
 
 --------------------------------------------------------
-PHASE 9 FEATURES (ACTIVE OR READY)
+PHASE 9 FEATURES
 --------------------------------------------------------
 
+✔ Auto simulation loop (interval-based execution)
 ✔ Gateway routing layer (phase9_gateway.html)
-✔ Auto-refresh simulation loop (optional)
-✔ Live dashboard updates (frontend only)
-✔ Event-driven control separation (UI vs engine)
+✔ Live system replay capability (cascade mode)
+✔ Optional continuous stress testing mode
 
 --------------------------------------------------------
-BUTTON SYSTEM
+BUTTON BEHAVIOR
 --------------------------------------------------------
 
-Normal → baseline stability simulation
-Failure → stress injection scenario
-Cascade → systemic contagion propagation
+Normal:
+- baseline stable macro conditions
+
+Failure:
+- moderate stress injection
+
+Cascade:
+- systemic stress propagation (high risk mode)
 
 AUTO MODE:
-- optional loop execution
-- must not override manual input unless enabled
+- triggers repeated cascade simulation
+- must be manually disabled to stop execution
 
 --------------------------------------------------------
-KNOWN DEPENDENCIES
+KNOWN LIMITATIONS
 --------------------------------------------------------
 
-Required scripts:
-- ../models/fx_model.js
-- ../models/contagion_model.js
-- ../core_engine/simulation_engine.js
+- No backend validation layer
+- Fully client-side execution
+- Performance depends on mobile browser limits
+- Auto loop may override manual input if misconfigured
 
 --------------------------------------------------------
-IMPORTANT NOTES
+DEBUG & RECOVERY
 --------------------------------------------------------
 
-- No backend required
-- Fully client-side deterministic engine
-- Designed for institutional simulation testing
-- Works on GitHub Pages static hosting
-- Mobile-safe execution supported
+If controls fail:
+1. Verify runSimulation() is loaded
+2. Ensure script order is correct
+3. Check browser console for JS errors
+4. Disable AUTO loop if UI becomes unresponsive
+5. Confirm GitHub Pages deployment is updated
 
 --------------------------------------------------------
-DEBUG MODE
+DEPLOYMENT SAFETY
 --------------------------------------------------------
 
-If buttons fail:
-- check run() is global
-- ensure DOM binding after load
-- verify script order
-- disable AUTO loop conflicts
+- Safe for GitHub Pages
+- No external API dependency
+- No server-side execution
+- Fully deterministic simulation model
 
 ========================================================
+-->
+
 -->
 
 <!DOCTYPE html>
