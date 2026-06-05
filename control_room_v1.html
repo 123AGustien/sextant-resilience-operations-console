@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sextant Control Room v1 (Stable)</title>
+
+    <style>
+        body {
+            background: #0b0f14;
+            color: #d7f3ff;
+            font-family: Arial, sans-serif;
+        }
+
+        .panel {
+            border: 1px solid #2bd4ff;
+            padding: 12px;
+            margin: 10px;
+        }
+
+        #status {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .STABLE { color: #00ff99; }
+        .ELEVATED { color: #ffd166; }
+        .WARNING { color: #ff9f1c; }
+        .CRITICAL { color: #ff4d4d; }
+    </style>
+</head>
+
+<body>
+
+<div class="panel">
+    <h2>🧭 Sextant Control Room v1</h2>
+
+    <button onclick="run('normal')">Run Normal</button>
+    <button onclick="run('failure')">Run Failure</button>
+    <button onclick="run('cascade')">Run Cascade</button>
+</div>
+
+<div class="panel">
+    <h3>Status</h3>
+    <div id="status">IDLE</div>
+</div>
+
+<div class="panel">
+    <h3>Output</h3>
+    <pre id="output"></pre>
+</div>
+
+<div class="panel">
+    <h3>Risk Graph</h3>
+    <div id="riskGraph"></div>
+</div>
+
+<!-- CORE SYSTEM ORDER (VERY IMPORTANT) -->
+<script src="simulation_schema_v1.js"></script>
+<script src="simulation_runtime_v1.js"></script>
+<script src="risk_graph.js"></script>
+
+<script>
+
+function run(type) {
+
+    if (!window.SEXTANT_RUNTIME_V1) {
+        console.error("Runtime not loaded");
+        return;
+    }
+
+    const result = window.SEXTANT_RUNTIME_V1.runSimulation({
+        type: type,
+        stress:
+            type === "cascade" ? 0.9 :
+            type === "failure" ? 0.6 : 0.2
+    });
+
+    if (!result) return;
+
+    // UI update
+    const status = document.getElementById("status");
+    status.innerText = result.state;
+    status.className = result.state;
+
+    document.getElementById("output").innerText =
+        JSON.stringify(result, null, 2);
+}
+
+</script>
+
+</body>
+</html>
