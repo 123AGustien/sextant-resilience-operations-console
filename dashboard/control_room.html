@@ -2,6 +2,37 @@
 <html>
 <head>
     <title>Sextant Control Room v7 - Stable</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b0f14;
+            color: #d7f7ff;
+        }
+
+        .panel {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #2bd4ff;
+        }
+
+        button {
+            margin: 5px;
+            padding: 10px;
+            border: 1px solid #2bd4ff;
+            background: black;
+            color: #2bd4ff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0f1a22;
+        }
+
+        #status {
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -44,11 +75,18 @@ function run(type) {
     output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
     // SAFE GRAPH FEED
-    window.RiskGraph?.push(result);
+    if (window.RiskGraph && typeof window.RiskGraph.push === "function") {
+        window.RiskGraph.push(result);
+    }
 }
 
 function testGraph() {
-    window.RiskGraph?.push({ impact: Math.random() * 100 });
+    if (window.RiskGraph) {
+        window.RiskGraph.push({
+            impact: Math.random() * 100,
+            state: "TEST"
+        });
+    }
 }
 
 </script>
@@ -56,6 +94,20 @@ function testGraph() {
 <button onclick="run('cascade')">Cascade</button>
 <button onclick="run('failure')">Failure</button>
 <button onclick="testGraph()">Test Graph</button>
+
+<!-- 🟢 SAFE GRAPH BOOTSTRAP -->
+<script>
+window.addEventListener("load", () => {
+
+    if (!window.RiskGraph) return;
+
+    window.RiskGraph.push({
+        impact: 0,
+        state: "INIT",
+        timestamp: Date.now()
+    });
+});
+</script>
 
 </body>
 </html>
