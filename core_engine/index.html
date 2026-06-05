@@ -1,21 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sextant Core Engine</title>
+    <title>Sextant Control Room v8.1</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #05070d;
+            color: #d7f7ff;
+            text-align: center;
+        }
+
+        #status {
+            font-size: 22px;
+            margin: 10px;
+        }
+
+        pre {
+            text-align: left;
+            max-width: 900px;
+            margin: auto;
+            background: #0b0f14;
+            padding: 10px;
+            border: 1px solid #2bd4ff;
+        }
+
+        .GREEN { color: #2bd4ff; }
+        .AMBER { color: orange; }
+        .RED { color: red; }
+    </style>
 </head>
 
 <body>
 
-<h1>Sextant Core Engine</h1>
+<h2>Control Room</h2>
 
-<p>Core simulation components for the Sextant Resilience Platform.</p>
+<div id="status">READY</div>
 
-<ul>
-    <li>baseline_model.py</li>
-    <li>simulation_engine.js</li>
-</ul>
+<!-- SCREEN MODEL (THIS IS YOUR “TEXT LAYER ABOVE GRAPH”) -->
+<pre id="output">Waiting...</pre>
 
-<a href="../index.html">Back to Operations Console</a>
+<!-- GRAPH LAYER -->
+<div id="riskGraph"></div>
+
+<script src="./simulation_engine.js"></script>
+<script src="../assets/risk_graph.js"></script>
+
+<script>
+
+function run(type) {
+
+    const result = runSimulation({
+        name: type,
+        stress: type === "cascade" ? 0.9 : type === "failure" ? 0.6 : 0
+    });
+
+    // SCREEN MODEL OUTPUT (IMPORTANT FIX)
+    document.getElementById("output").innerText =
+        JSON.stringify(result, null, 2);
+
+    document.getElementById("status").innerText =
+        result.final_state;
+
+    // GRAPH FEED
+    window.RiskGraph?.push(result);
+}
+
+</script>
+
+<button onclick="run('cascade')">Cascade</button>
+<button onclick="run('failure')">Failure</button>
 
 </body>
 </html>
