@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sextant Control Room</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #0b0f14;
+            color: #d7f3ff;
+        }
+
+        .panel {
+            border: 1px solid #2bd4ff;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 8px;
+            background: #111826;
+        }
+
+        .status {
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .green { color: lime; }
+        .amber { color: orange; }
+        .red { color: red; }
+
+        button {
+            margin: 5px;
+            padding: 10px;
+        }
+
+        pre {
+            font-size: 12px;
+            text-align: left;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>SEXTANT CONTROL ROOM</h2>
+
+<div class="panel">
+    <div>Status: <span id="status" class="status green">GREEN</span></div>
+</div>
+
+<div class="panel">
+    <button onclick="run('normal')">Normal</button>
+    <button onclick="run('failure')">Failure</button>
+    <button onclick="run('cascade')">Cascade</button>
+</div>
+
+<div class="panel">
+    <button onclick="startAuto()">AUTO ON</button>
+    <button onclick="stopAuto()">AUTO OFF</button>
+</div>
+
+<div class="panel">
+    <h3>Output</h3>
+    <div id="output">Waiting...</div>
+</div>
+
+<script src="../core/control_engine.js"></script>
+
+</body>
+</html>
