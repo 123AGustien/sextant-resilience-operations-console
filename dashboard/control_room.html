@@ -1,3 +1,17 @@
+<!--
+========================================================
+SEXTANT CONTROL ROOM
+Institutional Simulation Layer v7 → v8 → v9 (FINAL UI BUILD)
+
+FEATURES:
+- Deterministic simulation engine
+- Scenario execution (Normal / Failure / Cascade)
+- Auto-loop simulation
+- Risk graph integration hook
+- GitHub Pages compatible (static only)
+========================================================
+-->
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -43,6 +57,11 @@
             text-align: left;
             white-space: pre-wrap;
         }
+
+        canvas {
+            width: 100%;
+            max-width: 900px;
+        }
     </style>
 </head>
 
@@ -76,18 +95,25 @@
     <div id="output">Waiting...</div>
 </div>
 
-<!-- RISK GRAPH CONTAINER (auto-created if missing) -->
-<div id="riskGraph"></div>
+<!-- RISK GRAPH -->
+<div class="panel">
+    <h3>Risk Graph</h3>
+    <canvas id="riskGraph"></canvas>
+</div>
 
 <!-- ENGINE -->
 <script src="../core/control_engine.js"></script>
 
-<!-- OPTIONAL GRAPH MODULE -->
+<!-- GRAPH ENGINE -->
 <script src="../assets/risk_graph.js"></script>
 
 <script>
+
 let autoLoop = null;
 
+/* =========================
+   CORE SIMULATION RUNNER
+========================= */
 function run(type) {
 
     const status = document.getElementById("status");
@@ -105,7 +131,7 @@ function run(type) {
 
     const result = runSimulation(scenario);
 
-    // STATUS UPDATE
+    // STATUS
     const state = result?.final_state || "UNKNOWN";
     status.innerText = state;
     status.className = "status " + state.toLowerCase();
@@ -114,13 +140,13 @@ function run(type) {
     output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
     // GRAPH HOOK (SAFE)
-    if (window.RiskGraph) {
-        RiskGraph.push(result);
+    if (window.updateRiskGraph) {
+        window.updateRiskGraph(result);
     }
 }
 
 /* =========================
-   AUTO LOOP (SAFE CONTROL)
+   AUTO LOOP
 ========================= */
 function startAuto() {
 
@@ -135,6 +161,7 @@ function stopAuto() {
     clearInterval(autoLoop);
     autoLoop = null;
 }
+
 </script>
 
 </body>
