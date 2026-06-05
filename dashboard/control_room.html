@@ -50,10 +50,11 @@
 <script src="../assets/risk_graph.js"></script>
 
 <script>
+
 function run(type) {
 
     if (!window.runSimulation) {
-        document.getElementById("output").innerText = "ENGINE NOT LOADED";
+        document.getElementById("output").innerText = "ENGINE NOT READY";
         return;
     }
 
@@ -62,17 +63,29 @@ function run(type) {
         stress: type === "cascade" ? 0.9 : type === "failure" ? 0.6 : 0
     });
 
+    // MODEL VIEW (IMPORTANT SCREEN LAYER)
     document.getElementById("output").innerText =
         JSON.stringify(result, null, 2);
 
+    // STATE DISPLAY
     const state = result.final_state || "GREEN";
 
     const status = document.getElementById("status");
     status.innerText = state;
     status.className = state;
 
+    // GRAPH FEED
     window.RiskGraph?.push(result);
 }
+
+/* IMPORTANT: INITIAL SEED (FIXES "WAITING...") */
+window.addEventListener("load", () => {
+    window.RiskGraph?.push({
+        impact: 0,
+        final_state: "GREEN"
+    });
+});
+
 </script>
 
 <button onclick="run('cascade')">Cascade</button>
