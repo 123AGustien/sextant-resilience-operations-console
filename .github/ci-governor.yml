@@ -1,0 +1,28 @@
+# =========================================================
+# SEXTANT CI GOVERNOR v1
+# Global Control Layer for All Workflows
+# =========================================================
+
+CI_GOVERNOR:
+  ENABLED: true        # master switch
+  MODE: "STABLE"       # STABLE | SAFE | OFFLINE
+  AUTO_DEPLOY: false
+  AUTO_TEST: false
+
+RULES:
+  BLOCK_IF:
+    - CI_GOVERNOR.ENABLED == false
+    - CI_GOVERNOR.MODE == "OFFLINE"
+
+  SAFE_MODE:
+    - allow: workflow_dispatch only
+    - block: push triggers
+    - block: pull_request triggers
+
+  STABLE_MODE:
+    - allow: push (main only)
+    - allow: pull_request checks
+    - limit: 1 job per workflow
+
+  OFFLINE_MODE:
+    - block: ALL workflows
