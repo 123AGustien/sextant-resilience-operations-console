@@ -1,135 +1,130 @@
 /* =========================================================
-   SEXTANT SCENARIO ENGINE v1 (STABLE + CONTROL ROOM READY)
+   SEXTANT SIMULATION ENGINE v8 - STABLE CORE
 ========================================================= */
 
-import time
-import uuid
+function runSimulation(scenario) {
 
-class ScenarioEngine:
+    if (!scenario || typeof scenario !== "object") {
+        return fallback("Invalid scenario input");
+    }
 
-    def __init__(self, engine, validator, agent, logger=None):
-        self.engine = engine
-        self.validator = validator
-        self.agent = agent
-        self.logger = logger
+    const safeScenario = {
+        name: scenario.name || "Unnamed Scenario",
+        oil_price: scenario.oil_price ?? 100,
+        capital_flow: scenario.capital_flow || "neutral",
+        inflation_pressure: scenario.inflation_pressure || "stable"
+    };
 
-    def run(self, scenario: dict):
+    const run_id =
+        "SIM-" +
+        safeScenario.name.replace(/\s+/g, "-").toUpperCase() +
+        "-" +
+        Date.now();
 
-        results = []
-        stress_series = []
+    if (typeof simulateUSDIDR !== "function") {
+        return fallback("Missing simulateUSDIDR()");
+    }
 
-        scenario_name = scenario.get("name", "unnamed")
+    if (typeof propagateShock !== "function") {
+        return fallback("Missing propagateShock()");
+    }
 
-        run_id = f"SCN-{scenario_name.upper().replace(' ', '-')}-{uuid.uuid4().hex[:8]}"
+    try {
 
-        for step in scenario.get("steps", []):
+        const fxResult = simulateUSDIDR(safeScenario) || {
+            usd_idr: 0,
+            pressure_score: 0,
+            regime: "SAFE_MODE"
+        };
 
-            try:
-                input_signal = step.get("input", {})
+        fxResult.pressure_score =
+            Math.max(0, Math.min(1, fxResult.pressure_score || 0));
 
-                # ======================================================
-                # ENGINE EXECUTION
-                # ======================================================
-                engine_result = self.engine.evaluate(input_signal)
+        const systemResult = propagateShock(fxResult);
 
-                # ======================================================
-                # VALIDATION LAYER (SAFE GUARD)
-                # ======================================================
-                validation = self.validator.validate(engine_result) if self.validator else {
-                    "status": "SKIPPED"
-                }
+        const stateMap = {
+            STABLE: "GREEN",
+            WATCH: "AMBER",
+            STRESS: "RED",
+            CRITICAL: "CRITICAL",
+            SAFE: "GREEN"
+        };
 
-                # ======================================================
-                # AGENT STEP
-                # ======================================================
-                agent_result = self.agent.step(input_signal) if self.agent else {
-                    "status": "NO_AGENT"
-                }
+        const finalState = stateMap[systemResult.systemState] || "GREEN";
 
-                # ======================================================
-                # NORMALIZED STRESS EXTRACTION
-                # ======================================================
-                stress = self._extract_stress(engine_result)
-                stress_series.append(stress)
-
-                # ======================================================
-                # STEP RECORD
-                # ======================================================
-                record = {
-                    "input": input_signal,
-                    "engine": engine_result,
-                    "validation": validation,
-                    "agent": agent_result,
-                    "stress": stress,
-                    "timestamp": time.time()
-                }
-
-                results.append(record)
-
-                if self.logger:
-                    self.logger.log_event("SCENARIO_STEP", record)
-
-            except Exception as e:
-
-                fallback_record = {
-                    "input": step.get("input", {}),
-                    "error": str(e),
-                    "stress": 0,
-                    "engine": None,
-                    "validation": {"status": "FAILED"},
-                    "agent": {"status": "FAILED"}
-                }
-
-                results.append(fallback_record)
-
-                if self.logger:
-                    self.logger.log_event("SCENARIO_ERROR", fallback_record)
-
-        # ======================================================
-        # SYSTEM STATE AGGREGATION
-        # ======================================================
-        avg_stress = sum(stress_series) / len(stress_series) if stress_series else 0
-
-        system_state = self._map_state(avg_stress)
+        const baseline = {
+            SHI: 98.5,
+            RPS: fxResult.pressure_score / 100,
+            EVR: Math.round(fxResult.pressure_score * 120),
+            AIC: systemResult.systemState === "CRITICAL" ? 0.6 : 1.0,
+            EAF: fxResult.pressure_score / 1000
+        };
 
         return {
-            "run_id": run_id,
-            "scenario": scenario_name,
-            "total_steps": len(results),
-            "average_stress": avg_stress,
-            "system_state": system_state,
-            "results": results
-        }
+            run_id,
+            scenario: safeScenario.name,
+            baseline_state: baseline,
 
-    # ======================================================
-    # STRESS NORMALIZER
-    # ======================================================
-    def _extract_stress(self, engine_result):
+            fx: {
+                usd_idr: fxResult.usd_idr ?? 0,
+                pressure_score: fxResult.pressure_score ?? 0,
+                regime: fxResult.regime || "UNKNOWN"
+            },
 
-        if not engine_result:
-            return 0
+            system: systemResult,
+            final_state: finalState,
+            interpretation: getInterpretation(finalState)
+        };
 
-        if isinstance(engine_result, dict):
+    } catch (e) {
+        return fallback("Engine crash: " + e.message);
+    }
+}
 
-            if "stress" in engine_result:
-                return float(engine_result["stress"])
+function propagateShock(fxResult) {
 
-            if "pressure" in engine_result:
-                return float(engine_result["pressure"])
+    const pressure = fxResult.pressure_score ?? 0;
 
-            if "impact" in engine_result:
-                return float(engine_result["impact"]) / 100
+    return {
+        fxStress: pressure,
+        bankingStress: Math.min(1, pressure * 0.85),
+        liquidityStress: Math.min(1, pressure * 0.65),
+        equityStress: Math.min(1, pressure * 0.50),
+        confidenceDrop: Math.min(1, pressure * 0.70),
 
-        return 0
+        systemState:
+            pressure > 0.85 ? "CRITICAL" :
+            pressure > 0.60 ? "STRESS" :
+            pressure > 0.30 ? "WATCH" :
+            "STABLE"
+    };
+}
 
-    # ======================================================
-    # STATE MAPPER
-    # ======================================================
-    def _map_state(self, stress):
+function getInterpretation(state) {
+    switch (state) {
+        case "GREEN":
+            return "System stable";
+        case "AMBER":
+            return "Early stress detected";
+        case "RED":
+            return "Systemic stress active";
+        case "CRITICAL":
+            return "Critical breakdown risk";
+        default:
+            return "Unknown state";
+    }
+}
 
-        if stress > 0.75:
-            return "RED"
-        elif stress > 0.4:
-            return "AMBER"
-        else:
-            return "GREEN"
+function fallback(reason) {
+    return {
+        run_id: "FALLBACK",
+        scenario: "FALLBACK",
+        fx: { usd_idr: 0, pressure_score: 0, regime: "SAFE_MODE" },
+        system: { systemState: "SAFE", note: reason },
+        final_state: "GREEN",
+        interpretation: reason
+    };
+}
+
+/* ✅ CRITICAL FIX */
+window.runSimulation = runSimulation;
