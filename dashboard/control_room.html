@@ -4,6 +4,10 @@
     <div id="riskGraph"></div>
 </div>
 
+<!-- ENGINE (REQUIRED) -->
+<script src="../core/control_engine.js"></script>
+
+<!-- GRAPH ENGINE -->
 <script src="../assets/risk_graph.js"></script>
 
 <script>
@@ -24,15 +28,15 @@ function run(type) {
         stress: type === "cascade" ? 0.9 : type === "failure" ? 0.7 : 0
     });
 
-    status.innerText = result?.state || "UNKNOWN";
-    status.className = "status " + (result?.state || "unknown").toLowerCase();
+    const state = result?.state || "UNKNOWN";
+
+    status.innerText = state;
+    status.className = "status " + state.toLowerCase();
 
     output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
-    // GRAPH FEED
-    if (window.RiskGraph) {
-        window.RiskGraph.push(result);
-    }
+    // GRAPH FEED (SAFE)
+    window.RiskGraph?.push(result);
 }
 
 function startAuto() {
