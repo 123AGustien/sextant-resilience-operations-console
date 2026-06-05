@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sextant Control Room v8.1</title>
+    <title>Control Room v8.1</title>
 
     <style>
         body {
@@ -16,6 +16,10 @@
             margin: 10px;
         }
 
+        .GREEN { color: #2bd4ff; }
+        .AMBER { color: orange; }
+        .RED { color: red; }
+
         pre {
             text-align: left;
             max-width: 900px;
@@ -25,9 +29,10 @@
             border: 1px solid #2bd4ff;
         }
 
-        .GREEN { color: #2bd4ff; }
-        .AMBER { color: orange; }
-        .RED { color: red; }
+        button {
+            margin: 5px;
+            padding: 10px;
+        }
     </style>
 </head>
 
@@ -37,34 +42,47 @@
 
 <div id="status">READY</div>
 
-<!-- SCREEN MODEL (THIS IS YOUR “TEXT LAYER ABOVE GRAPH”) -->
+<!-- ✅ THIS IS YOUR SCREEN MODEL (IMPORTANT) -->
 <pre id="output">Waiting...</pre>
 
 <!-- GRAPH LAYER -->
 <div id="riskGraph"></div>
 
-<script src="./simulation_engine.js"></script>
+<script src="../core_engine/simulation_engine.js"></script>
 <script src="../assets/risk_graph.js"></script>
 
 <script>
 
 function run(type) {
 
+    if (!window.runSimulation) {
+        document.getElementById("output").innerText = "ENGINE NOT LOADED";
+        return;
+    }
+
     const result = runSimulation({
         name: type,
-        stress: type === "cascade" ? 0.9 : type === "failure" ? 0.6 : 0
+        stress: type === "cascade" ? 0.9 : 0.6
     });
 
-    // SCREEN MODEL OUTPUT (IMPORTANT FIX)
+    // SCREEN MODEL (TEXT OUTPUT)
     document.getElementById("output").innerText =
         JSON.stringify(result, null, 2);
 
-    document.getElementById("status").innerText =
-        result.final_state;
+    // STATUS
+    const status = document.getElementById("status");
+    status.innerText = result.final_state;
+    status.className = result.final_state;
 
     // GRAPH FEED
     window.RiskGraph?.push(result);
 }
+
+function bootGraph() {
+    window.RiskGraph?.push({ impact: 0 });
+}
+
+window.addEventListener("load", bootGraph);
 
 </script>
 
