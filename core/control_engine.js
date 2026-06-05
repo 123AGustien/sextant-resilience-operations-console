@@ -1,51 +1,68 @@
+/* =========================================================
+   SEXTANT CONTROL ROOM CORE ENGINE v1 (STABLE)
+========================================================= */
+
 let autoLoop = null;
 
 /* -------------------------
-   STATE STORAGE
+   STATE STORAGE (SAFE)
 ------------------------- */
 function saveState(data) {
-    localStorage.setItem("SEXTANT_STATE", JSON.stringify(data));
+    try {
+        localStorage.setItem("SEXTANT_STATE", JSON.stringify(data));
+    } catch (e) {
+        console.warn("Storage failed:", e);
+    }
 }
 
 function loadState() {
-    return JSON.parse(localStorage.getItem("SEXTANT_STATE") || "null");
+    try {
+        return JSON.parse(localStorage.getItem("SEXTANT_STATE") || "null");
+    } catch (e) {
+        return null;
+    }
 }
 
 /* -------------------------
-   MAIN SIMULATION ENGINE
+   MAIN RUN FUNCTION
 ------------------------- */
 function run(type) {
 
     const status = document.getElementById("status");
     const output = document.getElementById("output");
 
-    let scenario = {
-        type: type,
-        stress: 0
-    };
+    if (!status || !output) return;
 
-    if (type === "failure") scenario.stress = 0.6;
-    if (type === "cascade") scenario.stress = 0.9;
+    const scenario = {
+        type,
+        stress: type === "cascade" ? 0.9 :
+                type === "failure" ? 0.6 : 0
+    };
 
     const result = simulate(scenario);
 
     saveState(result);
 
-    status.innerText = result.state;
-    status.className = "status " + result.state.toLowerCase();
+    // UI STATE UPDATE
+    status.innerText = result.state || "GREEN";
+    status.className = "status " + (result.state || "green").toLowerCase();
 
     output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
+
+    // 🔥 GRAPH HOOK (IMPORTANT)
+    if (window.RiskGraph && typeof window.RiskGraph.push === "function") {
+        window.RiskGraph.push(result);
+    }
 }
 
 /* -------------------------
-   SIMPLE SIMULATION CORE
-   (safe lightweight version)
+   SIMULATION CORE (STABLE)
 ------------------------- */
 function simulate(scenario) {
 
-    let base = 100;
+    const stress = scenario.stress ?? 0;
 
-    let impact = base - (scenario.stress * 60);
+    let impact = 100 - (stress * 60);
 
     let state = "GREEN";
 
@@ -54,14 +71,14 @@ function simulate(scenario) {
 
     return {
         input: scenario,
-        impact: impact,
-        state: state,
+        impact: Math.max(0, Math.min(100, impact)),
+        state,
         timestamp: Date.now()
     };
 }
 
 /* -------------------------
-   AUTO LOOP (SAFE)
+   AUTO LOOP (SAFE GUARD)
 ------------------------- */
 function startAuto() {
     if (autoLoop) return;
@@ -72,21 +89,33 @@ function startAuto() {
 }
 
 function stopAuto() {
+    if (!autoLoop) return;
     clearInterval(autoLoop);
     autoLoop = null;
 }
 
 /* -------------------------
-   RESTORE STATE
+   RESTORE STATE (MOBILE SAFE)
 ------------------------- */
-window.onload = function () {
+window.addEventListener("load", () => {
+
     const saved = loadState();
+    if (!saved) return;
 
-    if (saved) {
-        document.getElementById("output").innerHTML =
-            "<pre>" + JSON.stringify(saved, null, 2) + "</pre>";
+    const output = document.getElementById("output");
+    const status = document.getElementById("status");
 
-        document.getElementById("status").innerText =
-            saved.state || "GREEN";
+    if (output) {
+        output.innerHTML = "<pre>" + JSON.stringify(saved, null, 2) + "</pre>";
     }
-};
+
+    if (status) {
+        status.innerText = saved.state || "GREEN";
+        status.className = "status " + (saved.state || "green").toLowerCase();
+    }
+
+    // restore graph feed
+    if (window.RiskGraph && saved) {
+        window.RiskGraph.push(saved);
+    }
+});
