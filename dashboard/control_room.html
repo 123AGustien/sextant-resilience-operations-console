@@ -1,81 +1,53 @@
-window.RiskGraph = (function () {
+<!-- GRAPH -->
+<div class="panel">
+    <h3>Risk Graph</h3>
+    <div id="riskGraph"></div>
+</div>
 
-    let canvas, ctx;
-    let data = [];
+<!-- ENGINE -->
+<script src="../core/control_engine.js"></script>
+<script src="../assets/risk_graph.js"></script>
 
-    function init() {
+<script>
 
-        if (canvas) return;
+let autoLoop = null;
 
-        const container = document.getElementById("riskGraph");
+function run(type) {
 
-        if (!container) {
-            console.error("riskGraph container missing");
-            return;
-        }
+    const status = document.getElementById("status");
+    const output = document.getElementById("output");
 
-        canvas = document.createElement("canvas");
-        canvas.width = 900;
-        canvas.height = 220;
-
-        canvas.style.border = "1px solid #2bd4ff";
-        canvas.style.background = "#0b0f14";
-        canvas.style.display = "block";
-        canvas.style.margin = "10px auto";
-
-        container.appendChild(canvas);
-
-        ctx = canvas.getContext("2d");
+    if (!window.runSimulation) {
+        output.innerHTML = "❌ ENGINE NOT LOADED";
+        return;
     }
 
-    function push(result) {
+    const result = runSimulation({
+        type,
+        stress: type === "cascade" ? 0.9 : type === "failure" ? 0.7 : 0
+    });
 
-        if (!result) return;
+    const state = result?.state || "UNKNOWN";
 
-        const value = result.impact ?? 0;
+    status.innerText = state;
+    status.className = "status " + state.toLowerCase();
 
-        data.push(value);
+    output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
-        if (data.length > 50) data.shift();
-
-        draw();
+    // ✅ GRAPH SAFE CALL
+    if (window.RiskGraph) {
+        window.RiskGraph.push(result);
     }
+}
 
-    function draw() {
+function startAuto() {
+    if (autoLoop) return;
+    autoLoop = setInterval(() => run("cascade"), 3000);
+}
 
-        init();
-        if (!ctx) return;
+function stopAuto() {
+    clearInterval(autoLoop);
+    autoLoop = null;
+}
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // grid
-        ctx.strokeStyle = "#1c2a33";
-        for (let i = 0; i < 10; i++) {
-            ctx.beginPath();
-            ctx.moveTo(0, i * 22);
-            ctx.lineTo(canvas.width, i * 22);
-            ctx.stroke();
-        }
-
-        // line
-        ctx.strokeStyle = "#2bd4ff";
-        ctx.beginPath();
-
-        for (let i = 0; i < data.length; i++) {
-
-            const x = (i / 50) * canvas.width;
-            const y = canvas.height - (data[i] / 100) * canvas.height;
-
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-        }
-
-        ctx.stroke();
-
-        ctx.fillStyle = "#d7f3ff";
-        ctx.fillText("Risk Trend", 10, 15);
-    }
-
-    return { push };
-
-})();
+</script>
