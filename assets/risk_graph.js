@@ -1,15 +1,18 @@
 /* =========================================================
-   SEXTANT RISK GRAPH vFINAL FIX
-   - Actually binds to your simulation engine
-   - Draws real-time canvas graph
-   - Works with control_room.html
+   SEXTANT RISK GRAPH v3 (FINAL STABLE FIX)
 ========================================================= */
 
 window.RiskGraph = (function () {
 
     let canvas, ctx;
 
-    const data = [];
+    const data = {
+        fx: [],
+        bank: [],
+        liq: [],
+        eq: [],
+        conf: []
+    };
 
     function init() {
 
@@ -18,18 +21,16 @@ window.RiskGraph = (function () {
         const container = document.getElementById("riskGraph");
 
         canvas = document.createElement("canvas");
-        canvas.id = "riskCanvas";
-        canvas.width = 900;
+        canvas.width = 850;
         canvas.height = 240;
 
-        canvas.style.width = "100%";
-        canvas.style.maxWidth = "900px";
+        canvas.style.display = "block";
+        canvas.style.margin = "10px auto";
         canvas.style.border = "1px solid #2bd4ff";
         canvas.style.background = "#0b0f14";
-        canvas.style.display = "block";
 
         if (container) {
-            container.innerHTML = "";
+            container.innerHTML = ""; // IMPORTANT: clear old junk
             container.appendChild(canvas);
         } else {
             document.body.appendChild(canvas);
@@ -42,60 +43,62 @@ window.RiskGraph = (function () {
 
         if (!result) return;
 
-        // unified risk value (THIS is why your old graph failed)
-        const value =
-            result.impact ??
-            result.system?.fxStress ??
-            result.system?.bankingStress ??
-            0;
+        const sys = result.system || {};
 
-        data.push(value);
+        data.fx.push(sys.fxStress || 0);
+        data.bank.push(sys.bankingStress || 0);
+        data.liq.push(sys.liquidityStress || 0);
+        data.eq.push(sys.equityStress || 0);
+        data.conf.push(sys.confidenceDrop || 0);
 
-        if (data.length > 60) data.shift();
+        trim(data.fx);
+        trim(data.bank);
+        trim(data.liq);
+        trim(data.eq);
+        trim(data.conf);
 
         draw();
+    }
+
+    function trim(arr) {
+        if (arr.length > 40) arr.shift();
     }
 
     function draw() {
 
         init();
-        if (!ctx) return;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        drawGrid();
-        drawLine();
-
-        ctx.fillStyle = "#d7f3ff";
-        ctx.fillText("Risk Impact (Live Simulation)", 10, 15);
-    }
-
-    function drawGrid() {
-
+        // GRID
         ctx.strokeStyle = "#1c2a33";
-        ctx.lineWidth = 1;
-
         for (let i = 0; i < 10; i++) {
             ctx.beginPath();
             ctx.moveTo(0, i * 24);
             ctx.lineTo(canvas.width, i * 24);
             ctx.stroke();
         }
+
+        drawLine(data.fx, "#2bd4ff");
+        drawLine(data.bank, "#ff4d4d");
+        drawLine(data.liq, "#ffa500");
+        drawLine(data.eq, "#b388ff");
+        drawLine(data.conf, "#00ff88");
     }
 
-    function drawLine() {
+    function drawLine(arr, color) {
 
-        if (!data.length) return;
+        if (!arr.length) return;
 
-        ctx.strokeStyle = "#2bd4ff";
+        ctx.strokeStyle = color;
         ctx.lineWidth = 2;
 
         ctx.beginPath();
 
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < arr.length; i++) {
 
-            const x = (i / 60) * canvas.width;
-            const y = canvas.height - (data[i] / 100) * canvas.height;
+            const x = (i / 40) * canvas.width;
+            const y = canvas.height - (arr[i] * canvas.height);
 
             if (i === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
