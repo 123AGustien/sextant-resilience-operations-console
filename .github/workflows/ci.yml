@@ -7,13 +7,14 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
+env:
+  CI_PAUSED: "false"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
+    if: ${{ env.CI_PAUSED != 'true' }}
     runs-on: ubuntu-latest
-
-    # 🔧 Fix for Node 20 deprecation warning in GitHub Actions
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout repository
