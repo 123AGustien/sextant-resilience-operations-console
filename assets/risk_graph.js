@@ -1,6 +1,7 @@
 /* =========================================================
-   SEXTANT RISK GRAPH v6 - PRODUCTION STABLE CORE
-========================================================= */
+    SEXTANT RISK GRAPH v6 - PRODUCTION STABLE CORE
+    CANVAS LAYER (CONTROL ROOM READY)
+ ========================================================= */
 
 window.RiskGraph = (function () {
 
@@ -29,7 +30,10 @@ window.RiskGraph = (function () {
         canvas = document.createElement("canvas");
         canvas.id = "riskCanvas";
 
-        canvas.width = 900;
+        // responsive safe sizing (mobile friendly upgrade)
+        const width = Math.min(900, window.innerWidth - 40);
+
+        canvas.width = width;
         canvas.height = 220;
 
         canvas.style.border = "1px solid #2bd4ff";
@@ -75,7 +79,7 @@ window.RiskGraph = (function () {
 
         ctx.clearRect(0, 0, w, h);
 
-        // grid
+        // ================= GRID =================
         ctx.strokeStyle = "#1c2a33";
         ctx.lineWidth = 1;
 
@@ -88,7 +92,7 @@ window.RiskGraph = (function () {
             ctx.stroke();
         }
 
-        // fallback state
+        // ================= EMPTY STATE =================
         if (data.length < 2) {
             ctx.fillStyle = "#d7f3ff";
             ctx.font = "12px Arial";
@@ -96,7 +100,7 @@ window.RiskGraph = (function () {
             return;
         }
 
-        // line plot
+        // ================= LINE GRAPH =================
         ctx.strokeStyle = "#2bd4ff";
         ctx.lineWidth = 2;
 
@@ -115,7 +119,7 @@ window.RiskGraph = (function () {
 
         ctx.stroke();
 
-        // label
+        // ================= LABEL =================
         ctx.fillStyle = "#d7f3ff";
         ctx.font = "12px Arial";
         ctx.fillText("Risk Impact Trend", 10, 18);
@@ -124,6 +128,8 @@ window.RiskGraph = (function () {
     // ======================================================
     // PUBLIC API
     // ======================================================
-    return { push };
+    return {
+        push
+    };
 
 })();
