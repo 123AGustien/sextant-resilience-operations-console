@@ -43,12 +43,6 @@
             text-align: left;
             white-space: pre-wrap;
         }
-
-        /* IMPORTANT: graph container */
-        #riskGraph {
-            max-width: 900px;
-            margin: 10px auto;
-        }
     </style>
 </head>
 
@@ -77,9 +71,13 @@
     <div id="output">Waiting...</div>
 </div>
 
-<!-- ✅ GRAPH GOES HERE -->
-<div id="riskGraph"></div>
+<!-- GRAPH CONTAINER -->
+<div class="panel">
+    <h3>Risk Graph</h3>
+    <div id="riskGraph"></div>
+</div>
 
+<!-- ENGINE -->
 <script src="../core/control_engine.js"></script>
 <script src="../assets/risk_graph.js"></script>
 
@@ -92,6 +90,11 @@ function run(type) {
     const status = document.getElementById("status");
     const output = document.getElementById("output");
 
+    if (typeof runSimulation !== "function") {
+        output.innerHTML = "❌ ENGINE NOT LOADED";
+        return;
+    }
+
     let scenario = { type };
 
     if (type === "failure") scenario = { stress: 0.7 };
@@ -99,14 +102,15 @@ function run(type) {
 
     const result = runSimulation(scenario);
 
+    // STATUS
     const state = result?.state || result?.final_state || "UNKNOWN";
-
     status.innerText = state;
     status.className = "status " + state.toLowerCase();
 
+    // OUTPUT
     output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
-    // ✅ THIS IS THE CRITICAL LINE
+    // GRAPH UPDATE
     if (window.RiskGraph) {
         RiskGraph.push(result);
     }
@@ -115,7 +119,9 @@ function run(type) {
 function startAuto() {
     if (autoLoop) return;
 
-    autoLoop = setInterval(() => run("cascade"), 3000);
+    autoLoop = setInterval(() => {
+        run("cascade");
+    }, 3000);
 }
 
 function stopAuto() {
