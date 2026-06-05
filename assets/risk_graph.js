@@ -1,5 +1,5 @@
 /* =========================================================
-   SEXTANT RISK GRAPH v5 (CLEAN STABLE)
+   SEXTANT RISK GRAPH v5 - LOCKED STABLE CORE
 ========================================================= */
 
 window.RiskGraph = (function () {
@@ -13,10 +13,8 @@ window.RiskGraph = (function () {
         const container = document.getElementById("riskGraph");
         if (!container) return;
 
-        // prevent duplicate canvas
-        let existing = document.getElementById("riskCanvas");
-        if (existing) {
-            canvas = existing;
+        if (document.getElementById("riskCanvas")) {
+            canvas = document.getElementById("riskCanvas");
             ctx = canvas.getContext("2d");
             return;
         }
@@ -34,6 +32,7 @@ window.RiskGraph = (function () {
         container.appendChild(canvas);
 
         ctx = canvas.getContext("2d");
+
         draw();
     }
 
@@ -74,6 +73,7 @@ window.RiskGraph = (function () {
         ctx.beginPath();
 
         for (let i = 0; i < data.length; i++) {
+
             const x = (i / 50) * canvas.width;
             const y = canvas.height - (data[i] / 100) * canvas.height;
 
