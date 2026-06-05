@@ -1,76 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Sextant Control Room</title>
-
-    <style>
-        body {
-            font-family: Arial;
-            text-align: center;
-            background: #0b0f14;
-            color: #d7f3ff;
-            margin: 0;
-            padding: 10px;
-        }
-
-        .panel {
-            border: 1px solid #2bd4ff;
-            padding: 15px;
-            margin: 10px auto;
-            border-radius: 8px;
-            background: #111826;
-            max-width: 900px;
-        }
-
-        .status {
-            font-size: 26px;
-            font-weight: bold;
-        }
-
-        .green { color: lime; }
-        .amber { color: orange; }
-        .red { color: red; }
-        .critical { color: magenta; }
-
-        button {
-            margin: 5px;
-            padding: 10px 14px;
-            cursor: pointer;
-        }
-
-        pre {
-            font-size: 12px;
-            text-align: left;
-            white-space: pre-wrap;
-        }
-    </style>
-</head>
-
-<body>
-
-<h2>SEXTANT CONTROL ROOM</h2>
-
-<div class="panel">
-    Status:
-    <span id="status" class="status green">GREEN</span>
-</div>
-
-<div class="panel">
-    <button onclick="run('normal')">Normal</button>
-    <button onclick="run('failure')">Failure</button>
-    <button onclick="run('cascade')">Cascade</button>
-</div>
-
-<div class="panel">
-    <button onclick="startAuto()">AUTO ON</button>
-    <button onclick="stopAuto()">AUTO OFF</button>
-</div>
-
-<div class="panel">
-    <h3>Simulation Output</h3>
-    <div id="output">Waiting...</div>
-</div>
-
 <!-- GRAPH CONTAINER -->
 <div class="panel">
     <h3>Risk Graph</h3>
@@ -102,17 +29,19 @@ function run(type) {
 
     const result = runSimulation(scenario);
 
-    // STATUS
+    // status safe read
     const state = result?.state || result?.final_state || "UNKNOWN";
     status.innerText = state;
     status.className = "status " + state.toLowerCase();
 
-    // OUTPUT
+    // output
     output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
-    // GRAPH UPDATE
-    if (window.RiskGraph) {
+    // GRAPH (SAFE CALL)
+    if (window.RiskGraph && typeof RiskGraph.push === "function") {
         RiskGraph.push(result);
+    } else {
+        console.log("RiskGraph not ready");
     }
 }
 
@@ -130,6 +59,3 @@ function stopAuto() {
 }
 
 </script>
-
-</body>
-</html>
