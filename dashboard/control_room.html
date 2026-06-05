@@ -1,12 +1,78 @@
-function bootGraph() {
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Control Room v8.1 Stable</title>
 
-    if (window.RiskGraph) {
-        window.RiskGraph.push({ impact: 0 });
+    <style>
+        body {
+            font-family: Arial;
+            background: #05070d;
+            color: #d7f7ff;
+            text-align: center;
+        }
+
+        #status { font-size: 22px; margin: 10px; }
+
+        pre {
+            text-align: left;
+            max-width: 900px;
+            margin: auto;
+            background: #0b0f14;
+            padding: 10px;
+            border: 1px solid #2bd4ff;
+        }
+
+        .GREEN { color: #2bd4ff; }
+        .AMBER { color: orange; }
+        .STRESS { color: red; }
+        .CRITICAL { color: red; }
+    </style>
+</head>
+
+<body>
+
+<h2>Control Room v8.1</h2>
+
+<div id="status">READY</div>
+
+<pre id="output">Waiting...</pre>
+
+<div id="riskGraph"></div>
+
+<script src="../core_engine/simulation_engine.js"></script>
+<script src="../assets/risk_graph.js"></script>
+
+<script>
+function run(type) {
+
+    if (!window.runSimulation) {
+        document.getElementById("output").innerText = "ENGINE NOT LOADED";
         return;
     }
 
-    // retry until loaded (mobile-safe)
-    setTimeout(bootGraph, 200);
+    const result = runSimulation({
+        name: type
+    });
+
+    document.getElementById("output").innerText =
+        JSON.stringify(result, null, 2);
+
+    const state = result.final_state || "STABLE";
+
+    const status = document.getElementById("status");
+    status.innerText = state;
+    status.className = state;
+
+    window.RiskGraph?.push(result);
 }
 
-window.addEventListener("load", bootGraph);
+window.addEventListener("load", () => {
+    window.RiskGraph?.push({ impact: 0 });
+});
+</script>
+
+<button onclick="run('cascade')">Cascade</button>
+<button onclick="run('failure')">Failure</button>
+
+</body>
+</html>
