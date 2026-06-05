@@ -1,13 +1,10 @@
 /* ======================================================
-   SEXTANT SIMULATION ENGINE v8 CORE (STABLE TAG FIXED)
-   CONTROL ROOM COMPATIBLE - CLEAN EXPORT LAYER
-====================================================== */
+    SEXTANT SIMULATION ENGINE v8 CORE
+    CONTROL ROOM COMPATIBLE - FINAL STABLE EXPORT
+ ====================================================== */
 
 function runSimulation(scenario) {
 
-    // ======================================================
-    // INPUT SAFETY LAYER
-    // ======================================================
     if (!scenario || typeof scenario !== "object") {
         return fallback("Invalid scenario input");
     }
@@ -19,18 +16,12 @@ function runSimulation(scenario) {
         inflation_pressure: scenario.inflation_pressure || "stable"
     };
 
-    // ======================================================
-    // RUN ID
-    // ======================================================
     const run_id =
         "SIM-" +
         safeScenario.name.replace(/\s+/g, "-").toUpperCase() +
         "-" +
         Date.now();
 
-    // ======================================================
-    // DEPENDENCY CHECKS
-    // ======================================================
     if (typeof simulateUSDIDR !== "function") {
         return fallback("Missing simulateUSDIDR()");
     }
@@ -41,9 +32,6 @@ function runSimulation(scenario) {
 
     try {
 
-        // ==================================================
-        // FX MODEL
-        // ==================================================
         const fxResult = simulateUSDIDR(safeScenario) || {
             usd_idr: 0,
             pressure_score: 0,
@@ -53,14 +41,8 @@ function runSimulation(scenario) {
         fxResult.pressure_score =
             Math.max(0, Math.min(1, fxResult.pressure_score || 0));
 
-        // ==================================================
-        // CONTAGION MODEL
-        // ==================================================
         const systemResult = propagateShock(fxResult);
 
-        // ==================================================
-        // STATE MAP
-        // ==================================================
         const stateMap = {
             STABLE: "GREEN",
             WATCH: "AMBER",
@@ -72,9 +54,6 @@ function runSimulation(scenario) {
         const finalState =
             stateMap[systemResult.systemState] || "GREEN";
 
-        // ==================================================
-        // BASELINE VECTOR
-        // ==================================================
         const baseline = {
             SHI: 98.5,
             RPS: fxResult.pressure_score / 100,
@@ -83,9 +62,6 @@ function runSimulation(scenario) {
             EAF: fxResult.pressure_score / 1000
         };
 
-        // ==================================================
-        // CONTROL ROOM OUTPUT CONTRACT
-        // ==================================================
         return {
             run_id,
             scenario: safeScenario.name,
@@ -107,9 +83,6 @@ function runSimulation(scenario) {
     }
 }
 
-/* ======================================================
-   CONTAGION MODEL (STABLE CORE)
-====================================================== */
 function propagateShock(fxResult) {
 
     const pressure = fxResult.pressure_score ?? 0;
@@ -118,8 +91,8 @@ function propagateShock(fxResult) {
         fxStress: pressure,
         bankingStress: Math.min(1, pressure * 0.85),
         liquidityStress: Math.min(1, pressure * 0.65),
-        equityStress: Math.min(1, pressure * 0.50),
-        confidenceDrop: Math.min(1, pressure * 0.70),
+        equityStress: Math.min(1, pressure * 0.5),
+        confidenceDrop: Math.min(1, pressure * 0.7),
 
         systemState:
             pressure > 0.85 ? "CRITICAL" :
@@ -129,69 +102,39 @@ function propagateShock(fxResult) {
     };
 }
 
-/* ======================================================
-   INTERPRETATION LAYER
-====================================================== */
 function getInterpretation(state) {
-
     switch (state) {
         case "GREEN":
-            return "System stable with manageable macro conditions";
+            return "System stable";
 
         case "AMBER":
-            return "Early stress signals detected across financial nodes";
+            return "Early stress detected";
 
         case "RED":
-            return "Systemic stress conditions active — contagion spreading";
+            return "Systemic stress active";
 
         case "CRITICAL":
-            return "Critical instability — multi-layer system breakdown";
+            return "Critical breakdown";
 
         default:
-            return "Unknown system state";
+            return "Unknown state";
     }
 }
 
-/* ======================================================
-   SAFE FALLBACK LAYER
-====================================================== */
 function fallback(reason) {
-
     return {
         run_id: "FALLBACK",
         scenario: "FALLBACK",
-
-        baseline_state: {
-            SHI: 98.5,
-            RPS: 0,
-            EVR: 0,
-            AIC: 1.0,
-            EAF: 0
-        },
-
-        fx: {
-            usd_idr: 0,
-            pressure_score: 0,
-            regime: "SAFE_MODE"
-        },
-
-        system: {
-            fxStress: 0,
-            bankingStress: 0,
-            liquidityStress: 0,
-            equityStress: 0,
-            confidenceDrop: 0,
-            systemState: "SAFE",
-            note: reason
-        },
-
+        baseline_state: { SHI: 98.5, RPS: 0, EVR: 0, AIC: 1.0, EAF: 0 },
+        fx: { usd_idr: 0, pressure_score: 0, regime: "SAFE_MODE" },
+        system: { systemState: "SAFE", note: reason },
         final_state: "GREEN",
-        interpretation: "SAFE MODE ACTIVE → " + reason
+        interpretation: reason
     };
 }
 
 /* ======================================================
-   GLOBAL EXPORT (CONTROL ROOM LINK LAYER)
+   CRITICAL EXPORT (THIS FIXES YOUR ERROR)
 ====================================================== */
 window.runSimulation = runSimulation;
 window.propagateShock = propagateShock;
