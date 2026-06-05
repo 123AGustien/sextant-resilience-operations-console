@@ -1,8 +1,8 @@
 /* =========================================================
    SEXTANT RISK GRAPH v3 (LIVE DASHBOARD STREAM)
-   - Auto-attaches to control system
+   - Auto canvas injection
    - Multi-metric financial risk visualization
-   - No manual push required
+   - Works with control_room.html
 ========================================================= */
 
 window.RiskGraph = (function () {
@@ -31,11 +31,15 @@ window.RiskGraph = (function () {
         canvas.style.border = "1px solid #2bd4ff";
         canvas.style.background = "#0b0f14";
 
-        document.body.appendChild(canvas);
+        // IMPORTANT: attach to graph container if exists
+        const target = document.getElementById("riskGraph");
+        if (target) {
+            target.appendChild(canvas);
+        } else {
+            document.body.appendChild(canvas);
+        }
 
         ctx = canvas.getContext("2d");
-
-        draw();
     }
 
     function push(result) {
@@ -50,16 +54,16 @@ window.RiskGraph = (function () {
         data.eq.push(sys.equityStress || 0);
         data.conf.push(sys.confidenceDrop || 0);
 
-        limit(data.fx);
-        limit(data.bank);
-        limit(data.liq);
-        limit(data.eq);
-        limit(data.conf);
+        trim(data.fx);
+        trim(data.bank);
+        trim(data.liq);
+        trim(data.eq);
+        trim(data.conf);
 
         draw();
     }
 
-    function limit(arr) {
+    function trim(arr) {
         if (arr.length > 40) arr.shift();
     }
 
@@ -71,11 +75,11 @@ window.RiskGraph = (function () {
 
         drawGrid();
 
-        drawLine(data.fx, "#2bd4ff");     // FX stress
-        drawLine(data.bank, "#ff4d4d");   // Banking
-        drawLine(data.liq, "#ffa500");    // Liquidity
-        drawLine(data.eq, "#b388ff");     // Equity
-        drawLine(data.conf, "#00ff88");   // Confidence
+        drawLine(data.fx, "#2bd4ff");
+        drawLine(data.bank, "#ff4d4d");
+        drawLine(data.liq, "#ffa500");
+        drawLine(data.eq, "#b388ff");
+        drawLine(data.conf, "#00ff88");
     }
 
     function drawGrid() {
