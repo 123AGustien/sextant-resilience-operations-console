@@ -1,5 +1,5 @@
 /* =========================================================
-   SEXTANT RISK GRAPH v6 - STABLE PRODUCTION CORE
+   SEXTANT RISK GRAPH v6 - PRODUCTION STABLE CORE
 ========================================================= */
 
 window.RiskGraph = (function () {
@@ -7,25 +7,22 @@ window.RiskGraph = (function () {
     let canvas = null;
     let ctx = null;
     let data = [];
-    let initialized = false;
 
     const MAX_POINTS = 50;
 
-    // -----------------------------
-    // INIT (SAFE SINGLETON + REUSE)
-    // -----------------------------
+    // ======================================================
+    // INIT (SAFE SINGLETON + MOBILE SAFE)
+    // ======================================================
     function init() {
 
         const container = document.getElementById("riskGraph");
         if (!container) return;
 
-        // reuse existing canvas if present
         const existing = document.getElementById("riskCanvas");
 
         if (existing) {
             canvas = existing;
             ctx = canvas.getContext("2d");
-            initialized = true;
             return;
         }
 
@@ -44,35 +41,31 @@ window.RiskGraph = (function () {
         container.appendChild(canvas);
 
         ctx = canvas.getContext("2d");
-
-        initialized = true;
-
-        draw();
     }
 
-    // -----------------------------
+    // ======================================================
     // PUSH DATA (SAFE ENTRY)
-    // -----------------------------
+    // ======================================================
     function push(result) {
 
         if (!result) return;
 
         init();
 
-        const value = Number(result?.impact ?? 0);
+        const value = Number(result.impact ?? 0);
 
         data.push(value);
 
         if (data.length > MAX_POINTS) {
-            data.splice(0, data.length - MAX_POINTS);
+            data = data.slice(-MAX_POINTS);
         }
 
         draw();
     }
 
-    // -----------------------------
-    // DRAW ENGINE (STABLE RENDER)
-    // -----------------------------
+    // ======================================================
+    // DRAW ENGINE (SAFE RENDER LOOP)
+    // ======================================================
     function draw() {
 
         if (!ctx || !canvas) return;
@@ -82,7 +75,7 @@ window.RiskGraph = (function () {
 
         ctx.clearRect(0, 0, w, h);
 
-        // background grid
+        // grid
         ctx.strokeStyle = "#1c2a33";
         ctx.lineWidth = 1;
 
@@ -95,6 +88,7 @@ window.RiskGraph = (function () {
             ctx.stroke();
         }
 
+        // fallback state
         if (data.length < 2) {
             ctx.fillStyle = "#d7f3ff";
             ctx.font = "12px Arial";
@@ -102,7 +96,7 @@ window.RiskGraph = (function () {
             return;
         }
 
-        // line graph
+        // line plot
         ctx.strokeStyle = "#2bd4ff";
         ctx.lineWidth = 2;
 
@@ -111,7 +105,8 @@ window.RiskGraph = (function () {
         for (let i = 0; i < data.length; i++) {
 
             const x = (i / (data.length - 1)) * w;
-            const normalized = Math.min(Math.max(data[i], 0), 100);
+
+            const normalized = Math.max(0, Math.min(100, data[i]));
             const y = h - (normalized / 100) * h;
 
             if (i === 0) ctx.moveTo(x, y);
@@ -126,11 +121,9 @@ window.RiskGraph = (function () {
         ctx.fillText("Risk Impact Trend", 10, 18);
     }
 
-    // -----------------------------
+    // ======================================================
     // PUBLIC API
-    // -----------------------------
-    return {
-        push
-    };
+    // ======================================================
+    return { push };
 
 })();
