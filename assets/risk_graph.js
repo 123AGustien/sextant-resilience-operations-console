@@ -1,113 +1,117 @@
 /* =========================================================
-   SEXTANT RISK GRAPH v2 (STABLE BUILD)
-   - Canvas live line chart
-   - Mobile safe
-   - Auto-init safe guard
-   - Simulation-compatible
+   SEXTANT RISK GRAPH v3 (LIVE DASHBOARD STREAM)
+   - Auto-attaches to control system
+   - Multi-metric financial risk visualization
+   - No manual push required
 ========================================================= */
 
 window.RiskGraph = (function () {
 
-    let data = [];
-    let canvas = null;
-    let ctx = null;
-    let initialized = false;
+    let canvas, ctx;
 
-    /* =========================
-       INIT CANVAS (SAFE)
-    ========================= */
+    const data = {
+        fx: [],
+        bank: [],
+        liq: [],
+        eq: [],
+        conf: []
+    };
+
     function init() {
 
-        if (initialized) return;
+        if (canvas) return;
 
-        canvas = document.getElementById("riskCanvas");
+        canvas = document.createElement("canvas");
+        canvas.id = "riskCanvas";
+        canvas.width = 900;
+        canvas.height = 240;
 
-        // If missing, create automatically
-        if (!canvas) {
-            canvas = document.createElement("canvas");
-            canvas.id = "riskCanvas";
-            canvas.width = 900;
-            canvas.height = 220;
+        canvas.style.display = "block";
+        canvas.style.margin = "20px auto";
+        canvas.style.border = "1px solid #2bd4ff";
+        canvas.style.background = "#0b0f14";
 
-            canvas.style.marginTop = "20px";
-            canvas.style.border = "1px solid #2bd4ff";
-            canvas.style.background = "#0b0f14";
-
-            document.body.appendChild(canvas);
-        }
+        document.body.appendChild(canvas);
 
         ctx = canvas.getContext("2d");
-        initialized = true;
-    }
-
-    /* =========================
-       PUSH NEW DATA POINT
-    ========================= */
-    function push(snapshot) {
-
-        if (!snapshot) return;
-
-        init();
-
-        const value =
-            snapshot.impact ??
-            snapshot.system?.fxStress ??
-            snapshot.stress ??
-            0;
-
-        data.push(value);
-
-        if (data.length > 50) {
-            data.shift();
-        }
 
         draw();
     }
 
-    /* =========================
-       DRAW GRAPH
-    ========================= */
+    function push(result) {
+
+        if (!result) return;
+
+        const sys = result.system || {};
+
+        data.fx.push(sys.fxStress || 0);
+        data.bank.push(sys.bankingStress || 0);
+        data.liq.push(sys.liquidityStress || 0);
+        data.eq.push(sys.equityStress || 0);
+        data.conf.push(sys.confidenceDrop || 0);
+
+        limit(data.fx);
+        limit(data.bank);
+        limit(data.liq);
+        limit(data.eq);
+        limit(data.conf);
+
+        draw();
+    }
+
+    function limit(arr) {
+        if (arr.length > 40) arr.shift();
+    }
+
     function draw() {
 
-        if (!ctx) return;
+        init();
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // GRID
+        drawGrid();
+
+        drawLine(data.fx, "#2bd4ff");     // FX stress
+        drawLine(data.bank, "#ff4d4d");   // Banking
+        drawLine(data.liq, "#ffa500");    // Liquidity
+        drawLine(data.eq, "#b388ff");     // Equity
+        drawLine(data.conf, "#00ff88");   // Confidence
+    }
+
+    function drawGrid() {
+
         ctx.strokeStyle = "#1c2a33";
+        ctx.lineWidth = 1;
 
         for (let i = 0; i < 10; i++) {
             ctx.beginPath();
-            ctx.moveTo(0, i * 22);
-            ctx.lineTo(canvas.width, i * 22);
+            ctx.moveTo(0, i * 24);
+            ctx.lineTo(canvas.width, i * 24);
             ctx.stroke();
         }
+    }
 
-        // LINE
-        ctx.strokeStyle = "#2bd4ff";
+    function drawLine(arr, color) {
+
+        if (!arr.length) return;
+
+        ctx.strokeStyle = color;
         ctx.lineWidth = 2;
 
         ctx.beginPath();
 
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < arr.length; i++) {
 
-            const x = (i / 50) * canvas.width;
-            const y = canvas.height - (data[i] / 100) * canvas.height;
+            const x = (i / 40) * canvas.width;
+            const y = canvas.height - (arr[i] * canvas.height);
 
             if (i === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
         }
 
         ctx.stroke();
-
-        // LABEL
-        ctx.fillStyle = "#d7f3ff";
-        ctx.font = "12px Arial";
-        ctx.fillText("Risk Impact Trend (live)", 10, 15);
     }
 
-    return {
-        push
-    };
+    return { push };
 
 })();
