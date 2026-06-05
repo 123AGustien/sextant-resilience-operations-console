@@ -1,17 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sextant Control Room v7 - Stable</title>
+</head>
+
+<body>
+
+<h2>Control Room</h2>
+
+<div id="status">READY</div>
+<div id="output"></div>
+
 <!-- GRAPH -->
 <div class="panel">
     <h3>Risk Graph</h3>
     <div id="riskGraph"></div>
 </div>
 
-<!-- ENGINE (REQUIRED) -->
+<!-- ENGINE -->
 <script src="../core/control_engine.js"></script>
-
-<!-- GRAPH ENGINE -->
 <script src="../assets/risk_graph.js"></script>
 
 <script>
-let autoLoop = null;
 
 function run(type) {
 
@@ -28,24 +38,24 @@ function run(type) {
         stress: type === "cascade" ? 0.9 : type === "failure" ? 0.7 : 0
     });
 
-    const state = result?.state || "UNKNOWN";
-
-    status.innerText = state;
-    status.className = "status " + state.toLowerCase();
+    status.innerText = result?.state || "UNKNOWN";
+    status.className = "status " + (result?.state || "unknown").toLowerCase();
 
     output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
-    // GRAPH FEED (SAFE)
+    // SAFE GRAPH FEED
     window.RiskGraph?.push(result);
 }
 
-function startAuto() {
-    if (autoLoop) return;
-    autoLoop = setInterval(() => run("cascade"), 3000);
+function testGraph() {
+    window.RiskGraph?.push({ impact: Math.random() * 100 });
 }
 
-function stopAuto() {
-    clearInterval(autoLoop);
-    autoLoop = null;
-}
 </script>
+
+<button onclick="run('cascade')">Cascade</button>
+<button onclick="run('failure')">Failure</button>
+<button onclick="testGraph()">Test Graph</button>
+
+</body>
+</html>
