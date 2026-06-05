@@ -1,17 +1,3 @@
-<!--
-========================================================
-SEXTANT CONTROL ROOM
-Institutional Simulation Layer v7 → v8 → v9 (FINAL UI BUILD)
-
-FEATURES:
-- Deterministic simulation engine
-- Scenario execution (Normal / Failure / Cascade)
-- Auto-loop simulation
-- Risk graph integration hook
-- GitHub Pages compatible (static only)
-========================================================
--->
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -58,9 +44,8 @@ FEATURES:
             white-space: pre-wrap;
         }
 
-        canvas {
-            width: 100%;
-            max-width: 900px;
+        #riskGraph {
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -71,9 +56,8 @@ FEATURES:
 
 <!-- STATUS -->
 <div class="panel">
-    <div>Status:
-        <span id="status" class="status green">GREEN</span>
-    </div>
+    Status:
+    <span id="status" class="status green">GREEN</span>
 </div>
 
 <!-- CONTROLS -->
@@ -95,25 +79,21 @@ FEATURES:
     <div id="output">Waiting...</div>
 </div>
 
-<!-- RISK GRAPH -->
+<!-- GRAPH PANEL (IMPORTANT: fixed container) -->
 <div class="panel">
     <h3>Risk Graph</h3>
-    <canvas id="riskGraph"></canvas>
+    <div id="riskGraph"></div>
 </div>
 
 <!-- ENGINE -->
 <script src="../core/control_engine.js"></script>
 
-<!-- GRAPH ENGINE -->
+<!-- GRAPH MODULE -->
 <script src="../assets/risk_graph.js"></script>
 
 <script>
-
 let autoLoop = null;
 
-/* =========================
-   CORE SIMULATION RUNNER
-========================= */
 function run(type) {
 
     const status = document.getElementById("status");
@@ -131,25 +111,21 @@ function run(type) {
 
     const result = runSimulation(scenario);
 
-    // STATUS
-    const state = result?.final_state || "UNKNOWN";
+    // status
+    const state = result?.state || result?.final_state || "UNKNOWN";
     status.innerText = state;
     status.className = "status " + state.toLowerCase();
 
-    // OUTPUT
+    // output
     output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
-    // GRAPH HOOK (SAFE)
-    if (window.updateRiskGraph) {
-        window.updateRiskGraph(result);
+    // graph update
+    if (window.RiskGraph) {
+        RiskGraph.push(result);
     }
 }
 
-/* =========================
-   AUTO LOOP
-========================= */
 function startAuto() {
-
     if (autoLoop) return;
 
     autoLoop = setInterval(() => {
@@ -161,7 +137,6 @@ function stopAuto() {
     clearInterval(autoLoop);
     autoLoop = null;
 }
-
 </script>
 
 </body>
