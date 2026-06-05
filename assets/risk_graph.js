@@ -44,7 +44,7 @@ window.RiskGraph = (function () {
 
     function draw() {
 
-        if (!ctx) return;
+        if (!ctx || !canvas) return;
 
         const w = canvas.width;
         const h = canvas.height;
@@ -64,6 +64,7 @@ window.RiskGraph = (function () {
 
         if (data.length < 2) return;
 
+        // line
         ctx.strokeStyle = "#2bd4ff";
         ctx.beginPath();
 
