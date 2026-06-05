@@ -1,36 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sextant Control Room v7 - Stable</title>
+    <title>Sextant Control Room v8</title>
+
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #0b0f14;
+            font-family: Arial;
+            background: #05070d;
             color: #d7f7ff;
-        }
-
-        .panel {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #2bd4ff;
-        }
-
-        button {
-            margin: 5px;
-            padding: 10px;
-            border: 1px solid #2bd4ff;
-            background: black;
-            color: #2bd4ff;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #0f1a22;
+            text-align: center;
         }
 
         #status {
-            font-weight: bold;
-            margin: 10px 0;
+            font-size: 22px;
+            margin: 10px;
+        }
+
+        .GREEN { color: #2bd4ff; }
+        .AMBER { color: orange; }
+        .RED { color: red; }
+
+        .panel {
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -40,16 +31,18 @@
 <h2>Control Room</h2>
 
 <div id="status">READY</div>
-<div id="output"></div>
 
-<!-- GRAPH -->
+<!-- MODEL OUTPUT (IMPORTANT SCREEN LAYER) -->
+<pre id="output">Waiting...</pre>
+
+<!-- GRAPH VIEW -->
 <div class="panel">
     <h3>Risk Graph</h3>
     <div id="riskGraph"></div>
 </div>
 
 <!-- ENGINE -->
-<script src="../core/control_engine.js"></script>
+<script src="../core_engine/simulation_engine.js"></script>
 <script src="../assets/risk_graph.js"></script>
 
 <script>
@@ -60,54 +53,37 @@ function run(type) {
     const output = document.getElementById("output");
 
     if (!window.runSimulation) {
-        output.innerHTML = "❌ ENGINE NOT LOADED";
+        output.innerText = "ENGINE NOT LOADED";
         return;
     }
 
     const result = runSimulation({
-        type,
-        stress: type === "cascade" ? 0.9 : type === "failure" ? 0.7 : 0
+        type: type,
+        stress:
+            type === "cascade" ? 0.9 :
+            type === "failure" ? 0.6 : 0
     });
 
-    status.innerText = result?.state || "UNKNOWN";
-    status.className = "status " + (result?.state || "unknown").toLowerCase();
+    // SCREEN MODEL VIEW (THIS IS WHAT YOU LOST BEFORE GRAPH)
+    output.innerText = JSON.stringify(result, null, 2);
 
-    output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
+    status.innerText = result.state;
+    status.className = result.state;
 
-    // SAFE GRAPH FEED
-    if (window.RiskGraph && typeof window.RiskGraph.push === "function") {
-        window.RiskGraph.push(result);
-    }
+    // GRAPH FEED
+    window.RiskGraph?.push(result);
 }
 
 function testGraph() {
-    if (window.RiskGraph) {
-        window.RiskGraph.push({
-            impact: Math.random() * 100,
-            state: "TEST"
-        });
-    }
+    window.RiskGraph?.push({ impact: Math.random() * 100 });
 }
 
 </script>
 
+<!-- CONTROLS -->
 <button onclick="run('cascade')">Cascade</button>
 <button onclick="run('failure')">Failure</button>
 <button onclick="testGraph()">Test Graph</button>
-
-<!-- 🟢 SAFE GRAPH BOOTSTRAP -->
-<script>
-window.addEventListener("load", () => {
-
-    if (!window.RiskGraph) return;
-
-    window.RiskGraph.push({
-        impact: 0,
-        state: "INIT",
-        timestamp: Date.now()
-    });
-});
-</script>
 
 </body>
 </html>
