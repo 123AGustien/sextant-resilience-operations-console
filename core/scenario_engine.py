@@ -1,3 +1,11 @@
+function simulateUSDIDR() {
+    return {
+        usd_idr: 17000,
+        pressure_score: Math.random(),
+        regime: "SIMULATION"
+    };
+}
+
 /* =========================================================
    SEXTANT SIMULATION ENGINE v8 - STABLE CORE
 ========================================================= */
