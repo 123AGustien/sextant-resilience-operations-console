@@ -1,162 +1,46 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Sextant Control Room v7</title>
+<!--
+========================================================
+SEXTANT CONTROL ROOM
+Institutional Simulation Layer v7 → v8 → v9 Upgrade
 
-    <link rel="stylesheet" href="../assets/styles.css">
+VERSION:
+- v7: Manual control simulation (UI-driven)
+- v8: State persistence + risk model integration
+- v9: Auto-refresh gateway + live simulation loop
 
-    <style>
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            max-width: 900px;
-            margin: auto;
-        }
+MODE:
+Deterministic Institutional Simulation Engine
 
-        .panel {
-            border: 1px solid #2bd4ff;
-            padding: 15px;
-            border-radius: 6px;
-        }
+DEPLOYMENT:
+GitHub Pages (main branch)
 
-        .status {
-            font-size: 22px;
-            font-weight: bold;
-        }
+STATUS:
+LIVE SIMULATION READY
 
-        .green { color: lime; }
-        .amber { color: orange; }
-        .red { color: red; }
-        .critical { color: magenta; }
+DEPENDENCIES:
+- fx_model.js
+- contagion_model.js
+- simulation_engine.js
 
-        pre {
-            text-align: left;
-            font-size: 12px;
-        }
-    </style>
-</head>
+FEATURES:
+✔ Scenario-based simulation
+✔ Risk propagation engine
+✔ State persistence (localStorage)
+✔ Auto-refresh capability (Phase 9)
+✔ Real-time dashboard rendering (no backend)
 
-<body>
+GITHUB PAGES:
+https://123agustien.github.io/sextant-resilience-operations-console/
 
-<h2>SEXTANT CONTROL ROOM v7</h2>
+SIMULATION ENTRY:
+/dashboard/control_room.html
 
-<div class="grid">
+GATEWAY (Phase 9):
+/phase9_gateway.html
 
-    <!-- STATUS PANEL -->
-    <div class="panel">
-        <h3>System Status</h3>
-        <div id="status" class="status green">GREEN</div>
-    </div>
-
-    <!-- ACTION PANEL -->
-    <div class="panel">
-        <h3>Simulation Controls</h3>
-
-        <button onclick="run('normal')">Normal</button>
-        <button onclick="run('failure')">Failure</button>
-        <button onclick="run('cascade')">Cascade</button>
-    </div>
-
-    <!-- OUTPUT PANEL -->
-    <div class="panel" style="grid-column: span 2;">
-        <h3>Simulation Output</h3>
-        <div id="output">Waiting...</div>
-    </div>
-
-</div>
-
-<!-- ================= ENGINE LOAD ================= -->
-<script src="../models/fx_model.js"></script>
-<script src="../models/contagion_model.js"></script>
-<script src="../core_engine/simulation_engine.js"></script>
-
-<script>
-
-function run(type) {
-
-    const status = document.getElementById("status");
-    const output = document.getElementById("output");
-
-    // ================================
-    // STEP 0 — Engine safety check
-    // ================================
-    if (typeof runSimulation !== "function") {
-        output.innerHTML = "❌ ERROR: simulation_engine.js not loaded";
-        console.error("[ControlRoom] runSimulation missing");
-        return;
-    }
-
-    // ================================
-    // STEP 1 — Scenario builder
-    // ================================
-    let scenario = {
-        name: "CONTROL_ROOM_TEST",
-        oil_price: 100,
-        capital_flow: "neutral",
-        inflation_pressure: "stable"
-    };
-
-    if (type === "failure") {
-        scenario = {
-            name: "FAILURE_TEST",
-            oil_price: 95,
-            capital_flow: "outflow",
-            inflation_pressure: "rising"
-        };
-    }
-
-    if (type === "cascade") {
-        scenario = {
-            name: "STRESS_TEST",
-            oil_price: 110,
-            capital_flow: "outflow",
-            inflation_pressure: "rising"
-        };
-    }
-
-    // ================================
-    // STEP 2 — Execute simulation
-    // ================================
-    let result;
-
-    try {
-        result = runSimulation(scenario);
-    } catch (err) {
-        output.innerHTML = "❌ ENGINE CRASH: " + err.message;
-        console.error(err);
-        return;
-    }
-
-    if (!result) {
-        output.innerHTML = "❌ ERROR: null simulation result";
-        return;
-    }
-
-    window.lastResult = result;
-
-    // ================================
-    // STEP 3 — STATUS UPDATE (SAFE)
-    // ================================
-    const state = result.final_state || "UNKNOWN";
-
-    status.innerText = state;
-
-    // prevent broken CSS class if undefined
-    status.className = "status " + state.toLowerCase();
-
-    // ================================
-    // STEP 4 — OUTPUT RENDER
-    // ================================
-    output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
-
-    // ================================
-    // STEP 5 — DEBUG LOG
-    // ================================
-    console.log("[Sextant]", result);
-}
-
-</script>
-
-</body>
-</html>
+NOTES:
+- No backend required
+- Fully frontend deterministic engine
+- Designed for institutional simulation testing layer
+========================================================
+-->
