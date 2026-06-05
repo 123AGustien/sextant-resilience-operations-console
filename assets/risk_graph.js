@@ -1,10 +1,14 @@
 /* =========================================================
-   SEXTANT RISK GRAPH v3.1 (STABLE + SAFE ATTACH)
+   SEXTANT RISK GRAPH vFINAL
+   - Stable DOM attach
+   - Safe mobile rendering
+   - Auto-init on first push
 ========================================================= */
 
 window.RiskGraph = (function () {
 
-    let canvas, ctx;
+    let canvas = null;
+    let ctx = null;
 
     const data = {
         fx: [],
@@ -18,21 +22,22 @@ window.RiskGraph = (function () {
 
         if (canvas) return;
 
+        const container = document.getElementById("riskGraph");
+
         canvas = document.createElement("canvas");
         canvas.id = "riskCanvas";
         canvas.width = 900;
         canvas.height = 240;
 
-        canvas.style.display = "block";
-        canvas.style.margin = "10px auto";
+        canvas.style.width = "100%";
+        canvas.style.maxWidth = "900px";
         canvas.style.border = "1px solid #2bd4ff";
         canvas.style.background = "#0b0f14";
+        canvas.style.display = "block";
 
-        // SAFE ATTACH
-        const target = document.getElementById("riskGraph");
-
-        if (target) {
-            target.appendChild(canvas);
+        if (container) {
+            container.innerHTML = "";
+            container.appendChild(canvas);
         } else {
             document.body.appendChild(canvas);
         }
@@ -52,22 +57,21 @@ window.RiskGraph = (function () {
         data.eq.push(sys.equityStress || 0);
         data.conf.push(sys.confidenceDrop || 0);
 
-        trim(data.fx);
-        trim(data.bank);
-        trim(data.liq);
-        trim(data.eq);
-        trim(data.conf);
-
+        trimAll();
         draw();
     }
 
-    function trim(arr) {
-        if (arr.length > 40) arr.shift();
+    function trimAll() {
+        const max = 50;
+        Object.keys(data).forEach(k => {
+            if (data[k].length > max) data[k].shift();
+        });
     }
 
     function draw() {
 
         init();
+        if (!ctx) return;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -78,6 +82,9 @@ window.RiskGraph = (function () {
         drawLine(data.liq, "#ffa500");
         drawLine(data.eq, "#b388ff");
         drawLine(data.conf, "#00ff88");
+
+        ctx.fillStyle = "#d7f3ff";
+        ctx.fillText("Risk Graph (live)", 10, 15);
     }
 
     function drawGrid() {
@@ -87,7 +94,7 @@ window.RiskGraph = (function () {
         for (let i = 0; i < 10; i++) {
             ctx.beginPath();
             ctx.moveTo(0, i * 24);
-            ctx.lineTo(canvas.width, i * 24);
+            ctx.lineTo(900, i * 24);
             ctx.stroke();
         }
     }
@@ -103,7 +110,7 @@ window.RiskGraph = (function () {
 
         for (let i = 0; i < arr.length; i++) {
 
-            const x = (i / 40) * canvas.width;
+            const x = (i / 50) * canvas.width;
             const y = canvas.height - (arr[i] * canvas.height);
 
             if (i === 0) ctx.moveTo(x, y);
