@@ -1,10 +1,14 @@
 /* =========================================================
-   SEXTANT RISK GRAPH v4 (FIXED + GUARANTEED RENDER)
+   SEXTANT RISK GRAPH v4 (FINAL STABLE BUILD)
+   - Guaranteed canvas render
+   - Safe initialization
+   - No duplicate DOM injection
 ========================================================= */
 
 window.RiskGraph = (function () {
 
-    let canvas, ctx;
+    let canvas = null;
+    let ctx = null;
     let data = [];
 
     function init() {
@@ -13,7 +17,11 @@ window.RiskGraph = (function () {
         if (!container) return;
 
         // prevent duplicate canvas
-        if (document.getElementById("riskCanvas")) return;
+        if (document.getElementById("riskCanvas")) {
+            canvas = document.getElementById("riskCanvas");
+            ctx = canvas.getContext("2d");
+            return;
+        }
 
         canvas = document.createElement("canvas");
         canvas.id = "riskCanvas";
@@ -29,20 +37,22 @@ window.RiskGraph = (function () {
 
         ctx = canvas.getContext("2d");
 
-        draw(); // IMPORTANT: initial render
+        draw(); // safe initial render
     }
 
     function push(result) {
 
         if (!result) return;
 
-        init(); // IMPORTANT: ensure canvas exists BEFORE push
+        init(); // always ensure canvas exists first
 
-        const value = result.impact ?? 0;
+        const value = result?.impact ?? 0;
 
         data.push(value);
 
-        if (data.length > 50) data.shift();
+        if (data.length > 50) {
+            data.shift();
+        }
 
         draw();
     }
@@ -51,19 +61,28 @@ window.RiskGraph = (function () {
 
         if (!ctx || !canvas) return;
 
+        // clear
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // grid
+        // =========================
+        // GRID
+        // =========================
         ctx.strokeStyle = "#1c2a33";
-        for (let i = 0; i < 10; i++) {
+
+        for (let i = 0; i <= 10; i++) {
+            const y = i * (canvas.height / 10);
+
             ctx.beginPath();
-            ctx.moveTo(0, i * 22);
-            ctx.lineTo(canvas.width, i * 22);
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
             ctx.stroke();
         }
 
-        // line
+        // =========================
+        // LINE GRAPH
+        // =========================
         ctx.strokeStyle = "#2bd4ff";
+        ctx.lineWidth = 2;
         ctx.beginPath();
 
         for (let i = 0; i < data.length; i++) {
@@ -77,10 +96,16 @@ window.RiskGraph = (function () {
 
         ctx.stroke();
 
+        // =========================
+        // LABEL
+        // =========================
         ctx.fillStyle = "#d7f3ff";
-        ctx.fillText("Risk Impact Trend", 10, 15);
+        ctx.font = "12px Arial";
+        ctx.fillText("Risk Impact Trend", 10, 18);
     }
 
-    return { push };
+    return {
+        push
+    };
 
 })();
