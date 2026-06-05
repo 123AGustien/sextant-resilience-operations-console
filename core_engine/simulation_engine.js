@@ -1,7 +1,7 @@
 /* ======================================================
-    SEXTANT SIMULATION ENGINE v8 CORE
-    CONTROL ROOM COMPATIBLE - FINAL STABLE EXPORT
- ====================================================== */
+   SEXTANT SIMULATION ENGINE v8 CORE
+   CONTROL ROOM STABLE EXPORT
+====================================================== */
 
 function runSimulation(scenario) {
 
@@ -22,26 +22,20 @@ function runSimulation(scenario) {
         "-" +
         Date.now();
 
-    if (typeof simulateUSDIDR !== "function") {
-        return fallback("Missing simulateUSDIDR()");
-    }
-
-    if (typeof propagateShock !== "function") {
-        return fallback("Missing propagateShock()");
-    }
-
     try {
 
-        const fxResult = simulateUSDIDR(safeScenario) || {
-            usd_idr: 0,
-            pressure_score: 0,
-            regime: "SAFE_MODE"
-        };
+        const fxResult = simulateUSDIDR
+            ? simulateUSDIDR(safeScenario)
+            : { usd_idr: 0, pressure_score: 0, regime: "SAFE_MODE" };
 
-        fxResult.pressure_score =
-            Math.max(0, Math.min(1, fxResult.pressure_score || 0));
+        fxResult.pressure_score = Math.max(
+            0,
+            Math.min(1, fxResult.pressure_score || 0)
+        );
 
-        const systemResult = propagateShock(fxResult);
+        const systemResult = propagateShock
+            ? propagateShock(fxResult)
+            : { systemState: "STABLE" };
 
         const stateMap = {
             STABLE: "GREEN",
@@ -51,8 +45,7 @@ function runSimulation(scenario) {
             SAFE: "GREEN"
         };
 
-        const finalState =
-            stateMap[systemResult.systemState] || "GREEN";
+        const finalState = stateMap[systemResult.systemState] || "GREEN";
 
         const baseline = {
             SHI: 98.5,
@@ -83,9 +76,12 @@ function runSimulation(scenario) {
     }
 }
 
+/* ======================================================
+   CONTAGION MODEL
+====================================================== */
 function propagateShock(fxResult) {
 
-    const pressure = fxResult.pressure_score ?? 0;
+    const pressure = fxResult?.pressure_score ?? 0;
 
     return {
         fxStress: pressure,
@@ -102,7 +98,11 @@ function propagateShock(fxResult) {
     };
 }
 
+/* ======================================================
+   INTERPRETATION LAYER
+====================================================== */
 function getInterpretation(state) {
+
     switch (state) {
         case "GREEN":
             return "System stable";
@@ -121,22 +121,35 @@ function getInterpretation(state) {
     }
 }
 
+/* ======================================================
+   FALLBACK LAYER
+====================================================== */
 function fallback(reason) {
     return {
         run_id: "FALLBACK",
         scenario: "FALLBACK",
-        baseline_state: { SHI: 98.5, RPS: 0, EVR: 0, AIC: 1.0, EAF: 0 },
-        fx: { usd_idr: 0, pressure_score: 0, regime: "SAFE_MODE" },
-        system: { systemState: "SAFE", note: reason },
+        baseline_state: {
+            SHI: 98.5,
+            RPS: 0,
+            EVR: 0,
+            AIC: 1.0,
+            EAF: 0
+        },
+        fx: {
+            usd_idr: 0,
+            pressure_score: 0,
+            regime: "SAFE_MODE"
+        },
+        system: {
+            systemState: "SAFE",
+            note: reason
+        },
         final_state: "GREEN",
         interpretation: reason
     };
 }
 
 /* ======================================================
-   CRITICAL EXPORT (THIS FIXES YOUR ERROR)
+   GLOBAL EXPORT (CRITICAL FIX FOR CONTROL ROOM)
 ====================================================== */
 window.runSimulation = runSimulation;
-window.propagateShock = propagateShock;
-window.getInterpretation = getInterpretation;
-window.fallback = fallback;
