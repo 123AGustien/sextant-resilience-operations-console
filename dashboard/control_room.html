@@ -1,5 +1,12 @@
-<script>
-window.addEventListener("load", () => {
-    window.RiskGraph?.push({ impact: 0 });
-});
-</script>    
+function bootGraph() {
+
+    if (window.RiskGraph) {
+        window.RiskGraph.push({ impact: 0 });
+        return;
+    }
+
+    // retry until loaded (mobile-safe)
+    setTimeout(bootGraph, 200);
+}
+
+window.addEventListener("load", bootGraph);
