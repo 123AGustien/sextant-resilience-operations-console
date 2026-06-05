@@ -20,8 +20,18 @@
         .AMBER { color: orange; }
         .RED { color: red; }
 
-        .panel {
-            margin-top: 20px;
+        pre {
+            text-align: left;
+            max-width: 900px;
+            margin: auto;
+            background: #0b0f14;
+            padding: 10px;
+            border: 1px solid #2bd4ff;
+        }
+
+        button {
+            margin: 5px;
+            padding: 10px;
         }
     </style>
 </head>
@@ -32,58 +42,41 @@
 
 <div id="status">READY</div>
 
-<!-- MODEL OUTPUT (IMPORTANT SCREEN LAYER) -->
 <pre id="output">Waiting...</pre>
 
-<!-- GRAPH VIEW -->
-<div class="panel">
-    <h3>Risk Graph</h3>
-    <div id="riskGraph"></div>
-</div>
+<div id="riskGraph"></div>
 
-<!-- ENGINE -->
 <script src="../core_engine/simulation_engine.js"></script>
 <script src="../assets/risk_graph.js"></script>
 
 <script>
-
 function run(type) {
 
-    const status = document.getElementById("status");
-    const output = document.getElementById("output");
-
     if (!window.runSimulation) {
-        output.innerText = "ENGINE NOT LOADED";
+        document.getElementById("output").innerText = "ENGINE NOT LOADED";
         return;
     }
 
     const result = runSimulation({
-        type: type,
-        stress:
-            type === "cascade" ? 0.9 :
-            type === "failure" ? 0.6 : 0
+        name: type,
+        stress: type === "cascade" ? 0.9 : type === "failure" ? 0.6 : 0
     });
 
-    // SCREEN MODEL VIEW (THIS IS WHAT YOU LOST BEFORE GRAPH)
-    output.innerText = JSON.stringify(result, null, 2);
+    document.getElementById("output").innerText =
+        JSON.stringify(result, null, 2);
 
-    status.innerText = result.state;
-    status.className = result.state;
+    const state = result.final_state || "GREEN";
 
-    // GRAPH FEED
+    const status = document.getElementById("status");
+    status.innerText = state;
+    status.className = state;
+
     window.RiskGraph?.push(result);
 }
-
-function testGraph() {
-    window.RiskGraph?.push({ impact: Math.random() * 100 });
-}
-
 </script>
 
-<!-- CONTROLS -->
 <button onclick="run('cascade')">Cascade</button>
 <button onclick="run('failure')">Failure</button>
-<button onclick="testGraph()">Test Graph</button>
 
 </body>
 </html>
