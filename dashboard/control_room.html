@@ -1,13 +1,3 @@
-<!-- GRAPH CONTAINER -->
-<div class="panel">
-    <h3>Risk Graph</h3>
-    <div id="riskGraph"></div>
-</div>
-
-<!-- ENGINE -->
-<script src="../core/control_engine.js"></script>
-<script src="../assets/risk_graph.js"></script>
-
 <script>
 
 let autoLoop = null;
@@ -17,40 +7,37 @@ function run(type) {
     const status = document.getElementById("status");
     const output = document.getElementById("output");
 
-    if (typeof runSimulation !== "function") {
+    if (!window.runSimulation) {
         output.innerHTML = "❌ ENGINE NOT LOADED";
         return;
     }
 
-    let scenario = { type };
+    const result = runSimulation({
+        type,
+        stress: type === "cascade" ? 0.9 : type === "failure" ? 0.7 : 0
+    });
 
-    if (type === "failure") scenario = { stress: 0.7 };
-    if (type === "cascade") scenario = { stress: 0.9 };
-
-    const result = runSimulation(scenario);
-
-    // status safe read
+    // STATUS
     const state = result?.state || result?.final_state || "UNKNOWN";
     status.innerText = state;
     status.className = "status " + state.toLowerCase();
 
-    // output
+    // OUTPUT
     output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
-    // GRAPH (SAFE CALL)
-    if (window.RiskGraph && typeof RiskGraph.push === "function") {
-        RiskGraph.push(result);
-    } else {
-        console.log("RiskGraph not ready");
+    // GRAPH (HARD SAFE)
+    try {
+        if (window.RiskGraph?.push) {
+            RiskGraph.push(result);
+        }
+    } catch (e) {
+        console.error("Graph error:", e);
     }
 }
 
 function startAuto() {
     if (autoLoop) return;
-
-    autoLoop = setInterval(() => {
-        run("cascade");
-    }, 3000);
+    autoLoop = setInterval(() => run("cascade"), 3000);
 }
 
 function stopAuto() {
