@@ -1,8 +1,0 @@
-env:
-  CI_GOVERNOR_ENABLED: "true"
-  CI_MODE: "STABLE"
-
-jobs:
-  build:
-    if: ${{ env.CI_GOVERNOR_ENABLED == 'true' && env.CI_MODE != 'OFFLINE' }}
-    runs-on: ubuntu-latest
