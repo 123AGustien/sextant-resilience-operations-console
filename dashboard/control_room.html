@@ -34,10 +34,8 @@ function run(type) {
 
     output.innerHTML = "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
 
-    // ✅ GRAPH SAFE CALL
-    if (window.RiskGraph) {
-        window.RiskGraph.push(result);
-    }
+    // GRAPH
+    window.RiskGraph?.push(result);
 }
 
 function startAuto() {
