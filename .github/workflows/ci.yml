@@ -9,13 +9,18 @@ env:
 
 jobs:
   build:
-    # Manual override safety gate
     if: ${{ github.event_name == 'workflow_dispatch' && env.CI_PAUSED != 'true' }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # 🔧 FIX: force modern Node for actions runtime
+      - name: Setup Node (for GitHub Actions compatibility)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
 
       - name: Setup Python
         uses: actions/setup-python@v5
