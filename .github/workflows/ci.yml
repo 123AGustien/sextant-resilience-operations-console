@@ -1,8 +1,7 @@
-name: Sextant Resilience CI (Production Stable)
+name: Sextant Resilience CI (Manual Stable Only)
 
 on:
   workflow_dispatch:
-  
 
 env:
   CI_PAUSED: "false"
@@ -10,7 +9,8 @@ env:
 
 jobs:
   build:
-    if: ${{ env.CI_PAUSED != 'true' }}
+    # Manual override safety gate
+    if: ${{ github.event_name == 'workflow_dispatch' && env.CI_PAUSED != 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -44,13 +44,11 @@ jobs:
           while IFS= read -r file; do
             name=$(basename "$file")
 
-            # Reject overly long filenames
             if [ ${#name} -gt 120 ]; then
               echo "Too long filename detected: $name"
               error=1
             fi
 
-            # Reject unsafe characters in filenames
             echo "$name" | grep -E "[#{}\[\]]" >/dev/null && {
               echo "Unsafe filename detected: $name"
               error=1
