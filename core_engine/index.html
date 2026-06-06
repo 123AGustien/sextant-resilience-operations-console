@@ -46,11 +46,16 @@
 
 <div id="riskGraph"></div>
 
+<!-- CORE ENGINE -->
 <script src="../core_engine/simulation_engine.js"></script>
+
+<!-- GRAPH LAYER -->
 <script src="../assets/risk_graph.js"></script>
 
+<!-- ETO REPORT LAYER -->
+<script src="../reports/eto_report.js"></script>
+
 <script>
-   <script src="../reports/eto_report.js"></script> 
 
 function run(type) {
 
@@ -59,32 +64,40 @@ function run(type) {
         return;
     }
 
+    // 1. RUN SIMULATION
     const result = runSimulation({
         name: type,
         stress: type === "cascade" ? 0.9 : 0.6
     });
 
-    // SCREEN MODEL
-    document.getElementById("output").innerText =
-        JSON.stringify(result, null, 2);
+    // 2. ETO REPORT (SAFE WRAPPER)
+    const eto = window.generateETOReport
+        ? window.generateETOReport(result)
+        : result;
 
-    // STATUS
+    // 3. SCREEN OUTPUT (ETO VIEW)
+    document.getElementById("output").innerText =
+        JSON.stringify(eto, null, 2);
+
+    // 4. STATUS DISPLAY
     const status = document.getElementById("status");
     status.innerText = result.final_state;
     status.className = result.final_state;
 
-    // GRAPH FEED (CLEAN FIX)
+    // 5. GRAPH FEED
     window.RiskGraph?.push({
         impact: (result.fx?.pressure_score ?? 0) * 100
     });
 }
 
+// INIT GRAPH
 window.addEventListener("load", () => {
     window.RiskGraph?.push({ impact: 0 });
 });
 
 </script>
 
+<!-- CONTROLS -->
 <button onclick="run('cascade')">Cascade</button>
 <button onclick="run('failure')">Failure</button>
 
