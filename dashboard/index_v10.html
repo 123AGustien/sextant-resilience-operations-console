@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>SEXTANT CONTROL ROOM v10 (RP-04 Unified)</title>
+    <title>SEXTANT CONTROL ROOM v10 (Orchestra Unified)</title>
 
     <style>
         body {
@@ -81,46 +81,21 @@
 <h3>OUTPUT</h3>
 <pre id="output">Waiting...</pre>
 
-<h3>RISK GRAPH (FX PRESSURE TRACE)</h3>
+<h3>RISK GRAPH (FX TRACE)</h3>
 <canvas id="graph" width="800" height="200"></canvas>
 
 <!-- ========================= -->
-<!-- RP-04 ENGINE -->
+<!-- LOAD ENGINE + ORCHESTRA -->
 <!-- ========================= -->
-<script>
-function runRP04(type) {
+<script src="../core_engine/rp04-engine-v10.js"></script>
+<script src="../core_engine/sextant_orchestra_v1.js"></script>
 
-    const rp04 = {
-        stability: type === "cascade" ? 0.25 : type === "failure" ? 0.55 : 0.82,
-        pressure:  type === "cascade" ? 0.95 : type === "failure" ? 0.6 : 0.28
-    };
-
-    const fx = rp04.pressure;
-
-    const bank = fx * 0.83;
-    const liq  = bank * 0.88;
-    const eq   = liq * 0.91;
-    const conf = eq * 0.94;
-
-    const system = { fx, bank, liq, eq, conf };
-
-    const state = rp04.stability > 0.6 ? "STABLE" : "RISK";
-
-    return { rp04, system, state };
-}
-
-// expose globally for buttons
-window.runRP04 = runRP04;
-</script>
-
-<!-- ========================= -->
-<!-- UI LOGIC -->
-<!-- ========================= -->
 <script>
 
 window.logs = [];
 
 function setNode(id, v) {
+
     const el = document.getElementById(id);
 
     let state =
@@ -132,14 +107,17 @@ function setNode(id, v) {
     el.innerText = id.toUpperCase() + ": " + v.toFixed(2);
 }
 
+/* =========================
+   MAIN CONTROL FLOW (ORCHESTRA)
+========================= */
 function run(type) {
 
-    if (!window.runRP04) {
-        document.getElementById("output").innerText = "ENGINE NOT LOADED";
+    if (!window.orchestra) {
+        document.getElementById("output").innerText = "ORCHESTRA NOT LOADED";
         return;
     }
 
-    const result = window.runRP04(type);
+    const result = window.orchestra.runStep(type);
 
     window.logs.push(result);
 
@@ -158,6 +136,9 @@ function run(type) {
     drawGraph();
 }
 
+/* =========================
+   GRAPH
+========================= */
 function drawGraph() {
 
     const canvas = document.getElementById("graph");
@@ -179,10 +160,20 @@ function drawGraph() {
     ctx.stroke();
 }
 
+/* =========================
+   RESET
+========================= */
 function resetSim() {
+
+    if (window.orchestra) {
+        window.orchestra.reset();
+    }
+
     window.logs = [];
+
     document.getElementById("output").innerText = "Waiting...";
     document.getElementById("status").innerText = "RESET";
+
     drawGraph();
 }
 
