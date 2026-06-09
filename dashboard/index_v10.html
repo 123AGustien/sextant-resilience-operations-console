@@ -83,7 +83,12 @@
 <h3>RISK GRAPH (FX PRESSURE TRACE)</h3>
 <canvas id="graph" width="800" height="200"></canvas>
 
-<script src="../core_engine/rp04-engine-v10.js"></script>
+<!-- MODULE BRIDGE (IMPORTANT FIX) -->
+<script type="module">
+import { runRP04 } from "../core_engine/rp04-engine-v10.js";
+
+window.runRP04 = runRP04;
+</script>
 
 <script>
 
