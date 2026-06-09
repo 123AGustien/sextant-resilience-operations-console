@@ -89,9 +89,6 @@ pre {
 
 window.logs = [];
 
-/* =========================
-   NODE RENDER
-========================= */
 function setNode(id, v) {
     const el = document.getElementById(id);
 
@@ -104,9 +101,6 @@ function setNode(id, v) {
     el.innerText = id.toUpperCase() + ": " + v.toFixed(2);
 }
 
-/* =========================
-   RP-04 CORE (DETERMINISTIC CASCADE)
-========================= */
 function runSim(type) {
 
     const rp04 = {
@@ -116,7 +110,6 @@ function runSim(type) {
 
     const fx = rp04.pressure;
 
-    /* STRICT CASCADE FLOW */
     const bank = fx * 0.85;
     const liq  = bank * 0.90;
     const eq   = liq * 0.92;
