@@ -15,21 +15,33 @@ class SextantIntelligence {
      */
     ask(question) {
 
-        if (!question) {
+        if (!question || typeof question !== "string") {
             return {
                 status: "EMPTY_INPUT",
-                message: "No question provided"
+                message: "No valid question provided"
             };
         }
 
-        const q = question.toLowerCase();
+        const q = question.toLowerCase().trim();
 
         // -------------------------
-        // SIMPLE COMMAND MAPPING
+        // SAFETY CHECKS
+        // -------------------------
+
+        if (!this.orchestra) {
+            return {
+                status: "NO_ORCHESTRA",
+                message: "Orchestra layer missing"
+            };
+        }
+
+        // -------------------------
+        // SIMULATION COMMANDS
         // -------------------------
 
         if (q.includes("run") || q.includes("simulate")) {
             const frame = this.orchestra.runStep("normal");
+
             return {
                 intent: "SIMULATION_RUN",
                 frame
@@ -38,6 +50,7 @@ class SextantIntelligence {
 
         if (q.includes("failure")) {
             const frame = this.orchestra.runStep("failure");
+
             return {
                 intent: "FAILURE_SIMULATION",
                 frame
@@ -46,6 +59,7 @@ class SextantIntelligence {
 
         if (q.includes("cascade")) {
             const frame = this.orchestra.runStep("cascade");
+
             return {
                 intent: "CASCADE_SIMULATION",
                 frame
@@ -53,15 +67,52 @@ class SextantIntelligence {
         }
 
         // -------------------------
-        // REASONING QUERY
+        // RESET COMMAND
+        // -------------------------
+
+        if (q.includes("reset")) {
+
+            this.orchestra.reset();
+
+            return {
+                intent: "RESET",
+                message: "System reset completed"
+            };
+        }
+
+        // -------------------------
+        // REASONING LAYER
         // -------------------------
 
         if (q.includes("why") || q.includes("explain")) {
+
+            if (!this.reasoning) {
+                return {
+                    status: "NO_REASONING",
+                    message: "Reasoning layer missing"
+                };
+            }
+
             const explanation = this.reasoning.explainLatest();
 
             return {
                 intent: "REASONING_QUERY",
                 explanation
+            };
+        }
+
+        // -------------------------
+        // STATUS QUERY
+        // -------------------------
+
+        if (q.includes("status") || q.includes("state")) {
+
+            const latest = this.orchestra.getLatest?.();
+
+            return {
+                intent: "STATUS_QUERY",
+                state: latest?.state || "NO_DATA",
+                frame: latest || null
             };
         }
 
@@ -73,7 +124,7 @@ class SextantIntelligence {
 
         return {
             intent: "GENERAL_QUERY",
-            message: "System received question but no direct mapping found.",
+            message: "No mapping found. Try: run, failure, cascade, explain, reset, status",
             latestFrame: latest || null
         };
     }
