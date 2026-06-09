@@ -1,0 +1,28 @@
+{
+  "report_metadata": {
+    "framework": "SEXTANT PROTOCOL v8.3.0",
+    "module": "SP-05 Institutional Review",
+    "output_type": "SYSTEM BEHAVIOR REPORT"
+  },
+  "executive_summary": "",
+  "scenario_overview": {
+    "scenario_type": "",
+    "market_conditions": "",
+    "stress_level": ""
+  },
+  "system_behavior_analysis": {
+    "liquidity_behavior": "",
+    "fx_behavior": "",
+    "correlation_behavior": "",
+    "volatility_behavior": ""
+  },
+  "risk_classification": {
+    "level": "LOW | MEDIUM | HIGH | SYSTEMIC",
+    "justification": ""
+  },
+  "regulatory_view": {
+    "interpretation": "",
+    "compliance_implication": ""
+  },
+  "final_statement": ""
+}
