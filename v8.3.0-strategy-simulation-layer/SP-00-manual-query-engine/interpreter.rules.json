@@ -1,0 +1,31 @@
+{
+  "rules": [
+    {
+      "if_contains": "USD",
+      "map_to": "FX_SHOCK"
+    },
+    {
+      "if_contains": "IDR weakens",
+      "map_to": "CURRENCY_DEPRECIATION"
+    },
+    {
+      "if_contains": "liquidity",
+      "map_to": "LIQUIDITY_CONTRACTION"
+    },
+    {
+      "if_contains": "volatility",
+      "map_to": "VOLATILITY_SPIKE"
+    }
+  ],
+  "output": {
+    "scenario_type": "",
+    "stress_level": "",
+    "route": [
+      "SP-01",
+      "SP-02",
+      "SP-03",
+      "SP-04",
+      "SP-05"
+    ]
+  }
+}
