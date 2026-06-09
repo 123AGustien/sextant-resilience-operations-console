@@ -1,37 +1,28 @@
 /**
- * Sextant Simulation Question Panel v1
- * UI → Intelligence bridge layer
+ * Sextant Question Panel v1
+ * UI bridge layer for simulation intelligence
  *
  * Purpose:
- * - Capture user questions
+ * - Accept user input
  * - Send to SextantIntelligence
- * - Render simulation reasoning output
+ * - Render simulation response
  */
 
-(function () {
+class SextantQuestionPanel {
 
-    /**
-     * Initialize question panel
-     */
-    function initQuestionPanel(intelligenceInstance) {
-
-        if (!intelligenceInstance) {
-            console.error("Intelligence layer not found");
-            return;
-        }
-
-        window.SEXTANT_AI = intelligenceInstance;
+    constructor(intelligence) {
+        this.intelligence = intelligence;
     }
 
     /**
-     * Ask simulation question
+     * Ask question into simulation system
      */
-    function askSimulationQuestion() {
+    ask() {
 
         const input = document.getElementById("sextant-question-input");
 
         if (!input) {
-            console.error("Input field missing");
+            console.error("Missing input field: sextant-question-input");
             return;
         }
 
@@ -39,15 +30,15 @@
 
         if (!question) return;
 
-        const result = window.SEXTANT_AI.ask(question);
+        const result = this.intelligence.ask(question);
 
-        renderResult(result);
+        this.render(result);
     }
 
     /**
-     * Render AI simulation response
+     * Render output to UI
      */
-    function renderResult(result) {
+    render(result) {
 
         const output = document.getElementById("sextant-ai-output");
 
@@ -57,22 +48,39 @@
     }
 
     /**
-     * Reset UI panel
+     * Reset panel
      */
-    function resetPanel() {
+    reset() {
 
-        const output = document.getElementById("sextant-ai-output");
         const input = document.getElementById("sextant-question-input");
+        const output = document.getElementById("sextant-ai-output");
 
         if (input) input.value = "";
         if (output) output.innerText = "Waiting for simulation input...";
     }
+}
 
-    // expose globally for HTML buttons
-    window.SextantQuestionPanel = {
-        init: initQuestionPanel,
-        ask: askSimulationQuestion,
-        reset: resetPanel
-    };
+/**
+ * Global attach function
+ */
+window.SextantQuestionPanel = {
 
-})();
+    instance: null,
+
+    init: function (intelligenceInstance) {
+        this.instance = new SextantQuestionPanel(intelligenceInstance);
+    },
+
+    ask: function () {
+        if (!this.instance) {
+            console.error("Panel not initialized");
+            return;
+        }
+        this.instance.ask();
+    },
+
+    reset: function () {
+        if (!this.instance) return;
+        this.instance.reset();
+    }
+};
