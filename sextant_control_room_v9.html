@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sextant Control Room v9 (Enhanced Deterministic Engine)</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0b0f19;
+    color: #e6f7ff;
+    text-align: center;
+}
+
+button {
+    margin: 6px;
+    padding: 10px;
+    background: black;
+    color: #2bd4ff;
+    border: 1px solid #2bd4ff;
+    cursor: pointer;
+}
+
+.panel {
+    border: 1px solid #2bd4ff;
+    max-width: 850px;
+    margin: 12px auto;
+    padding: 12px;
+    background: #111827;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    max-width: 850px;
+    margin: 20px auto;
+}
+
+.node {
+    border: 1px solid #2bd4ff;
+    padding: 12px;
+    background: #111827;
+    transition: 0.2s;
+}
+
+.green { color: lime; border-color: lime; }
+.amber { color: orange; border-color: orange; }
+.red { color: red; border-color: red; }
+.critical { color: magenta; border-color: magenta; }
+
+pre {
+    text-align: left;
+    background: #0a0a0a;
+    padding: 10px;
+    font-size: 12px;
+    overflow: auto;
+}
+</style>
+</head>
+
+<body>
+
+<h2>SEXTANT CONTROL ROOM v9</h2>
+<h3>Status: <span id="status">BOOT</span></h3>
+
+<div class="panel">
+    <input id="manualInput" placeholder="Type scenario (crash, risk, recovery...)" style="width:80%;padding:10px;">
+    <button onclick="runManual()">RUN</button>
+    <button onclick="resetSystem()">RESET</button>
+    <button onclick="exportLog()">EXPORT</button>
+</div>
+
+<div class="panel">
+    <button onclick="runSim('normal')">Normal</button>
+    <button onclick="runSim('failure')">Failure</button>
+    <button onclick="runSim('cascade')">Cascade</button>
+</div>
+
+<div class="grid">
+    <div class="node" id="rp04">RP-04</div>
+    <div class="node" id="fx">FX</div>
+    <div class="node" id="bank">BANK</div>
+    <div class="node" id="liq">LIQ</div>
+    <div class="node" id="eq">EQ</div>
+    <div class="node" id="conf">CONF</div>
+</div>
+
+<div class="panel">
+    <h3>OUTPUT</h3>
+    <div id="output">Waiting...</div>
+</div>
+
+<div class="panel">
+    <h3>LOG</h3>
+    <div id="log"></div>
+</div>
+
+<script>
+
+let logs = [];
+
+function setNode(id, v) {
+    const el = document.getElementById(id);
+
+    let state =
+        v < 0.3 ? "green" :
+        v < 0.6 ? "amber" :
+        v < 0.85 ? "red" : "critical";
+
+    el.className = "node " + state;
+    el.innerText = id.toUpperCase() + ": " + v.toFixed(2);
+}
+
+/* deterministic engine */
+function runSim(type) {
+
+    const rp04 = {
+        stability: type === "cascade" ? 0.30 : type === "failure" ? 0.55 : 0.80,
+        pressure:  type === "cascade" ? 0.95 : type === "failure" ? 0.60 : 0.25
+    };
+
+    const fx = rp04.pressure;
+
+    const bank = fx * 0.86;
+    const liq  = bank * 0.89;
+    const eq   = liq * 0.91;
+    const conf = eq * 0.94;
+
+    const system = { fx, bank, liq, eq, conf };
+
+    const riskScore =
+        (1 - rp04.stability) * 0.6 +
+        rp04.pressure * 0.4;
+
+    const state =
+        riskScore > 0.7 ? "CRITICAL" :
+        riskScore > 0.45 ? "RISK" : "STABLE";
+
+    const result = {
+        timestamp: new Date().toISOString(),
+        rp04,
+        system,
+        riskScore: riskScore.toFixed(3),
+        state
+    };
+
+    logs.push(result);
+    localStorage.setItem("sextant_logs_v9", JSON.stringify(logs));
+
+    document.getElementById("status").innerText = state;
+
+    document.getElementById("output").innerHTML =
+        "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
+
+    setNode("rp04", rp04.stability);
+    setNode("fx", fx);
+    setNode("bank", bank);
+    setNode("liq", liq);
+    setNode("eq", eq);
+    setNode("conf", conf);
+
+    document.getElementById("log").innerHTML =
+        logs.map((l,i) => `<div>#${i} ${l.state} (${l.riskScore})</div>`).join("");
+}
+
+function runManual() {
+    const text = document.getElementById("manualInput").value.toLowerCase();
+
+    if (text.includes("crash") || text.includes("collapse") || text.includes("cascade")) {
+        runSim("cascade");
+    } else if (text.includes("risk") || text.includes("drop") || text.includes("fall")) {
+        runSim("failure");
+    } else {
+        runSim("normal");
+    }
+}
+
+function resetSystem() {
+    logs = [];
+    localStorage.removeItem("sextant_logs_v9");
+
+    document.getElementById("log").innerHTML = "";
+    document.getElementById("output").innerHTML = "Reset complete";
+    document.getElementById("status").innerText = "BOOT";
+}
+
+function exportLog() {
+    const blob = new Blob([JSON.stringify(logs, null, 2)], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sextant_logs_v9.json";
+    a.click();
+}
+
+/* load previous session */
+(function init(){
+    const saved = localStorage.getItem("sextant_logs_v9");
+    if (saved) {
+        logs = JSON.parse(saved);
+        document.getElementById("log").innerHTML =
+            logs.map((l,i) => `<div>#${i} ${l.state}</div>`).join("");
+    }
+})();
+</script>
+
+</body>
+</html>
