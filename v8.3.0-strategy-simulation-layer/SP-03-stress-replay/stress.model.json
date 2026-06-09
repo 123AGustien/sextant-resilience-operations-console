@@ -1,0 +1,34 @@
+{
+  "stress_factors": {
+    "fx_pressure": 0,
+    "liquidity_pressure": 0,
+    "confidence_decay": 0,
+    "volatility_expansion": 0,
+    "correlation_breakdown": 0
+  },
+  "stress_scenarios": [
+    "MILD_STRESS",
+    "SEVERE_STRESS",
+    "CRISIS_CONDITIONS",
+    "SYSTEMIC_BREAKDOWN"
+  ],
+  "shock_events": {
+    "fx_shock": {
+      "usd_idr_spike": true,
+      "sgd_idr_spike": false
+    },
+    "liquidity_shock": {
+      "market_freeze": true,
+      "execution_delay": true
+    }
+  },
+  "replay_mode": {
+    "historical": true,
+    "synthetic": true,
+    "real_time_simulation": true
+  },
+  "output_route": [
+    "SP-04",
+    "SP-05"
+  ]
+}
