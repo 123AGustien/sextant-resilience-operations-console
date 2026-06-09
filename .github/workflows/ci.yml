@@ -1,46 +1,65 @@
-name: Sextant Resilience CI (Manual Stable Only)
+name: Sextant Resilience CI v10 (Manual Stable Gate)
 
 on:
   workflow_dispatch:
 
 env:
   CI_PAUSED: "false"
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  build:
-    if: ${{ github.event_name == 'workflow_dispatch' && env.CI_PAUSED != 'true' }}
+  validate:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 🔧 FIX: force modern Node for actions runtime
-      - name: Setup Node (for GitHub Actions compatibility)
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
+      # ─────────────────────────────
+      # STRUCTURE VALIDATION ONLY
+      # ─────────────────────────────
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
-
-      - name: Install dependencies
+      - name: Validate core structure
         run: |
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
+          echo "Validating Sextant repository structure..."
+
+          test -f index.html || exit 1
+          test -f dashboard/index_v10.html || exit 1
+          test -f core_engine/rp04-engine-v10.js || exit 1
+
+          echo "Core structure OK"
+
+      # ─────────────────────────────
+      # JS SANITY (NO NODE 24, NO MODULE CHECKS)
+      # ─────────────────────────────
+
+      - name: RP-04 JS validation (static)
+        run: |
+          if grep -q "export function" core_engine/rp04-engine-v10.js; then
+            echo "ES Module detected - not allowed"
+            exit 1
           fi
 
-      - name: Verify core import
-        run: python -c "import main; print('API OK')"
+          if ! grep -q "function runRP04" core_engine/rp04-engine-v10.js; then
+            echo "runRP04 missing"
+            exit 1
+          fi
 
-      - name: Runtime sanity check
-        run: python -c "print('System OK')"
+          echo "RP-04 engine OK"
+
+      # ─────────────────────────────
+      # DASHBOARD WIRING CHECK
+      # ─────────────────────────────
+
+      - name: Validate dashboard wiring
+        run: |
+          grep -q "rp04-engine-v10.js" dashboard/index_v10.html || exit 1
+          grep -q "runRP04" dashboard/index_v10.html || exit 1
+
+          echo "Dashboard wiring OK"
+
+      # ─────────────────────────────
+      # FILE SAFETY CHECK
+      # ─────────────────────────────
 
       - name: Filename safety guard
         run: |
@@ -50,14 +69,21 @@ jobs:
             name=$(basename "$file")
 
             if [ ${#name} -gt 120 ]; then
-              echo "Too long filename detected: $name"
+              echo "Too long filename: $name"
               error=1
             fi
 
             echo "$name" | grep -E "[#{}\[\]]" >/dev/null && {
-              echo "Unsafe filename detected: $name"
+              echo "Unsafe filename: $name"
               error=1
             }
           done < <(find . -type f)
 
           exit $error
+
+      # ─────────────────────────────
+      # FINAL GATE
+      # ─────────────────────────────
+
+      - name: CI STABLE PASS
+        run: echo "Sextant Control Room v10 CI: STABLE"
