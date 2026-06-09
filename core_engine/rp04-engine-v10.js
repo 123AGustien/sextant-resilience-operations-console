@@ -1,0 +1,20 @@
+export function runRP04(type) {
+
+    const rp04 = {
+        stability: type === "cascade" ? 0.25 : type === "failure" ? 0.55 : 0.82,
+        pressure:  type === "cascade" ? 0.95 : type === "failure" ? 0.6 : 0.28
+    };
+
+    const fx = rp04.pressure;
+
+    const bank = fx * 0.83;
+    const liq  = bank * 0.88;
+    const eq   = liq * 0.91;
+    const conf = eq * 0.94;
+
+    const system = { fx, bank, liq, eq, conf };
+
+    const state = rp04.stability > 0.6 ? "STABLE" : "RISK";
+
+    return { rp04, system, state };
+}
