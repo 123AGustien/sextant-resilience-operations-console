@@ -1,0 +1,29 @@
+{
+  "metrics": {
+    "survival_score": 0,
+    "drawdown_score": 0,
+    "fx_sensitivity_index": 0,
+    "liquidity_resilience_index": 0,
+    "recovery_speed_index": 0
+  },
+  "scoring_logic": {
+    "weight_survival": 0.3,
+    "weight_drawdown": 0.2,
+    "weight_fx": 0.2,
+    "weight_liquidity": 0.15,
+    "weight_recovery": 0.15
+  },
+  "thresholds": {
+    "GREEN": 80,
+    "YELLOW": 50,
+    "RED": 0
+  },
+  "final_output": {
+    "resilience_rating": "",
+    "system_state": "",
+    "risk_classification": ""
+  },
+  "output_route": [
+    "SP-05"
+  ]
+}
