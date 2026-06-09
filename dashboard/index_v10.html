@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Control Room v10 (RP-04 Unified)</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #05070d;
+            color: #d7f7ff;
+            text-align: center;
+        }
+
+        #status {
+            font-size: 22px;
+            margin: 10px;
+        }
+
+        .node {
+            border: 1px solid #2bd4ff;
+            padding: 10px;
+            margin: 5px;
+            display: inline-block;
+            min-width: 120px;
+        }
+
+        .green { color: lime; border-color: lime; }
+        .amber { color: orange; border-color: orange; }
+        .red { color: red; border-color: red; }
+        .critical { color: magenta; border-color: magenta; }
+
+        pre {
+            text-align: left;
+            max-width: 900px;
+            margin: auto;
+            background: #0b0f14;
+            padding: 10px;
+            border: 1px solid #2bd4ff;
+        }
+
+        button {
+            margin: 6px;
+            padding: 10px;
+            background: black;
+            color: #2bd4ff;
+            border: 1px solid #2bd4ff;
+            cursor: pointer;
+        }
+
+        canvas {
+            background: #0a0f14;
+            margin-top: 15px;
+            border: 1px solid #2bd4ff;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>SEXTANT CONTROL ROOM v10</h2>
+
+<div id="status">READY</div>
+
+<div>
+    <button onclick="run('normal')">Normal</button>
+    <button onclick="run('failure')">Failure</button>
+    <button onclick="run('cascade')">Cascade</button>
+    <button onclick="resetSim()">Reset</button>
+</div>
+
+<h3>RP-04 SYSTEM NODES</h3>
+
+<div class="node" id="rp04">RP-04</div>
+<div class="node" id="fx">FX</div>
+<div class="node" id="bank">BANK</div>
+<div class="node" id="liq">LIQ</div>
+<div class="node" id="eq">EQ</div>
+<div class="node" id="conf">CONF</div>
+
+<h3>OUTPUT</h3>
+<pre id="output">Waiting...</pre>
+
+<h3>RISK GRAPH (FX PRESSURE TRACE)</h3>
+<canvas id="graph" width="800" height="200"></canvas>
+
+<script src="../core_engine/rp04-engine-v10.js"></script>
+
+<script>
+
+window.logs = [];
+
+function setNode(id, v) {
+    const el = document.getElementById(id);
+
+    let state =
+        v < 0.3 ? "green" :
+        v < 0.6 ? "amber" :
+        v < 0.85 ? "red" : "critical";
+
+    el.className = "node " + state;
+    el.innerText = id.toUpperCase() + ": " + v.toFixed(2);
+}
+
+function run(type) {
+
+    if (!window.runRP04) {
+        document.getElementById("output").innerText = "ENGINE NOT LOADED";
+        return;
+    }
+
+    const result = window.runRP04(type);
+
+    window.logs.push(result);
+
+    document.getElementById("status").innerText = result.state;
+
+    document.getElementById("output").innerText =
+        JSON.stringify(result, null, 2);
+
+    setNode("rp04", result.rp04.stability);
+    setNode("fx", result.system.fx);
+    setNode("bank", result.system.bank);
+    setNode("liq", result.system.liq);
+    setNode("eq", result.system.eq);
+    setNode("conf", result.system.conf);
+
+    drawGraph();
+}
+
+function drawGraph() {
+
+    const canvas = document.getElementById("graph");
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.beginPath();
+    ctx.strokeStyle = "#2bd4ff";
+
+    window.logs.forEach((l, i) => {
+        const x = i * 40;
+        const y = 180 - (l.system.fx * 150);
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+
+    ctx.stroke();
+}
+
+function resetSim() {
+    window.logs = [];
+    document.getElementById("output").innerText = "Waiting...";
+    document.getElementById("status").innerText = "RESET";
+    drawGraph();
+}
+
+drawGraph();
+
+</script>
+
+</body>
+</html>
