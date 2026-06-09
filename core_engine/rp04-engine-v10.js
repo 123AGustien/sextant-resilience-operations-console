@@ -1,4 +1,4 @@
-export function runRP04(type) {
+function runRP04(type) {
 
     const rp04 = {
         stability: type === "cascade" ? 0.25 : type === "failure" ? 0.55 : 0.82,
@@ -18,3 +18,5 @@ export function runRP04(type) {
 
     return { rp04, system, state };
 }
+
+window.runRP04 = runRP04;
