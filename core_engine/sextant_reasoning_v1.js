@@ -1,16 +1,23 @@
 /**
  * Sextant Reasoning Layer v1
- * Converts orchestration frames into explanations
+ * Converts orchestration frames into structured explanations
+ *
+ * DEPENDS ON:
+ * - window.orchestra (SextantOrchestra)
  */
 
 class SextantReasoning {
 
     constructor(orchestra) {
+        if (!orchestra) {
+            throw new Error("Orchestra instance required");
+        }
+
         this.orchestra = orchestra;
     }
 
     /**
-     * Analyze latest simulation frame
+     * Explain latest simulation frame
      */
     explainLatest() {
 
@@ -19,23 +26,20 @@ class SextantReasoning {
         if (!frame) {
             return {
                 status: "NO_DATA",
-                explanation: "No simulation frames available"
+                state: "EMPTY",
+                explanation: "No simulation frames available yet"
             };
         }
 
-        return this._analyzeFrame(frame);
+        return this.analyzeFrame(frame);
     }
 
     /**
      * Core reasoning engine
      */
-    _analyzeFrame(frame) {
+    analyzeFrame(frame) {
 
-        const fx = frame.system.fx;
-        const bank = frame.system.bank;
-        const liq = frame.system.liq;
-        const eq = frame.system.eq;
-        const conf = frame.system.conf;
+        const { fx, bank, liq, eq, conf } = frame.system;
 
         const instabilityScore =
             (fx * 0.30) +
@@ -48,58 +52,89 @@ class SextantReasoning {
         if (instabilityScore > 0.65) state = "RISK";
         if (instabilityScore > 0.80) state = "CRITICAL";
 
-        const weakestNode = this._findWeakest(frame.system);
+        const weakestNode = this.findWeakestNode(frame.system);
 
         return {
             state,
             instabilityScore: Number(instabilityScore.toFixed(3)),
             weakestNode,
-            explanation: this._generateNarrative(frame, weakestNode, state)
+            explanation: this.generateNarrative(frame, weakestNode, state)
         };
     }
 
     /**
-     * Identify weakest system node
+     * Find weakest system node
      */
-    _findWeakest(system) {
+    findWeakestNode(system) {
 
         let minNode = "fx";
         let minValue = system.fx;
 
-        for (const key of Object.keys(system)) {
+        for (const key in system) {
             if (system[key] < minValue) {
                 minValue = system[key];
                 minNode = key;
             }
         }
 
-        return { node: minNode, value: minValue };
+        return {
+            node: minNode,
+            value: Number(minValue.toFixed(3))
+        };
     }
 
     /**
-     * Generate human-readable reasoning
+     * Human-readable reasoning output
      */
-    _generateNarrative(frame, weakest, state) {
+    generateNarrative(frame, weakest, state) {
 
         return `
+SEXTANT REASONING ENGINE
+
 Scenario: ${frame.scenario}
 Step: ${frame.step}
 Type: ${frame.type}
 
-System State: ${state}
+-------------------------
+SYSTEM STATE: ${state}
+-------------------------
 
-Primary Weak Point: ${weakest.node.toUpperCase()} (${weakest.value.toFixed(2)})
+FX:   ${frame.system.fx.toFixed(3)}
+BANK: ${frame.system.bank.toFixed(3)}
+LIQ:  ${frame.system.liq.toFixed(3)}
+EQ:   ${frame.system.eq.toFixed(3)}
+CONF: ${frame.system.conf.toFixed(3)}
 
-Propagation:
+Weakest Node: ${weakest.node.toUpperCase()} (${weakest.value})
+
+Propagation Model:
 FX → BANK → LIQ → EQ → CONF
 
 Interpretation:
-${state === "STABLE"
-    ? "System is within controlled bounds. No cascading instability detected."
-    : "System shows stress propagation through financial layers. Weak node amplifying risk."}
+${
+    state === "STABLE"
+        ? "System remains within controlled thresholds. No cascading instability detected."
+        : state === "RISK"
+            ? "Stress signals detected. Early cascade propagation possible across financial layers."
+            : "CRITICAL STATE: cascading instability active across system nodes."
+}
         `.trim();
     }
 }
 
-// expose globally
+/**
+ * GLOBAL EXPORT (browser dashboard safe)
+ */
 window.SextantReasoning = SextantReasoning;
+
+/**
+ * OPTIONAL INIT HELPER (for Step 10 wiring)
+ */
+window.initReasoning = function () {
+    if (!window.orchestra) {
+        console.error("Orchestra not found");
+        return;
+    }
+
+    window.reasoning = new SextantReasoning(window.orchestra);
+};
