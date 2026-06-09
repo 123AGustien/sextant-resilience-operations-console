@@ -12,12 +12,11 @@ function runRP04(type) {
     const eq   = liq * 0.91;
     const conf = eq * 0.94;
 
-    const system = { fx, bank, liq, eq, conf };
-
-    const state = rp04.stability > 0.6 ? "STABLE" : "RISK";
-
-    return { rp04, system, state };
+    return {
+        rp04,
+        system: { fx, bank, liq, eq, conf },
+        state: rp04.stability > 0.6 ? "STABLE" : "RISK"
+    };
 }
 
-// IMPORTANT: expose globally
 window.runRP04 = runRP04;
