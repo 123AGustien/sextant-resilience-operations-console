@@ -31,20 +31,19 @@
             return;
         }
 
-        // attach reasoning layer on top of orchestra
+        // attach reasoning layer
         window.reasoning = new SextantReasoning(window.orchestra);
 
         console.log("Sextant System v10: FULLY WIRED");
     }
 
     /**
-     * RUN FULL PIPELINE (ENGINE → ORCHESTRA → REASONING → UI)
+     * RUN SIMULATION PIPELINE
      */
-    function runFullSimulation(type) {
+    function runSimulation(type) {
 
         const frame = window.orchestra.runStep(type);
 
-        // update UI nodes if they exist
         if (typeof window.setNode === "function") {
             window.setNode("rp04", frame.rp04.stability);
             window.setNode("fx", frame.fx);
@@ -54,11 +53,9 @@
             window.setNode("conf", frame.conf);
         }
 
-        // update status
         const status = document.getElementById("status");
         if (status) status.innerText = frame.state;
 
-        // update output
         const output = document.getElementById("output");
         if (output) {
             output.innerText = JSON.stringify(frame, null, 2);
@@ -68,9 +65,9 @@
     }
 
     /**
-     * RUN REASONING EXPLANATION
+     * RUN REASONING ENGINE
      */
-    function runReasoning() {
+    function explainSystem() {
 
         if (!window.reasoning) return;
 
@@ -84,13 +81,15 @@
     }
 
     /**
-     * RESET FULL SYSTEM
+     * RESET SYSTEM
      */
     function resetSystem() {
 
         if (window.orchestra) {
             window.orchestra.reset();
         }
+
+        window.logs = [];
 
         const output = document.getElementById("output");
         if (output) output.innerText = "RESET";
@@ -102,12 +101,12 @@
     }
 
     /**
-     * EXPOSE GLOBAL API
+     * GLOBAL API EXPORT
      */
     window.SextantSystem = {
         init: initSextantSystem,
-        run: runFullSimulation,
-        explain: runReasoning,
+        run: runSimulation,
+        explain: explainSystem,
         reset: resetSystem
     };
 
