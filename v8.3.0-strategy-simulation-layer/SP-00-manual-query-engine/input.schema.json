@@ -1,0 +1,12 @@
+{
+  "user_question": "",
+  "context": {
+    "asset_type": "FX",
+    "base_currency": "SGD",
+    "quote_currency": "IDR"
+  },
+  "intent": {
+    "type": "MANUAL_QUERY",
+    "risk_sensitivity": "MEDIUM"
+  }
+}
