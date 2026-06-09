@@ -19,4 +19,5 @@ function runRP04(type) {
     return { rp04, system, state };
 }
 
+// IMPORTANT: expose globally
 window.runRP04 = runRP04;
