@@ -1,0 +1,25 @@
+{
+  "strategy_name": "",
+  "asset_class": "FX",
+  "market": {
+    "base_currency": "SGD",
+    "quote_currency": "IDR"
+  },
+  "direction": "LONG | SHORT | NEUTRAL",
+  "entry_conditions": [
+    ""
+  ],
+  "exit_conditions": [
+    ""
+  ],
+  "risk_parameters": {
+    "max_drawdown": 0,
+    "position_size": 0,
+    "leverage": 1
+  },
+  "simulation_tags": [
+    "SP-02",
+    "SP-03",
+    "SP-04"
+  ]
+}
