@@ -62,6 +62,12 @@ pre {
 <h2>SEXTANT CONTROL ROOM v8</h2>
 <h3>Status: <span id="status">BOOTING</span></h3>
 
+<div class="panel">
+    <h3>MANUAL INPUT</h3>
+    <input id="manualInput" placeholder="Type scenario (e.g. FX crash)" style="width:80%;padding:10px;">
+    <button onclick="runManual()">Run Manual</button>
+</div>
+
 <button onclick="runSim('normal')">Normal</button>
 <button onclick="runSim('failure')">Failure</button>
 <button onclick="runSim('cascade')">Cascade</button>
@@ -139,6 +145,20 @@ function runSim(type) {
         window.logs.map((l,i) =>
             `<div>#${i} ${l.state}</div>`
         ).join("");
+}
+
+function runManual() {
+    const text = document.getElementById("manualInput").value.toLowerCase();
+
+    let type = "normal";
+
+    if (text.includes("crash") || text.includes("collapse") || text.includes("cascade")) {
+        type = "cascade";
+    } else if (text.includes("risk") || text.includes("drop") || text.includes("fall")) {
+        type = "failure";
+    }
+
+    runSim(type);
 }
 
 </script>
