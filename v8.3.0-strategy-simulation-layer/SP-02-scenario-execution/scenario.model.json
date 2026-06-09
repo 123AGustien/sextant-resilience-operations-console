@@ -1,0 +1,28 @@
+{
+  "scenario_types": [
+    "NORMAL",
+    "VOLATILITY_SPIKE",
+    "FX_SHOCK",
+    "LIQUIDITY_CONTRACTION",
+    "MULTI_ASSET_STRESS"
+  ],
+  "market_inputs": {
+    "usd_idr": 17000,
+    "sgd_idr": 14000
+  },
+  "time_horizon": {
+    "default": "30D",
+    "stress_mode": "INSTANT_SHOCK"
+  },
+  "simulation_depth": {
+    "price_action": true,
+    "liquidity_flow": true,
+    "correlation_breakdown": true,
+    "confidence_shift": true
+  },
+  "output_route": [
+    "SP-03",
+    "SP-04",
+    "SP-05"
+  ]
+}
