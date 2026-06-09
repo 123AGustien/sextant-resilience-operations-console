@@ -1,6 +1,7 @@
 /**
  * Sextant Intelligence v11
  * Natural language → simulation control layer
+ * FINAL STABILIZED VERSION
  */
 
 class SextantIntelligence {
@@ -15,6 +16,9 @@ class SextantIntelligence {
      */
     ask(question) {
 
+        // -------------------------
+        // INPUT VALIDATION
+        // -------------------------
         if (!question || typeof question !== "string") {
             return {
                 status: "EMPTY_INPUT",
@@ -25,21 +29,24 @@ class SextantIntelligence {
         const q = question.toLowerCase().trim();
 
         // -------------------------
-        // SAFETY CHECKS
+        // ORCHESTRA SAFETY CHECK (HARDENED)
         // -------------------------
-
-        if (!this.orchestra) {
+        if (
+            !this.orchestra ||
+            typeof this.orchestra.runStep !== "function" ||
+            typeof this.orchestra.reset !== "function"
+        ) {
             return {
-                status: "NO_ORCHESTRA",
-                message: "Orchestra layer missing"
+                status: "ORCHESTRA_INVALID",
+                message: "Orchestra layer not properly initialized"
             };
         }
 
         // -------------------------
         // SIMULATION COMMANDS
         // -------------------------
-
         if (q.includes("run") || q.includes("simulate")) {
+
             const frame = this.orchestra.runStep("normal");
 
             return {
@@ -49,6 +56,7 @@ class SextantIntelligence {
         }
 
         if (q.includes("failure")) {
+
             const frame = this.orchestra.runStep("failure");
 
             return {
@@ -58,6 +66,7 @@ class SextantIntelligence {
         }
 
         if (q.includes("cascade")) {
+
             const frame = this.orchestra.runStep("cascade");
 
             return {
@@ -69,7 +78,6 @@ class SextantIntelligence {
         // -------------------------
         // RESET COMMAND
         // -------------------------
-
         if (q.includes("reset")) {
 
             this.orchestra.reset();
@@ -83,10 +91,9 @@ class SextantIntelligence {
         // -------------------------
         // REASONING LAYER
         // -------------------------
-
         if (q.includes("why") || q.includes("explain")) {
 
-            if (!this.reasoning) {
+            if (!this.reasoning || typeof this.reasoning.explainLatest !== "function") {
                 return {
                     status: "NO_REASONING",
                     message: "Reasoning layer missing"
@@ -104,7 +111,6 @@ class SextantIntelligence {
         // -------------------------
         // STATUS QUERY
         // -------------------------
-
         if (q.includes("status") || q.includes("state")) {
 
             const latest = this.orchestra.getLatest?.();
@@ -119,7 +125,6 @@ class SextantIntelligence {
         // -------------------------
         // DEFAULT RESPONSE
         // -------------------------
-
         const latest = this.orchestra.getLatest?.();
 
         return {
