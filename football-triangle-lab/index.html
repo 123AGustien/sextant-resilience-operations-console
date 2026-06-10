@@ -20,19 +20,20 @@
 
 <body>
 
-  <h1>Triangle Football Lab</h1>
+<h1>Triangle Football Lab</h1>
 
-  <canvas id="pitch" width="900" height="500"></canvas>
+<canvas id="pitch" width="900" height="500"></canvas>
 
-  <div>
-    Blue: <span id="blueScore">0</span> |
-    Red: <span id="redScore">0</span>
-  </div>
+<div>
+  Blue: <span id="blueScore">0</span> |
+  Red: <span id="redScore">0</span>
+</div>
 
-  <button onclick="startMatch()">Start</button>
-  <button onclick="resetMatch()">Reset</button>
+<button onclick="startMatch()">Start</button>
+<button onclick="resetMatch()">Reset</button>
 
 <script>
+
 let canvas = document.getElementById("pitch");
 let ctx = canvas.getContext("2d");
 
@@ -43,6 +44,9 @@ let ball;
 let blueScore = 0;
 let redScore = 0;
 
+// --------------------
+// PLAYER
+// --------------------
 class Player {
   constructor(x, y, team) {
     this.x = x;
@@ -56,6 +60,9 @@ class Player {
   }
 }
 
+// --------------------
+// BALL
+// --------------------
 class Ball {
   constructor() {
     this.x = 450;
@@ -63,14 +70,28 @@ class Ball {
     this.owner = null;
   }
 
-  moveTo(player) {
-    this.x = player.x;
-    this.y = player.y;
+  attach(player) {
     this.owner = player;
+  }
+
+  update() {
+    if (this.owner) {
+      this.x = this.owner.x;
+      this.y = this.owner.y;
+    }
   }
 }
 
-// CPA RULE (1m constraint simplified)
+// --------------------
+// DISTANCE
+// --------------------
+function distance(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+// --------------------
+// CPA RULE (REALISTIC)
+// --------------------
 function enforceCPA(players) {
   for (let i = 0; i < players.length; i++) {
     for (let j = i + 1; j < players.length; j++) {
@@ -80,28 +101,36 @@ function enforceCPA(players) {
 
       let dx = a.x - b.x;
       let dy = a.y - b.y;
-      let dist = Math.sqrt(dx*dx + dy*dy);
+      let dist = Math.hypot(dx, dy);
 
-      if (dist < 1) {
-        a.x += dx * 0.5;
-        a.y += dy * 0.5;
+      if (dist < 18) {
+        let push = 0.5;
 
-        b.x -= dx * 0.5;
-        b.y -= dy * 0.5;
+        a.x += dx * push;
+        a.y += dy * push;
+
+        b.x -= dx * push;
+        b.y -= dy * push;
       }
     }
   }
 }
 
-// BLUE TRIANGLE
+// --------------------
+// BLUE TACTIC (TRIANGLE)
+// --------------------
 function blueTactic() {
   let carrier = ball.owner || blueTeam[0];
+
+  blueTeam[0].move(carrier.x, carrier.y);
 
   blueTeam[1].move(carrier.x + 60, carrier.y - 40);
   blueTeam[2].move(carrier.x + 60, carrier.y + 40);
 }
 
-// RED DEFENSE
+// --------------------
+// RED TACTIC (PRESSURE)
+// --------------------
 function redTactic() {
   let closest = redTeam.reduce((a, b) =>
     distance(b, ball) < distance(a, ball) ? b : a
@@ -116,10 +145,9 @@ function redTactic() {
   });
 }
 
-function distance(a, b) {
-  return Math.hypot(a.x - b.x, a.y - b.y);
-}
-
+// --------------------
+// INIT
+// --------------------
 function init() {
   blueTeam = [
     new Player(200, 200, "blue"),
@@ -134,28 +162,50 @@ function init() {
   ];
 
   ball = new Ball();
-  ball.owner = blueTeam[0];
+  ball.attach(blueTeam[0]);
 }
 
+// --------------------
+// UPDATE
+// --------------------
 function update() {
+
   blueTactic();
   redTactic();
 
   enforceCPA([...blueTeam, ...redTeam]);
 
-  let nearest = [...blueTeam, ...redTeam].reduce((a, b) =>
-    distance(b, ball) < distance(a, ball) ? b : a
-  );
+  ball.update();
 
-  ball.moveTo(nearest);
+  // INTERCEPTION SYSTEM
+  [...blueTeam, ...redTeam].forEach(p => {
+    if (distance(p, ball) < 12) {
+      ball.attach(p);
+    }
+  });
 
+  // GOALS
   if (ball.x > 880) goal("blue");
   if (ball.x < 20) goal("red");
 }
 
+// --------------------
+// DRAW FIELD
+// --------------------
 function draw() {
   ctx.clearRect(0, 0, 900, 500);
 
+  ctx.fillStyle = "#1e7f1e";
+  ctx.fillRect(0, 0, 900, 500);
+
+  // center line
+  ctx.strokeStyle = "white";
+  ctx.beginPath();
+  ctx.moveTo(450, 0);
+  ctx.lineTo(450, 500);
+  ctx.stroke();
+
+  // ball
   ctx.fillStyle = "white";
   ctx.beginPath();
   ctx.arc(ball.x, ball.y, 5, 0, Math.PI * 2);
@@ -165,8 +215,12 @@ function draw() {
   drawTeam(redTeam, "red");
 }
 
+// --------------------
+// DRAW TEAM
+// --------------------
 function drawTeam(team, color) {
   ctx.fillStyle = color;
+
   team.forEach(p => {
     ctx.beginPath();
     ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
@@ -174,6 +228,9 @@ function drawTeam(team, color) {
   });
 }
 
+// --------------------
+// GOAL
+// --------------------
 function goal(team) {
   if (team === "blue") blueScore++;
   if (team === "red") redScore++;
@@ -184,6 +241,9 @@ function goal(team) {
   init();
 }
 
+// --------------------
+// CONTROL
+// --------------------
 function startMatch() {
   init();
   loop();
@@ -192,16 +252,22 @@ function startMatch() {
 function resetMatch() {
   blueScore = 0;
   redScore = 0;
+
   document.getElementById("blueScore").innerText = 0;
   document.getElementById("redScore").innerText = 0;
+
   init();
 }
 
+// --------------------
+// LOOP
+// --------------------
 function loop() {
   update();
   draw();
   requestAnimationFrame(loop);
 }
+
 </script>
 
 </body>
