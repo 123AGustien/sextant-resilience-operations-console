@@ -12,22 +12,59 @@ let redScore = 0;
 let ballVx = 0;
 let ballVy = 0;
 
+// ----------------------
+// HEATMAP STORAGE
+// ----------------------
+let heatmap = Array.from({ length: 900 }, () =>
+  Array.from({ length: 500 }, () => 0)
+);
+
+// TRAILS
+let trails = [];
+
+// PLAYER CLASS WITH STAMINA
+class FatPlayer extends Player {
+  constructor(x, y, team) {
+    super(x, y, team);
+    this.stamina = 100;
+    this.baseSpeed = 0.05;
+  }
+
+  move(tx, ty) {
+    let speedFactor = this.stamina / 100;
+    let speed = this.baseSpeed * speedFactor;
+
+    this.x += (tx - this.x) * speed;
+    this.y += (ty - this.y) * speed;
+
+    this.stamina -= 0.02;
+    if (this.stamina < 20) this.stamina = 20;
+  }
+
+  recover() {
+    this.stamina += 0.01;
+    if (this.stamina > 100) this.stamina = 100;
+  }
+}
+
 // INIT
 function init() {
   blueTeam = [
-    new Player(200, 200, "blue"),
-    new Player(200, 250, "blue"),
-    new Player(200, 300, "blue")
+    new FatPlayer(200, 200, "blue"),
+    new FatPlayer(200, 250, "blue"),
+    new FatPlayer(200, 300, "blue")
   ];
 
   redTeam = [
-    new Player(700, 200, "red"),
-    new Player(700, 250, "red"),
-    new Player(700, 300, "red")
+    new FatPlayer(700, 200, "red"),
+    new FatPlayer(700, 250, "red"),
+    new FatPlayer(700, 300, "red")
   ];
 
   ball = new Ball();
   ball.owner = blueTeam[0];
+
+  trails = [];
 }
 
 // DISTANCE
@@ -47,7 +84,9 @@ function choosePass(team) {
     if (p === carrier) return;
 
     let d = distance(carrier, p);
-    let score = 100 - d;
+    let pressurePenalty = getPressure(carrier);
+
+    let score = 100 - d - pressurePenalty;
 
     if (score > bestScore) {
       bestScore = score;
@@ -56,6 +95,19 @@ function choosePass(team) {
   });
 
   return bestTarget;
+}
+
+// PRESSURE SYSTEM
+function getPressure(player) {
+  let opponents = player.team === "blue" ? redTeam : blueTeam;
+  let pressure = 0;
+
+  opponents.forEach(o => {
+    let d = distance(o, player);
+    if (d < 80) pressure += (80 - d) * 0.2;
+  });
+
+  return pressure;
 }
 
 // PASS
@@ -71,7 +123,24 @@ function passBall(from, to) {
   ball.owner = null;
 }
 
-// UPDATE
+// ----------------------
+// HEATMAP UPDATE
+// ----------------------
+function updateHeatmap() {
+  [...blueTeam, ...redTeam].forEach(p => {
+    let x = Math.floor(p.x);
+    let y = Math.floor(p.y);
+
+    if (heatmap[x] && heatmap[x][y] !== undefined) {
+      heatmap[x][y] += 1;
+    }
+
+    trails.push({ x: p.x, y: p.y });
+    if (trails.length > 200) trails.shift();
+  });
+}
+
+// UPDATE LOOP
 function update() {
   blueTactic(blueTeam, ball);
   redTactic(redTeam, ball);
@@ -82,9 +151,7 @@ function update() {
     let team = ball.owner.team === "blue" ? blueTeam : redTeam;
     let target = choosePass(team);
 
-    if (target) {
-      passBall(ball.owner, target);
-    }
+    if (target) passBall(ball.owner, target);
   }
 
   if (!ball.owner) {
@@ -95,21 +162,25 @@ function update() {
     ballVy *= 0.98;
   }
 
-  // regain possession
+  // POSSESSION
   [...blueTeam, ...redTeam].forEach(p => {
-    if (distance(p, ball) < 12) {
-      ball.owner = p;
-    }
+    if (distance(p, ball) < 12) ball.owner = p;
   });
 
-  // goals
-  if (ball.x > 880) goal("blue");
-  if (ball.x < 20) goal("red");
+  // stamina recovery
+  [...blueTeam, ...redTeam].forEach(p => p.recover());
+
+  updateHeatmap();
+
+  // GOALS
+  if (ball.x > 880 && ball.y > 200 && ball.y < 300) goal("blue");
+  if (ball.x < 20 && ball.y > 200 && ball.y < 300) goal("red");
 }
 
-// 🎥 SCREEN RENDER (UPGRADED)
+// ----------------------
+// DRAW + VISUAL INTELLIGENCE
+// ----------------------
 function draw() {
-  // pitch
   ctx.fillStyle = "#1e7f1e";
   ctx.fillRect(0, 0, 900, 500);
 
@@ -125,7 +196,18 @@ function draw() {
   ctx.arc(450, 250, 60, 0, Math.PI * 2);
   ctx.stroke();
 
-  // ball
+  // GOALS
+  ctx.strokeRect(10, 200, 10, 100);
+  ctx.strokeRect(880, 200, 10, 100);
+
+  // HEATMAP (visual intensity)
+  ctx.fillStyle = "rgba(255, 255, 0, 0.03)";
+  for (let i = 0; i < trails.length; i++) {
+    let t = trails[i];
+    ctx.fillRect(t.x, t.y, 2, 2);
+  }
+
+  // BALL
   ctx.fillStyle = "white";
   ctx.beginPath();
   ctx.arc(ball.x, ball.y, 5, 0, Math.PI * 2);
@@ -135,11 +217,10 @@ function draw() {
   drawTeam(redTeam, "red");
 }
 
-// TEAM DRAW + HIGHLIGHT
+// TEAM DRAW
 function drawTeam(team, color) {
   team.forEach(p => {
 
-    // highlight ball carrier
     if (ball.owner === p) {
       ctx.strokeStyle = "yellow";
       ctx.beginPath();
