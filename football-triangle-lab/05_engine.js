@@ -8,7 +8,11 @@ let ball;
 let blueScore = 0;
 let redScore = 0;
 
-// INIT MATCH
+// BALL PHYSICS (NEW)
+let ballVx = 0;
+let ballVy = 0;
+
+// INIT
 function init() {
   blueTeam = [
     new Player(200, 200, "blue"),
@@ -26,6 +30,47 @@ function init() {
   ball.owner = blueTeam[0];
 }
 
+// DISTANCE
+function distance(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+// PASS CHOICE (REAL AI)
+function choosePass(team) {
+  let carrier = ball.owner;
+  if (!carrier) return null;
+
+  let bestTarget = null;
+  let bestScore = -999;
+
+  team.forEach(p => {
+    if (p === carrier) return;
+
+    let d = distance(carrier, p);
+    let score = 100 - d; // prefer closer support
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestTarget = p;
+    }
+  });
+
+  return bestTarget;
+}
+
+// PASS EXECUTION
+function passBall(from, to) {
+  let dx = to.x - from.x;
+  let dy = to.y - from.y;
+
+  let mag = Math.sqrt(dx * dx + dy * dy);
+
+  ballVx = (dx / mag) * 4;
+  ballVy = (dy / mag) * 4;
+
+  ball.owner = null;
+}
+
 // UPDATE LOOP
 function update() {
   blueTactic(blueTeam, ball);
@@ -33,18 +78,38 @@ function update() {
 
   enforceCPA([...blueTeam, ...redTeam]);
 
-  let nearest = [...blueTeam, ...redTeam].reduce((a, b) =>
-    distance(b, ball) < distance(a, ball) ? b : a
-  );
+  // PASS SYSTEM
+  if (ball.owner) {
+    let team = ball.owner.team === "blue" ? blueTeam : redTeam;
+    let target = choosePass(team);
 
-  ball.moveTo(nearest);
+    if (target) {
+      passBall(ball.owner, target);
+    }
+  }
+
+  // BALL MOVEMENT (REAL PHYSICS)
+  if (!ball.owner) {
+    ball.x += ballVx;
+    ball.y += ballVy;
+
+    ballVx *= 0.98;
+    ballVy *= 0.98;
+  }
+
+  // POSSESSION REGAIN
+  [...blueTeam, ...redTeam].forEach(p => {
+    if (distance(p, ball) < 12) {
+      ball.owner = p;
+    }
+  });
 
   // GOALS
   if (ball.x > 880) goal("blue");
   if (ball.x < 20) goal("red");
 }
 
-// DRAW LOOP
+// DRAW
 function draw() {
   ctx.clearRect(0, 0, 900, 500);
 
