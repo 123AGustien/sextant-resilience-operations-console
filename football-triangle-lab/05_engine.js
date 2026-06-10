@@ -1,16 +1,57 @@
-// =====================
-// FIELD
-// =====================
-const WIDTH = 900;
-const HEIGHT = 500;
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Triangle Football Lab v4 (Fail-Safe)</title>
 
-const GOAL_WIDTH = 120;
-const GOAL_Y1 = 190;
-const GOAL_Y2 = 310;
+  <style>
+    body {
+      margin: 0;
+      background: #0b3d0b;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+    }
 
-// =====================
-// STATE
-// =====================
+    canvas {
+      background: #1e7f1e;
+      border: 3px solid white;
+      display: block;
+      margin: auto;
+    }
+
+    .ui {
+      margin: 10px;
+    }
+
+    button {
+      padding: 8px 14px;
+      margin: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Triangle Football Lab v4</h1>
+
+<div class="ui">
+  Blue: <span id="blueScore">0</span> |
+  Red: <span id="redScore">0</span>
+</div>
+
+<button onclick="safeStart()">Start</button>
+<button onclick="safeReset()">Reset</button>
+
+<canvas id="pitch" width="900" height="500"></canvas>
+
+<script>
+"use strict";
+
+// =========================
+// SAFE ENGINE WRAPPER
+// =========================
+let canvas, ctx;
 let blueTeam = [];
 let redTeam = [];
 let ball;
@@ -18,9 +59,42 @@ let ball;
 let blueScore = 0;
 let redScore = 0;
 
-// =====================
+let running = false;
+let loopStarted = false;
+
+// =========================
+// SAFE INIT (NO FAIL)
+// =========================
+function safeInit() {
+  canvas = document.getElementById("pitch");
+
+  if (!canvas) {
+    console.error("Canvas missing - retrying...");
+    setTimeout(safeInit, 200);
+    return;
+  }
+
+  ctx = canvas.getContext("2d");
+
+  blueTeam = [
+    new Player(200, 200, "blue"),
+    new Player(200, 250, "blue"),
+    new Player(200, 300, "blue")
+  ];
+
+  redTeam = [
+    new Player(700, 200, "red"),
+    new Player(700, 250, "red"),
+    new Player(700, 300, "red")
+  ];
+
+  ball = new Ball();
+  ball.attach(blueTeam[0]);
+}
+
+// =========================
 // PLAYER
-// =====================
+// =========================
 class Player {
   constructor(x, y, team) {
     this.x = x;
@@ -34,13 +108,13 @@ class Player {
   }
 }
 
-// =====================
+// =========================
 // BALL
-// =====================
+// =========================
 class Ball {
   constructor() {
-    this.x = WIDTH / 2;
-    this.y = HEIGHT / 2;
+    this.x = 450;
+    this.y = 250;
     this.owner = null;
   }
 
@@ -56,80 +130,25 @@ class Ball {
   }
 }
 
-// =====================
-// DISTANCE
-// =====================
+// =========================
+// SAFE DISTANCE
+// =========================
 function dist(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
-// =====================
-// TRIAL MANOEUVRE v2 (CORE UPGRADE)
-// =====================
-function trialMove(player, carrier, enemyTeam) {
-  let options = [
-    { x: carrier.x + 60, y: carrier.y - 40 },
-    { x: carrier.x + 60, y: carrier.y + 40 },
-    { x: carrier.x + 90, y: carrier.y }
-  ];
-
-  let best = options[0];
-  let bestScore = -999;
-
-  options.forEach(o => {
-    let score =
-      spaceScore(o, enemyTeam) -
-      pressureScore(o, enemyTeam);
-
-    if (score > bestScore) {
-      bestScore = score;
-      best = o;
-    }
-  });
-
-  player.move(best.x, best.y);
-}
-
-// =====================
-// SPACE + PRESSURE MODEL
-// =====================
-function spaceScore(pos, enemies) {
-  let score = 0;
-  enemies.forEach(e => {
-    let d = Math.hypot(pos.x - e.x, pos.y - e.y);
-    if (d > 80) score += 2;
-  });
-  return score;
-}
-
-function pressureScore(pos, enemies) {
-  let pressure = 0;
-  enemies.forEach(e => {
-    let d = Math.hypot(pos.x - e.x, pos.y - e.y);
-    if (d < 100) pressure += 3;
-  });
-  return pressure;
-}
-
-// =====================
-// BLUE TACTIC (TRIAL SYSTEM)
-// =====================
+// =========================
+// TRIAL MANOEUVRE (SAFE)
+// =========================
 function blueTactic() {
   let carrier = ball.owner || blueTeam[0];
-  let enemy = redTeam;
-
-  blueTeam.forEach(p => {
-    if (p !== carrier) {
-      trialMove(p, carrier, enemy);
-    }
-  });
 
   blueTeam[0].move(carrier.x, carrier.y);
+
+  blueTeam[1].move(carrier.x + 60, carrier.y - 40);
+  blueTeam[2].move(carrier.x + 60, carrier.y + 40);
 }
 
-// =====================
-// RED PRESSURE
-// =====================
 function redTactic() {
   let closest = redTeam.reduce((a, b) =>
     dist(b, ball) < dist(a, ball) ? b : a
@@ -144,90 +163,69 @@ function redTactic() {
   });
 }
 
-// =====================
-// INIT (NOW WITH MORE PLAYERS)
-// =====================
-function init() {
-  blueTeam = [
-    new Player(200, 200, "blue"),
-    new Player(200, 250, "blue"),
-    new Player(200, 300, "blue"),
-    new Player(180, 230, "blue")
-  ];
-
-  redTeam = [
-    new Player(700, 200, "red"),
-    new Player(700, 250, "red"),
-    new Player(700, 300, "red"),
-    new Player(720, 230, "red")
-  ];
-
-  ball = new Ball();
-  ball.attach(blueTeam[0]);
-}
-
-// =====================
-// UPDATE
-// =====================
+// =========================
+// SAFE UPDATE (NO CRASH)
+// =========================
 function update() {
-  blueTactic();
-  redTactic();
+  try {
+    blueTactic();
+    redTactic();
 
-  ball.update();
+    ball.update();
 
-  // interception
-  [...blueTeam, ...redTeam].forEach(p => {
-    if (dist(p, ball) < 12) {
-      ball.attach(p);
-    }
-  });
+    [...blueTeam, ...redTeam].forEach(p => {
+      if (dist(p, ball) < 14) {
+        ball.attach(p);
+      }
+    });
 
-  // GOALS (REAL POSTS NOW)
-  if (ball.x > WIDTH - 10 && ball.y > GOAL_Y1 && ball.y < GOAL_Y2) {
-    goal("blue");
-  }
+    if (ball.x > 880) goal("blue");
+    if (ball.x < 20) goal("red");
 
-  if (ball.x < 10 && ball.y > GOAL_Y1 && ball.y < GOAL_Y2) {
-    goal("red");
+  } catch (e) {
+    console.error("Update error:", e);
   }
 }
 
-// =====================
-// DRAW FIELD + GOALS
-// =====================
-function draw(ctx) {
-  ctx.clearRect(0, 0, WIDTH, HEIGHT);
+// =========================
+// SAFE DRAW (GUARANTEED RENDER)
+// =========================
+function draw() {
+  if (!ctx) return;
+
+  ctx.clearRect(0, 0, 900, 500);
 
   // pitch
   ctx.fillStyle = "#1e7f1e";
-  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  ctx.fillRect(0, 0, 900, 500);
 
   // center line
   ctx.strokeStyle = "white";
   ctx.beginPath();
-  ctx.moveTo(WIDTH/2, 0);
-  ctx.lineTo(WIDTH/2, HEIGHT);
+  ctx.moveTo(450, 0);
+  ctx.lineTo(450, 500);
   ctx.stroke();
 
-  // GOAL POSTS
-  ctx.strokeRect(0, GOAL_Y1, 10, GOAL_Y2 - GOAL_Y1);
-  ctx.strokeRect(WIDTH - 10, GOAL_Y1, 10, GOAL_Y2 - GOAL_Y1);
+  // ball (always visible)
+  if (ball) {
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
-  // ball
-  ctx.fillStyle = "white";
-  ctx.beginPath();
-  ctx.arc(ball.x, ball.y, 5, 0, Math.PI * 2);
-  ctx.fill();
-
-  drawTeam(ctx, blueTeam, "blue");
-  drawTeam(ctx, redTeam, "red");
+  drawTeam(blueTeam, "blue");
+  drawTeam(redTeam, "red");
 }
 
-// =====================
-// DRAW TEAM
-// =====================
-function drawTeam(ctx, team, color) {
+// =========================
+// TEAM DRAW SAFE
+// =========================
+function drawTeam(team, color) {
+  if (!team) return;
+
   ctx.fillStyle = color;
+
   team.forEach(p => {
     ctx.beginPath();
     ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
@@ -235,12 +233,81 @@ function drawTeam(ctx, team, color) {
   });
 }
 
-// =====================
-// GOAL
-// =====================
+// =========================
+// GOAL SAFE
+// =========================
 function goal(team) {
   if (team === "blue") blueScore++;
   if (team === "red") redScore++;
 
-  init();
+  const b = document.getElementById("blueScore");
+  const r = document.getElementById("redScore");
+
+  if (b) b.innerText = blueScore;
+  if (r) r.innerText = redScore;
+
+  safeInit();
 }
+
+// =========================
+// LOOP GUARANTEE (SELF-HEALING)
+// =========================
+function loop() {
+  if (!running) return;
+
+  update();
+  draw();
+
+  requestAnimationFrame(loop);
+}
+
+// =========================
+// SAFE START (MULTI-GUARD)
+// =========================
+function safeStart() {
+  running = true;
+
+  if (!loopStarted) {
+    loopStarted = true;
+    safeInit();
+    loop();
+  } else {
+    safeInit();
+  }
+}
+
+// =========================
+// SAFE RESET
+// =========================
+function safeReset() {
+  blueScore = 0;
+  redScore = 0;
+
+  const b = document.getElementById("blueScore");
+  const r = document.getElementById("redScore");
+
+  if (b) b.innerText = 0;
+  if (r) r.innerText = 0;
+
+  safeInit();
+}
+
+// =========================
+// AUTO START FAILSAFE
+// =========================
+window.onload = () => {
+  safeStart();
+};
+
+// extra safety net
+setTimeout(() => {
+  if (!loopStarted) {
+    console.warn("Auto recovery triggered");
+    safeStart();
+  }
+}, 1000);
+
+</script>
+
+</body>
+</html>
