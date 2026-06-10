@@ -1,13 +1,142 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Sextant Control Room v10</title>
+<meta charset="UTF-8">
+<title>Sextant Control Room v12</title>
 
-  <meta http-equiv="refresh" content="0; url=dashboard/index_v10.html">
+<style>
+body {
+    background:#05070d;
+    color:#2bd4ff;
+    font-family:Arial;
+    text-align:center;
+}
+
+#status {
+    font-size:20px;
+    margin:10px;
+}
+
+button {
+    margin:5px;
+    padding:10px;
+    border:1px solid #2bd4ff;
+    background:black;
+    color:#2bd4ff;
+    cursor:pointer;
+}
+
+pre {
+    text-align:left;
+    max-width:900px;
+    margin:auto;
+    background:#0b0f14;
+    padding:10px;
+    border:1px solid #2bd4ff;
+}
+</style>
 </head>
 
-<body style="background:#05070d;color:#2bd4ff;text-align:center;font-family:Arial;">
-  <h2>Redirecting to Control Room v10...</h2>
+<body>
+
+<h2>SEXTANT CONTROL ROOM v12</h2>
+
+<div id="status">BOOTING...</div>
+
+<div>
+    <button onclick="runSim('normal')">Normal</button>
+    <button onclick="runSim('failure')">Failure</button>
+    <button onclick="runSim('cascade')">Cascade</button>
+    <button onclick="resetSim()">Reset</button>
+</div>
+
+<pre id="output">Waiting for system...</pre>
+
+<!-- ========================= -->
+<!-- LOAD CORE SYSTEM -->
+<!-- ========================= -->
+<script src="core_engine/rp04-engine-v10.js"></script>
+<script src="core_engine/sextant_orchestra_v1.js"></script>
+<script src="core_engine/sextant_reasoning_v1.js"></script>
+
+<script>
+/**
+ * =========================
+ * SEXTANT v12 STABLE SCREEN
+ * =========================
+ */
+
+window.logs = [];
+
+/**
+ * SAFE STATUS CHECK
+ */
+function checkSystem() {
+
+    const engine = typeof window.runRP04 === "function";
+    const orchestra = typeof window.orchestra !== "undefined";
+
+    const status = document.getElementById("status");
+
+    if (!engine || !orchestra) {
+        status.innerText = "SYSTEM BOOTING (DEGRADED MODE)";
+        status.style.color = "orange";
+        return false;
+    }
+
+    status.innerText = "CONTROL ROOM ONLINE";
+    status.style.color = "lime";
+    return true;
+}
+
+/**
+ * RUN SIMULATION
+ */
+function runSim(type) {
+
+    if (!checkSystem()) return;
+
+    const frame = window.orchestra.runStep(type);
+
+    window.logs.push(frame);
+
+    document.getElementById("output").innerText =
+        JSON.stringify(frame, null, 2);
+}
+
+/**
+ * RESET SYSTEM
+ */
+function resetSim() {
+
+    window.orchestra?.reset?.();
+    window.logs = [];
+
+    document.getElementById("output").innerText = "RESET COMPLETE";
+    document.getElementById("status").innerText = "RESET";
+}
+
+/**
+ * AUTO BOOT LOOP (CRITICAL FIX)
+ * prevents OFFLINE state permanently
+ */
+function bootLoop() {
+
+    const ok = checkSystem();
+
+    if (!ok) {
+        setTimeout(bootLoop, 1000);
+        return;
+    }
+
+    console.log("🟢 Sextant v12 Stable Control Room ONLINE");
+}
+
+/**
+ * INIT
+ */
+window.addEventListener("load", bootLoop);
+</script>
+
 </body>
 </html>
