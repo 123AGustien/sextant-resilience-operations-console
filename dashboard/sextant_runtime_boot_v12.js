@@ -17,7 +17,7 @@
     };
 
     // -------------------------
-    // SAFE LOADER CHECK
+    // DEPENDENCY CHECK
     // -------------------------
     function checkDependencies() {
 
@@ -31,12 +31,11 @@
     }
 
     // -------------------------
-    // UI STATUS UPDATE
+    // STATUS UI
     // -------------------------
     function updateStatus() {
 
         const el = document.getElementById("status");
-
         if (!el) return;
 
         if (!STATE.ready) {
@@ -49,12 +48,12 @@
     }
 
     // -------------------------
-    // SAFE SIMULATION RUNNER
+    // SIMULATION RUNNER
     // -------------------------
     function run(type) {
 
         if (!STATE.ready) {
-            console.error("System not ready:", STATE);
+            console.error("System not ready", STATE);
             return {
                 status: "OFFLINE",
                 message: "Engine or Orchestra not loaded"
@@ -64,7 +63,6 @@
         const frame = window.orchestra.runStep(type);
 
         const output = document.getElementById("output");
-
         if (output) {
             output.innerText = JSON.stringify(frame, null, 2);
         }
@@ -89,12 +87,11 @@
     }
 
     // -------------------------
-    // GRAPH SAFE HOOK
+    // SAFE GRAPH RENDER
     // -------------------------
     function safeGraph() {
 
         const canvas = document.getElementById("graph");
-
         if (!canvas || !window.logs) return;
 
         const ctx = canvas.getContext("2d");
@@ -117,14 +114,13 @@
     }
 
     // -------------------------
-    // BOOT LOOP (IMPORTANT FIX)
+    // BOOT SEQUENCE (STABLE RETRY)
     // -------------------------
     function boot() {
 
         checkDependencies();
         updateStatus();
 
-        // retry loader (fixes async GitHub Pages load issues)
         setTimeout(() => {
             checkDependencies();
             updateStatus();
@@ -135,11 +131,11 @@
             updateStatus();
         }, 3000);
 
-        console.log("Sextant v12 runtime booted", STATE);
+        console.log("Sextant Runtime v12 booted", STATE);
     }
 
     // -------------------------
-    // GLOBAL EXPORT (IMPORTANT)
+    // GLOBAL EXPORT
     // -------------------------
     window.SextantRuntime = {
         run,
@@ -149,7 +145,6 @@
         state: STATE
     };
 
-    // AUTO BOOT
     window.addEventListener("load", boot);
 
 })();
