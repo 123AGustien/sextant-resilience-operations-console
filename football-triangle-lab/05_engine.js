@@ -8,12 +8,11 @@ let ball;
 let blueScore = 0;
 let redScore = 0;
 
-// BALL PHYSICS
 let ballVx = 0;
 let ballVy = 0;
 
 // ----------------------
-// FORMATION BASE POSITIONS
+// FORMATIONS
 // ----------------------
 let blueFormation = [
   { x: 200, y: 200 },
@@ -46,21 +45,21 @@ function distance(a, b) {
 }
 
 // ----------------------
-// PRESSURE MAP (SEXTANT LAYER)
+// PRESSURE MODEL
 // ----------------------
-function zonePressure(x, y, enemyTeam) {
+function pressureAt(x, y, enemyTeam) {
   let pressure = 0;
 
   enemyTeam.forEach(p => {
     let d = Math.hypot(p.x - x, p.y - y);
-    if (d < 120) pressure += (120 - d) * 0.3;
+    if (d < 120) pressure += (120 - d) * 0.25;
   });
 
   return pressure;
 }
 
 // ----------------------
-// PASS AI (ADAPTIVE)
+// PASS AI (SMART + PRESSURE AWARE)
 // ----------------------
 function choosePass(team) {
   let carrier = ball.owner;
@@ -75,9 +74,9 @@ function choosePass(team) {
     let d = distance(carrier, p);
 
     let enemy = carrier.team === "blue" ? redTeam : blueTeam;
-    let pressure = zonePressure(p.x, p.y, enemy);
+    let pressure = pressureAt(p.x, p.y, enemy);
 
-    let score = 120 - d - pressure;
+    let score = 130 - d - pressure;
 
     if (score > bestScore) {
       bestScore = score;
@@ -104,7 +103,7 @@ function passBall(from, to) {
 }
 
 // ----------------------
-// FORMATION RECOVERY (STEP 11)
+// FORMATION CONTROL (STEP 11)
 // ----------------------
 function maintainFormation(team, formation) {
   team.forEach((p, i) => {
@@ -117,14 +116,12 @@ function maintainFormation(team, formation) {
 // ----------------------
 // ADAPTIVE PRESSURE (STEP 12)
 // ----------------------
-function adaptivePressure(team) {
+function adaptiveDefense(team) {
   let enemy = team[0].team === "blue" ? blueTeam : redTeam;
 
   team.forEach(p => {
     enemy.forEach(e => {
-      let d = distance(p, e);
-
-      if (d < 90) {
+      if (distance(p, e) < 90) {
         p.move(ball.x, ball.y);
       }
     });
@@ -132,7 +129,7 @@ function adaptivePressure(team) {
 }
 
 // ----------------------
-// UPDATE LOOP
+// UPDATE
 // ----------------------
 function update() {
   blueTactic(blueTeam, ball);
@@ -162,26 +159,21 @@ function update() {
     if (distance(p, ball) < 12) ball.owner = p;
   });
 
-  // STAMINA RECOVERY
+  // RECOVERY
   [...blueTeam, ...redTeam].forEach(p => p.recover());
 
-  // STEP 11: FORMATION CONTROL
+  // STEP 11
   maintainFormation(blueTeam, blueFormation);
   maintainFormation(redTeam, redFormation);
 
-  // STEP 12: ADAPTIVE DEFENSE
-  adaptivePressure(redTeam);
+  // STEP 12
+  adaptiveDefense(redTeam);
 
-  // STEP 13: SEXTANT FIELD INTELLIGENCE
-  let blueRisk = zonePressure(ball.x, ball.y, redTeam);
+  // STEP 13 — SEXTANT RISK LOGIC
+  let risk = pressureAt(ball.x, ball.y, redTeam);
 
-  if (blueRisk > 60 && ball.owner) {
-    // urgency override
-    blueTeam.forEach(p => {
-      if (p.team === "blue") {
-        p.move(ball.x, ball.y);
-      }
-    });
+  if (risk > 60 && ball.owner) {
+    blueTeam.forEach(p => p.move(ball.x, ball.y));
   }
 
   // GOALS
@@ -190,27 +182,30 @@ function update() {
 }
 
 // ----------------------
-// DRAW
+// DRAW FIELD
 // ----------------------
 function draw() {
   ctx.fillStyle = "#1e7f1e";
   ctx.fillRect(0, 0, 900, 500);
 
-  // FIELD LINES
   ctx.strokeStyle = "white";
+
+  // center line
   ctx.beginPath();
   ctx.moveTo(450, 0);
   ctx.lineTo(450, 500);
   ctx.stroke();
 
+  // center circle
   ctx.beginPath();
   ctx.arc(450, 250, 60, 0, Math.PI * 2);
   ctx.stroke();
 
+  // goals
   ctx.strokeRect(10, 200, 10, 100);
   ctx.strokeRect(880, 200, 10, 100);
 
-  // BALL
+  // ball
   ctx.fillStyle = "white";
   ctx.beginPath();
   ctx.arc(ball.x, ball.y, 5, 0, Math.PI * 2);
@@ -225,6 +220,7 @@ function draw() {
 // ----------------------
 function drawTeam(team, color) {
   team.forEach(p => {
+
     if (ball.owner === p) {
       ctx.strokeStyle = "yellow";
       ctx.beginPath();
