@@ -12,26 +12,62 @@ let ballVx = 0;
 let ballVy = 0;
 
 // ----------------------
-// FORMATIONS
+// FORMATIONS (11v11 STRUCTURE)
 // ----------------------
-let blueFormation = [
-  { x: 200, y: 200 },
-  { x: 200, y: 250 },
-  { x: 200, y: 300 }
-];
+function createTeam(side) {
+  let team = [];
 
-let redFormation = [
-  { x: 700, y: 200 },
-  { x: 700, y: 250 },
-  { x: 700, y: 300 }
-];
+  for (let i = 0; i < 11; i++) {
+    let role = getRole(i);
+
+    let x = side === "blue" ? 150 : 750;
+    let y = 40 + i * 40;
+
+    team.push(new RolePlayer(x, y, side, role));
+  }
+
+  return team;
+}
+
+// ----------------------
+// ROLE ASSIGNMENT
+// ----------------------
+function getRole(i) {
+  if (i === 0) return "GK";
+  if (i <= 3) return "DEF";
+  if (i <= 7) return "MID";
+  return "FWD";
+}
+
+// ----------------------
+// ROLE PLAYER CLASS
+// ----------------------
+class RolePlayer extends Player {
+  constructor(x, y, team, role) {
+    super(x, y, team);
+    this.role = role;
+    this.stamina = 100;
+  }
+
+  move(tx, ty) {
+    let speed = 0.05;
+
+    // role-based speed tuning
+    if (this.role === "FWD") speed = 0.07;
+    if (this.role === "DEF") speed = 0.04;
+    if (this.role === "GK") speed = 0.02;
+
+    this.x += (tx - this.x) * speed;
+    this.y += (ty - this.y) * speed;
+  }
+}
 
 // ----------------------
 // INIT
 // ----------------------
 function init() {
-  blueTeam = blueFormation.map(p => new FatPlayer(p.x, p.y, "blue"));
-  redTeam = redFormation.map(p => new FatPlayer(p.x, p.y, "red"));
+  blueTeam = createTeam("blue");
+  redTeam = createTeam("red");
 
   ball = new Ball();
   ball.owner = blueTeam[0];
@@ -45,21 +81,36 @@ function distance(a, b) {
 }
 
 // ----------------------
-// PRESSURE MODEL
+// ROLE BEHAVIOR SYSTEM
 // ----------------------
-function pressureAt(x, y, enemyTeam) {
-  let pressure = 0;
+function roleBehavior(player) {
+  let enemy = player.team === "blue" ? redTeam : blueTeam;
 
-  enemyTeam.forEach(p => {
-    let d = Math.hypot(p.x - x, p.y - y);
-    if (d < 120) pressure += (120 - d) * 0.25;
-  });
+  if (player.role === "GK") {
+    // stay near goal
+    let gx = player.team === "blue" ? 80 : 820;
+    player.move(gx, 250);
+  }
 
-  return pressure;
+  if (player.role === "DEF") {
+    // defensive line
+    player.move(player.team === "blue" ? 250 : 650, player.y);
+  }
+
+  if (player.role === "MID") {
+    // support ball
+    player.move(ball.x, ball.y);
+  }
+
+  if (player.role === "FWD") {
+    // attack goal
+    let targetX = player.team === "blue" ? 850 : 50;
+    player.move(targetX, ball.y);
+  }
 }
 
 // ----------------------
-// PASS AI (SMART + PRESSURE AWARE)
+// PASS AI
 // ----------------------
 function choosePass(team) {
   let carrier = ball.owner;
@@ -72,11 +123,7 @@ function choosePass(team) {
     if (p === carrier) return;
 
     let d = distance(carrier, p);
-
-    let enemy = carrier.team === "blue" ? redTeam : blueTeam;
-    let pressure = pressureAt(p.x, p.y, enemy);
-
-    let score = 130 - d - pressure;
+    let score = 120 - d;
 
     if (score > bestScore) {
       bestScore = score;
@@ -88,7 +135,7 @@ function choosePass(team) {
 }
 
 // ----------------------
-// PASS EXECUTION
+// PASS
 // ----------------------
 function passBall(from, to) {
   let dx = to.x - from.x;
@@ -103,32 +150,6 @@ function passBall(from, to) {
 }
 
 // ----------------------
-// FORMATION CONTROL (STEP 11)
-// ----------------------
-function maintainFormation(team, formation) {
-  team.forEach((p, i) => {
-    if (p !== ball.owner) {
-      p.move(formation[i].x, formation[i].y);
-    }
-  });
-}
-
-// ----------------------
-// ADAPTIVE PRESSURE (STEP 12)
-// ----------------------
-function adaptiveDefense(team) {
-  let enemy = team[0].team === "blue" ? blueTeam : redTeam;
-
-  team.forEach(p => {
-    enemy.forEach(e => {
-      if (distance(p, e) < 90) {
-        p.move(ball.x, ball.y);
-      }
-    });
-  });
-}
-
-// ----------------------
 // UPDATE
 // ----------------------
 function update() {
@@ -136,6 +157,9 @@ function update() {
   redTactic(redTeam, ball);
 
   enforceCPA([...blueTeam, ...redTeam]);
+
+  // ROLE SYSTEM (STEP 19 CORE)
+  [...blueTeam, ...redTeam].forEach(roleBehavior);
 
   // PASS SYSTEM
   if (ball.owner) {
@@ -159,30 +183,13 @@ function update() {
     if (distance(p, ball) < 12) ball.owner = p;
   });
 
-  // RECOVERY
-  [...blueTeam, ...redTeam].forEach(p => p.recover());
-
-  // STEP 11
-  maintainFormation(blueTeam, blueFormation);
-  maintainFormation(redTeam, redFormation);
-
-  // STEP 12
-  adaptiveDefense(redTeam);
-
-  // STEP 13 — SEXTANT RISK LOGIC
-  let risk = pressureAt(ball.x, ball.y, redTeam);
-
-  if (risk > 60 && ball.owner) {
-    blueTeam.forEach(p => p.move(ball.x, ball.y));
-  }
-
   // GOALS
   if (ball.x > 880 && ball.y > 200 && ball.y < 300) goal("blue");
   if (ball.x < 20 && ball.y > 200 && ball.y < 300) goal("red");
 }
 
 // ----------------------
-// DRAW FIELD
+// DRAW
 // ----------------------
 function draw() {
   ctx.fillStyle = "#1e7f1e";
@@ -190,22 +197,18 @@ function draw() {
 
   ctx.strokeStyle = "white";
 
-  // center line
   ctx.beginPath();
   ctx.moveTo(450, 0);
   ctx.lineTo(450, 500);
   ctx.stroke();
 
-  // center circle
   ctx.beginPath();
   ctx.arc(450, 250, 60, 0, Math.PI * 2);
   ctx.stroke();
 
-  // goals
   ctx.strokeRect(10, 200, 10, 100);
   ctx.strokeRect(880, 200, 10, 100);
 
-  // ball
   ctx.fillStyle = "white";
   ctx.beginPath();
   ctx.arc(ball.x, ball.y, 5, 0, Math.PI * 2);
@@ -216,11 +219,10 @@ function draw() {
 }
 
 // ----------------------
-// TEAM DRAW
+// DRAW TEAM
 // ----------------------
 function drawTeam(team, color) {
   team.forEach(p => {
-
     if (ball.owner === p) {
       ctx.strokeStyle = "yellow";
       ctx.beginPath();
@@ -232,6 +234,11 @@ function drawTeam(team, color) {
     ctx.beginPath();
     ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
     ctx.fill();
+
+    // role label (visual debug)
+    ctx.fillStyle = "white";
+    ctx.font = "10px Arial";
+    ctx.fillText(p.role || "", p.x - 10, p.y - 15);
   });
 }
 
