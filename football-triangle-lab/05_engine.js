@@ -13,104 +13,84 @@ let ballVx = 0;
 let ballVy = 0;
 
 // ----------------------
-// HEATMAP STORAGE
+// FORMATION BASE POSITIONS
 // ----------------------
-let heatmap = Array.from({ length: 900 }, () =>
-  Array.from({ length: 500 }, () => 0)
-);
+let blueFormation = [
+  { x: 200, y: 200 },
+  { x: 200, y: 250 },
+  { x: 200, y: 300 }
+];
 
-// TRAILS
-let trails = [];
+let redFormation = [
+  { x: 700, y: 200 },
+  { x: 700, y: 250 },
+  { x: 700, y: 300 }
+];
 
-// PLAYER CLASS WITH STAMINA
-class FatPlayer extends Player {
-  constructor(x, y, team) {
-    super(x, y, team);
-    this.stamina = 100;
-    this.baseSpeed = 0.05;
-  }
-
-  move(tx, ty) {
-    let speedFactor = this.stamina / 100;
-    let speed = this.baseSpeed * speedFactor;
-
-    this.x += (tx - this.x) * speed;
-    this.y += (ty - this.y) * speed;
-
-    this.stamina -= 0.02;
-    if (this.stamina < 20) this.stamina = 20;
-  }
-
-  recover() {
-    this.stamina += 0.01;
-    if (this.stamina > 100) this.stamina = 100;
-  }
-}
-
+// ----------------------
 // INIT
+// ----------------------
 function init() {
-  blueTeam = [
-    new FatPlayer(200, 200, "blue"),
-    new FatPlayer(200, 250, "blue"),
-    new FatPlayer(200, 300, "blue")
-  ];
-
-  redTeam = [
-    new FatPlayer(700, 200, "red"),
-    new FatPlayer(700, 250, "red"),
-    new FatPlayer(700, 300, "red")
-  ];
+  blueTeam = blueFormation.map(p => new FatPlayer(p.x, p.y, "blue"));
+  redTeam = redFormation.map(p => new FatPlayer(p.x, p.y, "red"));
 
   ball = new Ball();
   ball.owner = blueTeam[0];
-
-  trails = [];
 }
 
+// ----------------------
 // DISTANCE
+// ----------------------
 function distance(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
-// PASS AI
+// ----------------------
+// PRESSURE MAP (SEXTANT LAYER)
+// ----------------------
+function zonePressure(x, y, enemyTeam) {
+  let pressure = 0;
+
+  enemyTeam.forEach(p => {
+    let d = Math.hypot(p.x - x, p.y - y);
+    if (d < 120) pressure += (120 - d) * 0.3;
+  });
+
+  return pressure;
+}
+
+// ----------------------
+// PASS AI (ADAPTIVE)
+// ----------------------
 function choosePass(team) {
   let carrier = ball.owner;
   if (!carrier) return null;
 
-  let bestTarget = null;
+  let best = null;
   let bestScore = -999;
 
   team.forEach(p => {
     if (p === carrier) return;
 
     let d = distance(carrier, p);
-    let pressurePenalty = getPressure(carrier);
 
-    let score = 100 - d - pressurePenalty;
+    let enemy = carrier.team === "blue" ? redTeam : blueTeam;
+    let pressure = zonePressure(p.x, p.y, enemy);
+
+    let score = 120 - d - pressure;
 
     if (score > bestScore) {
       bestScore = score;
-      bestTarget = p;
+      best = p;
     }
   });
 
-  return bestTarget;
+  return best;
 }
 
-// PRESSURE SYSTEM
-function getPressure(player) {
-  let opponents = player.team === "blue" ? redTeam : blueTeam;
-  let pressure = 0;
-
-  opponents.forEach(o => {
-    let d = distance(o, player);
-    if (d < 80) pressure += (80 - d) * 0.2;
-  });
-
-  return pressure;
-}
-
-// PASS
+// ----------------------
+// PASS EXECUTION
+// ----------------------
 function passBall(from, to) {
   let dx = to.x - from.x;
   let dy = to.y - from.y;
@@ -124,29 +104,43 @@ function passBall(from, to) {
 }
 
 // ----------------------
-// HEATMAP UPDATE
+// FORMATION RECOVERY (STEP 11)
 // ----------------------
-function updateHeatmap() {
-  [...blueTeam, ...redTeam].forEach(p => {
-    let x = Math.floor(p.x);
-    let y = Math.floor(p.y);
-
-    if (heatmap[x] && heatmap[x][y] !== undefined) {
-      heatmap[x][y] += 1;
+function maintainFormation(team, formation) {
+  team.forEach((p, i) => {
+    if (p !== ball.owner) {
+      p.move(formation[i].x, formation[i].y);
     }
-
-    trails.push({ x: p.x, y: p.y });
-    if (trails.length > 200) trails.shift();
   });
 }
 
+// ----------------------
+// ADAPTIVE PRESSURE (STEP 12)
+// ----------------------
+function adaptivePressure(team) {
+  let enemy = team[0].team === "blue" ? blueTeam : redTeam;
+
+  team.forEach(p => {
+    enemy.forEach(e => {
+      let d = distance(p, e);
+
+      if (d < 90) {
+        p.move(ball.x, ball.y);
+      }
+    });
+  });
+}
+
+// ----------------------
 // UPDATE LOOP
+// ----------------------
 function update() {
   blueTactic(blueTeam, ball);
   redTactic(redTeam, ball);
 
   enforceCPA([...blueTeam, ...redTeam]);
 
+  // PASS SYSTEM
   if (ball.owner) {
     let team = ball.owner.team === "blue" ? blueTeam : redTeam;
     let target = choosePass(team);
@@ -154,6 +148,7 @@ function update() {
     if (target) passBall(ball.owner, target);
   }
 
+  // BALL MOVEMENT
   if (!ball.owner) {
     ball.x += ballVx;
     ball.y += ballVy;
@@ -167,10 +162,27 @@ function update() {
     if (distance(p, ball) < 12) ball.owner = p;
   });
 
-  // stamina recovery
+  // STAMINA RECOVERY
   [...blueTeam, ...redTeam].forEach(p => p.recover());
 
-  updateHeatmap();
+  // STEP 11: FORMATION CONTROL
+  maintainFormation(blueTeam, blueFormation);
+  maintainFormation(redTeam, redFormation);
+
+  // STEP 12: ADAPTIVE DEFENSE
+  adaptivePressure(redTeam);
+
+  // STEP 13: SEXTANT FIELD INTELLIGENCE
+  let blueRisk = zonePressure(ball.x, ball.y, redTeam);
+
+  if (blueRisk > 60 && ball.owner) {
+    // urgency override
+    blueTeam.forEach(p => {
+      if (p.team === "blue") {
+        p.move(ball.x, ball.y);
+      }
+    });
+  }
 
   // GOALS
   if (ball.x > 880 && ball.y > 200 && ball.y < 300) goal("blue");
@@ -178,34 +190,25 @@ function update() {
 }
 
 // ----------------------
-// DRAW + VISUAL INTELLIGENCE
+// DRAW
 // ----------------------
 function draw() {
   ctx.fillStyle = "#1e7f1e";
   ctx.fillRect(0, 0, 900, 500);
 
-  // center line
+  // FIELD LINES
   ctx.strokeStyle = "white";
   ctx.beginPath();
   ctx.moveTo(450, 0);
   ctx.lineTo(450, 500);
   ctx.stroke();
 
-  // center circle
   ctx.beginPath();
   ctx.arc(450, 250, 60, 0, Math.PI * 2);
   ctx.stroke();
 
-  // GOALS
   ctx.strokeRect(10, 200, 10, 100);
   ctx.strokeRect(880, 200, 10, 100);
-
-  // HEATMAP (visual intensity)
-  ctx.fillStyle = "rgba(255, 255, 0, 0.03)";
-  for (let i = 0; i < trails.length; i++) {
-    let t = trails[i];
-    ctx.fillRect(t.x, t.y, 2, 2);
-  }
 
   // BALL
   ctx.fillStyle = "white";
@@ -217,10 +220,11 @@ function draw() {
   drawTeam(redTeam, "red");
 }
 
+// ----------------------
 // TEAM DRAW
+// ----------------------
 function drawTeam(team, color) {
   team.forEach(p => {
-
     if (ball.owner === p) {
       ctx.strokeStyle = "yellow";
       ctx.beginPath();
@@ -235,7 +239,9 @@ function drawTeam(team, color) {
   });
 }
 
+// ----------------------
 // GOAL
+// ----------------------
 function goal(team) {
   if (team === "blue") blueScore++;
   if (team === "red") redScore++;
@@ -243,7 +249,9 @@ function goal(team) {
   init();
 }
 
+// ----------------------
 // CONTROL
+// ----------------------
 function startMatch() {
   init();
   loop();
@@ -255,7 +263,9 @@ function resetMatch() {
   init();
 }
 
+// ----------------------
 // LOOP
+// ----------------------
 function loop() {
   update();
   draw();
