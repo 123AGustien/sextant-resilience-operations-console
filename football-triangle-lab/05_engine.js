@@ -8,7 +8,7 @@ let ball;
 let blueScore = 0;
 let redScore = 0;
 
-// BALL PHYSICS (NEW)
+// BALL PHYSICS
 let ballVx = 0;
 let ballVy = 0;
 
@@ -35,7 +35,7 @@ function distance(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
-// PASS CHOICE (REAL AI)
+// PASS AI
 function choosePass(team) {
   let carrier = ball.owner;
   if (!carrier) return null;
@@ -47,7 +47,7 @@ function choosePass(team) {
     if (p === carrier) return;
 
     let d = distance(carrier, p);
-    let score = 100 - d; // prefer closer support
+    let score = 100 - d;
 
     if (score > bestScore) {
       bestScore = score;
@@ -58,7 +58,7 @@ function choosePass(team) {
   return bestTarget;
 }
 
-// PASS EXECUTION
+// PASS
 function passBall(from, to) {
   let dx = to.x - from.x;
   let dy = to.y - from.y;
@@ -71,14 +71,13 @@ function passBall(from, to) {
   ball.owner = null;
 }
 
-// UPDATE LOOP
+// UPDATE
 function update() {
   blueTactic(blueTeam, ball);
   redTactic(redTeam, ball);
 
   enforceCPA([...blueTeam, ...redTeam]);
 
-  // PASS SYSTEM
   if (ball.owner) {
     let team = ball.owner.team === "blue" ? blueTeam : redTeam;
     let target = choosePass(team);
@@ -88,7 +87,6 @@ function update() {
     }
   }
 
-  // BALL MOVEMENT (REAL PHYSICS)
   if (!ball.owner) {
     ball.x += ballVx;
     ball.y += ballVy;
@@ -97,23 +95,37 @@ function update() {
     ballVy *= 0.98;
   }
 
-  // POSSESSION REGAIN
+  // regain possession
   [...blueTeam, ...redTeam].forEach(p => {
     if (distance(p, ball) < 12) {
       ball.owner = p;
     }
   });
 
-  // GOALS
+  // goals
   if (ball.x > 880) goal("blue");
   if (ball.x < 20) goal("red");
 }
 
-// DRAW
+// 🎥 SCREEN RENDER (UPGRADED)
 function draw() {
-  ctx.clearRect(0, 0, 900, 500);
+  // pitch
+  ctx.fillStyle = "#1e7f1e";
+  ctx.fillRect(0, 0, 900, 500);
 
-  // BALL
+  // center line
+  ctx.strokeStyle = "white";
+  ctx.beginPath();
+  ctx.moveTo(450, 0);
+  ctx.lineTo(450, 500);
+  ctx.stroke();
+
+  // center circle
+  ctx.beginPath();
+  ctx.arc(450, 250, 60, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // ball
   ctx.fillStyle = "white";
   ctx.beginPath();
   ctx.arc(ball.x, ball.y, 5, 0, Math.PI * 2);
@@ -123,18 +135,26 @@ function draw() {
   drawTeam(redTeam, "red");
 }
 
-// DRAW TEAM
+// TEAM DRAW + HIGHLIGHT
 function drawTeam(team, color) {
-  ctx.fillStyle = color;
-
   team.forEach(p => {
+
+    // highlight ball carrier
+    if (ball.owner === p) {
+      ctx.strokeStyle = "yellow";
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 14, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = color;
     ctx.beginPath();
     ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
     ctx.fill();
   });
 }
 
-// GOAL SYSTEM
+// GOAL
 function goal(team) {
   if (team === "blue") blueScore++;
   if (team === "red") redScore++;
