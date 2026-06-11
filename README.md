@@ -1,3 +1,21 @@
+
+## 🌐 LIVE SYSTEM ACCESS
+
+### Operations Console
+https://123agustien.github.io/sextant-resilience-operations-console/
+
+### Scenario Simulator
+https://123agustien.github.io/sextant-resilience-operations-console/simulator.html
+
+### FX Dashboard
+https://123AGustien.github.io/sextant-fx-dashboard/
+
+### Main Repository
+https://github.com/123AGustien/sextant-resilience-operations-console
+
+### FX Repository
+https://github.com/123AGustien/sextant-fx-dashboard
+
 # 🧭 Sextant Control Room  
 ## Operational Resilience Simulation Platform  
 
