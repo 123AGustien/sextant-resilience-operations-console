@@ -1,1 +1,149 @@
+/**
+ * Sextant Intelligence v11
+ * Natural language → simulation control layer
+ * FINAL STABILIZED VERSION (FRONTEND ONLY SAFE)
+ */
 
+class SextantIntelligence {
+
+    constructor(orchestra, reasoning) {
+        this.orchestra = orchestra;
+        this.reasoning = reasoning;
+    }
+
+    /**
+     * Main AI entry point
+     */
+    ask(question) {
+
+        // -------------------------
+        // INPUT VALIDATION
+        // -------------------------
+        if (!question || typeof question !== "string") {
+            return {
+                status: "EMPTY_INPUT",
+                message: "No valid question provided"
+            };
+        }
+
+        const q = question.toLowerCase().trim();
+
+        // -------------------------
+        // ORCHESTRA SAFETY CHECK
+        // -------------------------
+        if (
+            !this.orchestra ||
+            typeof this.orchestra.runStep !== "function" ||
+            typeof this.orchestra.reset !== "function"
+        ) {
+            return {
+                status: "ORCHESTRA_INVALID",
+                message: "Orchestra layer not properly initialized"
+            };
+        }
+
+        // -------------------------
+        // SIMULATION COMMANDS
+        // -------------------------
+        if (q.includes("run") || q.includes("simulate")) {
+
+            const frame = this.orchestra.runStep("normal");
+
+            return {
+                intent: "SIMULATION_RUN",
+                frame
+            };
+        }
+
+        if (q.includes("failure")) {
+
+            const frame = this.orchestra.runStep("failure");
+
+            return {
+                intent: "FAILURE_SIMULATION",
+                frame
+            };
+        }
+
+        if (q.includes("cascade")) {
+
+            const frame = this.orchestra.runStep("cascade");
+
+            return {
+                intent: "CASCADE_SIMULATION",
+                frame
+            };
+        }
+
+        // -------------------------
+        // RESET COMMAND
+        // -------------------------
+        if (q.includes("reset")) {
+
+            this.orchestra.reset();
+
+            return {
+                intent: "RESET",
+                message: "System reset completed"
+            };
+        }
+
+        // -------------------------
+        // REASONING LAYER
+        // -------------------------
+        if (q.includes("why") || q.includes("explain")) {
+
+            if (!this.reasoning || typeof this.reasoning.explainLatest !== "function") {
+                return {
+                    status: "NO_REASONING",
+                    message: "Reasoning layer missing"
+                };
+            }
+
+            const explanation = this.reasoning.explainLatest();
+
+            return {
+                intent: "REASONING_QUERY",
+                explanation
+            };
+        }
+
+        // -------------------------
+        // STATUS QUERY (SAFE + FULLY COMPATIBLE)
+        // -------------------------
+        if (q.includes("status") || q.includes("state")) {
+
+            const latest =
+                this.orchestra.getLastReport?.() ||
+                this.orchestra.timeline?.at(-1) ||
+                null;
+
+            return {
+                intent: "STATUS_QUERY",
+                state:
+                    latest?.state ||
+                    latest?.engine?.state ||
+                    latest?.systemState ||
+                    "NO_DATA",
+                frame: latest
+            };
+        }
+
+        // -------------------------
+        // DEFAULT RESPONSE
+        // -------------------------
+        const latest =
+            this.orchestra.getLastReport?.() ||
+            this.orchestra.timeline?.at(-1) ||
+            null;
+
+        return {
+            intent: "GENERAL_QUERY",
+            message: "No mapping found. Try: run, failure, cascade, explain, reset, status",
+            latestFrame: latest
+        };
+    }
+}
+
+// expose globally (frontend only)
+window.SextantIntelligence = SextantIntelligence;
