@@ -11,14 +11,9 @@ class SextantIntelligence {
         this.reasoning = reasoning;
     }
 
-    /**
-     * Main AI entry point
-     */
     ask(question) {
 
-        // -------------------------
         // INPUT VALIDATION
-        // -------------------------
         if (!question || typeof question !== "string") {
             return {
                 status: "EMPTY_INPUT",
@@ -28,9 +23,7 @@ class SextantIntelligence {
 
         const q = question.toLowerCase().trim();
 
-        // -------------------------
-        // ORCHESTRA SAFETY CHECK (HARDENED)
-        // -------------------------
+        // ORCHESTRA SAFETY CHECK
         if (
             !this.orchestra ||
             typeof this.orchestra.runStep !== "function" ||
@@ -42,11 +35,8 @@ class SextantIntelligence {
             };
         }
 
-        // -------------------------
         // SIMULATION COMMANDS
-        // -------------------------
         if (q.includes("run") || q.includes("simulate")) {
-
             const frame = this.orchestra.runStep("normal");
 
             return {
@@ -56,7 +46,6 @@ class SextantIntelligence {
         }
 
         if (q.includes("failure")) {
-
             const frame = this.orchestra.runStep("failure");
 
             return {
@@ -66,7 +55,6 @@ class SextantIntelligence {
         }
 
         if (q.includes("cascade")) {
-
             const frame = this.orchestra.runStep("cascade");
 
             return {
@@ -75,11 +63,8 @@ class SextantIntelligence {
             };
         }
 
-        // -------------------------
-        // RESET COMMAND
-        // -------------------------
+        // RESET
         if (q.includes("reset")) {
-
             this.orchestra.reset();
 
             return {
@@ -88,9 +73,7 @@ class SextantIntelligence {
             };
         }
 
-        // -------------------------
-        // REASONING LAYER
-        // -------------------------
+        // REASONING
         if (q.includes("why") || q.includes("explain")) {
 
             if (!this.reasoning || typeof this.reasoning.explainLatest !== "function") {
@@ -108,29 +91,31 @@ class SextantIntelligence {
             };
         }
 
-        // -------------------------
-        // STATUS QUERY
-        // -------------------------
+        // STATUS QUERY (FIXED)
         if (q.includes("status") || q.includes("state")) {
 
-            const latest = this.orchestra.getLatest?.();
+            const latest =
+                this.orchestra.getLastReport?.() ||
+                this.orchestra.timeline?.at(-1) ||
+                null;
 
             return {
                 intent: "STATUS_QUERY",
-                state: latest?.state || "NO_DATA",
-                frame: latest || null
+                state: latest?.state || latest?.systemState || "NO_DATA",
+                frame: latest
             };
         }
 
-        // -------------------------
-        // DEFAULT RESPONSE
-        // -------------------------
-        const latest = this.orchestra.getLatest?.();
+        // DEFAULT
+        const latest =
+            this.orchestra.getLastReport?.() ||
+            this.orchestra.timeline?.at(-1) ||
+            null;
 
         return {
             intent: "GENERAL_QUERY",
             message: "No mapping found. Try: run, failure, cascade, explain, reset, status",
-            latestFrame: latest || null
+            latestFrame: latest
         };
     }
 }
