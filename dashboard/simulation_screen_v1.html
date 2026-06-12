@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sextant Simulation Screen v1</title>
+<title>Sextant Simulation Screen v2</title>
 
 <style>
 body {
@@ -58,7 +58,7 @@ canvas {
 
 <body>
 
-<h2>SEXTANT SIMULATION SCREEN v1</h2>
+<h2>SEXTANT SIMULATION SCREEN v2</h2>
 
 <div id="status">BOOTING</div>
 
@@ -78,6 +78,21 @@ canvas {
 
 <h3>Output</h3>
 <pre id="output">Waiting...</pre>
+
+<h3>🧭 Risk Dashboard</h3>
+
+<div id="riskLevel" style="font-size:20px; margin:10px;">
+Risk: --
+</div>
+
+<h4>Metrics</h4>
+<pre id="metrics">--</pre>
+
+<h4>Insights</h4>
+<pre id="insights">--</pre>
+
+<h4>Recommendations</h4>
+<pre id="recommendations">--</pre>
 
 <h3>FX Risk Graph</h3>
 <canvas id="graph" width="800" height="200"></canvas>
@@ -132,8 +147,6 @@ function setNode(id, v) {
 
 function run(type) {
 
-    if (!window.runRP04) return;
-
     const result = window.runRP04(type);
 
     window.logs.push(result);
@@ -151,6 +164,8 @@ function run(type) {
     setNode("conf", result.system.conf);
 
     drawGraph();
+
+    updateDashboard(result);
 }
 
 function drawGraph() {
@@ -182,7 +197,70 @@ function resetSim() {
     document.getElementById("output").innerText = "RESET";
     document.getElementById("status").innerText = "RESET";
 
+    document.getElementById("riskLevel").innerText = "Risk: --";
+    document.getElementById("metrics").innerText = "--";
+    document.getElementById("insights").innerText = "--";
+    document.getElementById("recommendations").innerText = "--";
+
     drawGraph();
+}
+
+/* =========================
+   🧭 DASHBOARD ENGINE
+========================= */
+
+function updateDashboard(result) {
+
+    const conf = result.system.conf;
+
+    let risk =
+        conf > 0.8 ? "🟢 STABLE" :
+        conf > 0.6 ? "🟡 CONTROLLED STRESS" :
+        conf > 0.4 ? "🟠 ELEVATED RISK" :
+                     "🔴 SYSTEMIC INSTABILITY";
+
+    document.getElementById("riskLevel").innerText = "Risk: " + risk;
+
+    document.getElementById("metrics").innerText =
+        `FX: ${result.system.fx.toFixed(2)}\n` +
+        `BANK: ${result.system.bank.toFixed(2)}\n` +
+        `LIQ: ${result.system.liq.toFixed(2)}\n` +
+        `EQ: ${result.system.eq.toFixed(2)}\n` +
+        `CONF: ${result.system.conf.toFixed(2)}`;
+
+    let insights = [];
+
+    if (result.system.liq < 0.5) {
+        insights.push("Liquidity stress propagating through system layers.");
+    }
+
+    if (result.system.bank < 0.5) {
+        insights.push("Bank subsystem showing instability signals.");
+    }
+
+    if (result.system.fx > 0.8) {
+        insights.push("FX volatility contributing to cascade amplification.");
+    }
+
+    document.getElementById("insights").innerText =
+        insights.length ? insights.join("\n") : "No critical insights detected.";
+
+    let recs = [];
+
+    if (result.system.liq < 0.5) {
+        recs.push("Increase liquidity buffers.");
+    }
+
+    if (result.system.conf < 0.6) {
+        recs.push("Activate circuit breaker logic.");
+    }
+
+    if (result.system.bank < 0.5) {
+        recs.push("Strengthen banking subsystem redundancy.");
+    }
+
+    document.getElementById("recommendations").innerText =
+        recs.length ? recs.join("\n") : "System operating within safe parameters.";
 }
 </script>
 
