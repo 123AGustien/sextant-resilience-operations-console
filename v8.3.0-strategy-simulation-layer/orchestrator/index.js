@@ -6,8 +6,9 @@ import { SP04ResilienceAssessment } from "../SP-04-resilience-assessment/index.j
 import { SP05InstitutionalReview } from "../SP-05-institutional-review/index.js";
 
 /**
- * SP-ORCHESTRATOR
- * Institutional pipeline controller for Sextant System
+ * SP-ORCHESTRATOR v2
+ * Institutional-grade deterministic execution engine
+ * Adds: modes, structured output, audit contract
  */
 
 export class SextantOrchestrator {
@@ -25,68 +26,110 @@ export class SextantOrchestrator {
     }
 
     /**
-     * MAIN PIPELINE EXECUTION
+     * PUBLIC ENTRY POINT
+     * mode: live | batch | replay
      */
-    run(input) {
+    run(input, mode = "live") {
 
-        // -------------------
-        // SP-00: Parse input
-        // -------------------
-        const parsed = this.sp00.parse(input);
+        const trace = this._executePipeline(input);
 
-        // -------------------
-        // SP-01: Strategy build
-        // -------------------
-        const strategy = this.sp01.build(parsed);
+        const packaged = this._package(trace, mode);
 
-        // -------------------
-        // SP-02: Execution
-        // -------------------
-        const execution = this.sp02.run(strategy);
+        // only store real runs, not replay duplication
+        if (mode !== "replay") {
+            this.execution_log.push(packaged);
+        }
 
-        // -------------------
-        // SP-03: Stress replay
-        // -------------------
-        const stress = this.sp03.run(execution);
-
-        // -------------------
-        // SP-04: Risk assessment
-        // -------------------
-        const risk = this.sp04.assess(execution, stress);
-
-        // -------------------
-        // SP-05: Final decision
-        // -------------------
-        const decision = this.sp05.review(risk);
-
-        // -------------------
-        // FULL TRACE RECORD
-        // -------------------
-        const trace = {
-            timestamp: Date.now(),
-
-            sp00: parsed,
-            sp01: strategy,
-            sp02: execution,
-            sp03: stress,
-            sp04: risk,
-            sp05: decision
-        };
-
-        this.execution_log.push(trace);
-
-        return trace;
+        return packaged;
     }
 
     /**
-     * GET FULL HISTORY
+     * CORE PIPELINE (SP-00 → SP-05)
+     */
+    _executePipeline(input) {
+
+        // SP-00: Input parsing
+        const sp00 = this.sp00.parse(input);
+
+        // SP-01: Strategy definition
+        const sp01 = this.sp01.build(sp00);
+
+        // SP-02: Scenario execution
+        const sp02 = this.sp02.run(sp01);
+
+        // SP-03: Stress replay simulation
+        const sp03 = this.sp03.run(sp02);
+
+        // SP-04: Risk assessment engine
+        const sp04 = this.sp04.assess(sp02, sp03);
+
+        // SP-05: Institutional decision layer
+        const sp05 = this.sp05.review(sp04);
+
+        return { sp00, sp01, sp02, sp03, sp04, sp05 };
+    }
+
+    /**
+     * INSTITUTIONAL OUTPUT CONTRACT
+     * Dashboard + reporting + API safe format
+     */
+    _package(trace, mode) {
+
+        return {
+            meta: {
+                system: "Sextant Orchestrator v2",
+                mode: mode,
+                timestamp: Date.now(),
+                pipeline_version: "SP-v8.3.0"
+            },
+
+            pipeline: trace,
+
+            summary: {
+                risk_score: trace.sp04.risk_score ?? null,
+                risk_grade: trace.sp04.risk_grade ?? null,
+                system_health: trace.sp04.system_health ?? null,
+                decision: trace.sp05.decision_status ?? null,
+                confidence: trace.sp05.confidence ?? null
+            },
+
+            audit: {
+                sp_count: 6,
+                deterministic: true,
+                replayable: true
+            }
+        };
+    }
+
+    /**
+     * HISTORY (AUDIT TRAIL)
      */
     getHistory() {
         return this.execution_log;
     }
 
     /**
-     * RESET PIPELINE STATE
+     * REPLAY MODE (deterministic rerun)
+     */
+    replay(index) {
+
+        const record = this.execution_log[index];
+
+        if (!record) {
+            return {
+                error: "REPLAY_NOT_FOUND",
+                index
+            };
+        }
+
+        return this.run(
+            record.pipeline.sp00.strategy_request,
+            "replay"
+        );
+    }
+
+    /**
+     * RESET SYSTEM STATE
      */
     reset() {
         this.execution_log = [];
