@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sextant Control Room v2 (Fixed Online Mode)</title>
+<title>Sextant Bank Control Room v3 (S1–S5)</title>
 
 <style>
 body {
@@ -58,13 +58,13 @@ canvas {
 
 <body>
 
-<h2>SEXTANT CONTROL ROOM v2 (ONLINE FIXED MODE)</h2>
+<h2>SEXTANT BANK CONTROL ROOM v3 (S1–S5 LIVE)</h2>
 
-<div id="status">ONLINE</div>
+<div id="status">ONLINE • READY</div>
 
 <button onclick="run('normal')">Normal</button>
-<button onclick="run('failure')">Failure</button>
-<button onclick="run('cascade')">Cascade</button>
+<button onclick="run('failure')">Stress</button>
+<button onclick="run('cascade')">Crisis</button>
 <button onclick="resetSim()">Reset</button>
 
 <h3>System Nodes</h3>
@@ -77,37 +77,36 @@ canvas {
 <div class="node" id="conf">CONF</div>
 
 <h3>Output</h3>
-<pre id="output">System initialised (frontend simulation mode)</pre>
+<pre id="output">System initialised (S1–S5 banking simulation mode)</pre>
 
 <h3>FX Risk Graph</h3>
 <canvas id="graph" width="800" height="200"></canvas>
 
 <script>
 
-window.SYSTEM_ONLINE = true;
 window.logs = [];
 
-/**
- * FIX: removed backend dependency entirely
- * replaces broken fetch("/api") design
- */
-function simulateEvidenceFeed() {
-    return {
-        timestamp: new Date().toISOString(),
-        feed: "SIMULATED_EVIDENCE_STREAM_ACTIVE",
-        integrity: 1.0
-    };
+/* =========================
+   S1–S5 BANK GRADING ENGINE
+   ========================= */
+function getRiskGrade(stability) {
+
+    if (stability > 0.85) return "S1 • STRONG";
+    if (stability > 0.70) return "S2 • STABLE";
+    if (stability > 0.55) return "S3 • WATCH";
+    if (stability > 0.40) return "S4 • STRESS";
+    return "S5 • CRITICAL";
 }
 
-/**
- * Core deterministic simulation
- */
+/* =========================
+   SIMULATION ENGINE (RP-04)
+   ========================= */
 function runRP04(type) {
 
     const rp04 = {
         stability:
             type === "cascade" ? 0.25 :
-            type === "failure" ? 0.55 : 0.82,
+            type === "failure" ? 0.55 : 0.88,
 
         pressure:
             type === "cascade" ? 0.95 :
@@ -120,10 +119,7 @@ function runRP04(type) {
     const eq = liq * 0.91;
     const conf = eq * 0.94;
 
-    const state =
-        rp04.stability > 0.7 ? "STABLE" :
-        rp04.stability > 0.4 ? "RISK" :
-        "CASCADE";
+    const state = getRiskGrade(rp04.stability);
 
     return {
         rp04,
@@ -132,19 +128,18 @@ function runRP04(type) {
     };
 }
 
+/* =========================
+   SIM RUN
+   ========================= */
 function run(type) {
-
-    // FIX: always inject simulated evidence instead of API call
-    const evidence = simulateEvidenceFeed();
 
     const result = runRP04(type);
 
-    // FIX: ONLINE state never depends on API
     document.getElementById("status").innerText =
         "ONLINE • " + result.state;
 
     document.getElementById("output").innerText =
-        JSON.stringify({ result, evidence }, null, 2);
+        JSON.stringify(result, null, 2);
 
     window.logs.push(result);
 
@@ -158,6 +153,9 @@ function run(type) {
     drawGraph();
 }
 
+/* =========================
+   NODE DISPLAY
+   ========================= */
 function setNode(id, v) {
 
     const el = document.getElementById(id);
@@ -172,6 +170,9 @@ function setNode(id, v) {
     el.innerText = id.toUpperCase() + ": " + v.toFixed(2);
 }
 
+/* =========================
+   GRAPH
+   ========================= */
 function drawGraph() {
 
     const canvas = document.getElementById("graph");
@@ -196,24 +197,29 @@ function drawGraph() {
     ctx.stroke();
 }
 
+/* =========================
+   RESET
+   ========================= */
 function resetSim() {
 
     window.logs = [];
 
-    document.getElementById("status").innerText = "ONLINE • RESET";
-    document.getElementById("output").innerText = "RESET COMPLETE (NO BACKEND REQUIRED)";
+    document.getElementById("status").innerText =
+        "ONLINE • RESET";
+
+    document.getElementById("output").innerText =
+        "RESET COMPLETE (S1–S5 ENGINE READY)";
 
     drawGraph();
 }
 
-/**
- * AUTO BOOT FIX
- */
+/* =========================
+   AUTO BOOT
+   ========================= */
 (function boot() {
 
-    window.SYSTEM_ONLINE = true;
-
-    document.getElementById("status").innerText = "ONLINE • READY";
+    document.getElementById("status").innerText =
+        "ONLINE • S1–S5 SYSTEM READY";
 
     drawGraph();
 
