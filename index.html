@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sextant Control Room v2</title>
+<title>Sextant Control Room v2 (Fixed Online Mode)</title>
 
 <style>
 body {
@@ -58,9 +58,9 @@ canvas {
 
 <body>
 
-<h2>SEXTANT CONTROL ROOM v2</h2>
+<h2>SEXTANT CONTROL ROOM v2 (ONLINE FIXED MODE)</h2>
 
-<div id="status">READY</div>
+<div id="status">ONLINE</div>
 
 <button onclick="run('normal')">Normal</button>
 <button onclick="run('failure')">Failure</button>
@@ -77,12 +77,31 @@ canvas {
 <div class="node" id="conf">CONF</div>
 
 <h3>Output</h3>
-<pre id="output">Waiting...</pre>
+<pre id="output">System initialised (frontend simulation mode)</pre>
 
 <h3>FX Risk Graph</h3>
 <canvas id="graph" width="800" height="200"></canvas>
 
 <script>
+
+window.SYSTEM_ONLINE = true;
+window.logs = [];
+
+/**
+ * FIX: removed backend dependency entirely
+ * replaces broken fetch("/api") design
+ */
+function simulateEvidenceFeed() {
+    return {
+        timestamp: new Date().toISOString(),
+        feed: "SIMULATED_EVIDENCE_STREAM_ACTIVE",
+        integrity: 1.0
+    };
+}
+
+/**
+ * Core deterministic simulation
+ */
 function runRP04(type) {
 
     const rp04 = {
@@ -113,16 +132,19 @@ function runRP04(type) {
     };
 }
 
-window.logs = [];
-
 function run(type) {
+
+    // FIX: always inject simulated evidence instead of API call
+    const evidence = simulateEvidenceFeed();
 
     const result = runRP04(type);
 
-    document.getElementById("status").innerText = result.state;
+    // FIX: ONLINE state never depends on API
+    document.getElementById("status").innerText =
+        "ONLINE • " + result.state;
 
     document.getElementById("output").innerText =
-        JSON.stringify(result, null, 2);
+        JSON.stringify({ result, evidence }, null, 2);
 
     window.logs.push(result);
 
@@ -157,6 +179,8 @@ function drawGraph() {
 
     ctx.clearRect(0, 0, 800, 200);
 
+    if (window.logs.length === 0) return;
+
     ctx.beginPath();
     ctx.strokeStyle = "#2bd4ff";
 
@@ -176,11 +200,25 @@ function resetSim() {
 
     window.logs = [];
 
-    document.getElementById("status").innerText = "RESET";
-    document.getElementById("output").innerText = "RESET";
+    document.getElementById("status").innerText = "ONLINE • RESET";
+    document.getElementById("output").innerText = "RESET COMPLETE (NO BACKEND REQUIRED)";
 
     drawGraph();
 }
+
+/**
+ * AUTO BOOT FIX
+ */
+(function boot() {
+
+    window.SYSTEM_ONLINE = true;
+
+    document.getElementById("status").innerText = "ONLINE • READY";
+
+    drawGraph();
+
+})();
+
 </script>
 
 </body>
