@@ -1,7 +1,7 @@
 /**
  * Sextant Intelligence v11
  * Natural language → simulation control layer
- * FINAL STABILIZED VERSION
+ * FINAL STABILIZED VERSION (FRONTEND ONLY SAFE)
  */
 
 class SextantIntelligence {
@@ -11,9 +11,14 @@ class SextantIntelligence {
         this.reasoning = reasoning;
     }
 
+    /**
+     * Main AI entry point
+     */
     ask(question) {
 
+        // -------------------------
         // INPUT VALIDATION
+        // -------------------------
         if (!question || typeof question !== "string") {
             return {
                 status: "EMPTY_INPUT",
@@ -23,7 +28,9 @@ class SextantIntelligence {
 
         const q = question.toLowerCase().trim();
 
+        // -------------------------
         // ORCHESTRA SAFETY CHECK
+        // -------------------------
         if (
             !this.orchestra ||
             typeof this.orchestra.runStep !== "function" ||
@@ -35,8 +42,11 @@ class SextantIntelligence {
             };
         }
 
+        // -------------------------
         // SIMULATION COMMANDS
+        // -------------------------
         if (q.includes("run") || q.includes("simulate")) {
+
             const frame = this.orchestra.runStep("normal");
 
             return {
@@ -46,6 +56,7 @@ class SextantIntelligence {
         }
 
         if (q.includes("failure")) {
+
             const frame = this.orchestra.runStep("failure");
 
             return {
@@ -55,6 +66,7 @@ class SextantIntelligence {
         }
 
         if (q.includes("cascade")) {
+
             const frame = this.orchestra.runStep("cascade");
 
             return {
@@ -63,8 +75,11 @@ class SextantIntelligence {
             };
         }
 
-        // RESET
+        // -------------------------
+        // RESET COMMAND
+        // -------------------------
         if (q.includes("reset")) {
+
             this.orchestra.reset();
 
             return {
@@ -73,7 +88,9 @@ class SextantIntelligence {
             };
         }
 
-        // REASONING
+        // -------------------------
+        // REASONING LAYER
+        // -------------------------
         if (q.includes("why") || q.includes("explain")) {
 
             if (!this.reasoning || typeof this.reasoning.explainLatest !== "function") {
@@ -91,7 +108,9 @@ class SextantIntelligence {
             };
         }
 
-        // STATUS QUERY (FIXED)
+        // -------------------------
+        // STATUS QUERY (SAFE + FULLY COMPATIBLE)
+        // -------------------------
         if (q.includes("status") || q.includes("state")) {
 
             const latest =
@@ -101,12 +120,18 @@ class SextantIntelligence {
 
             return {
                 intent: "STATUS_QUERY",
-                state: latest?.state || latest?.systemState || "NO_DATA",
+                state:
+                    latest?.state ||
+                    latest?.engine?.state ||
+                    latest?.systemState ||
+                    "NO_DATA",
                 frame: latest
             };
         }
 
-        // DEFAULT
+        // -------------------------
+        // DEFAULT RESPONSE
+        // -------------------------
         const latest =
             this.orchestra.getLastReport?.() ||
             this.orchestra.timeline?.at(-1) ||
@@ -120,5 +145,5 @@ class SextantIntelligence {
     }
 }
 
-// expose globally
+// expose globally (frontend only)
 window.SextantIntelligence = SextantIntelligence;
