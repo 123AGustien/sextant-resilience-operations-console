@@ -1,4 +1,4 @@
-<!-- redeploy trigger -->
+OFger -->
 ## 🌐 LIVE SYSTEM ACCESS
 
 ### Operations Console
@@ -170,3 +170,96 @@ All outputs are synthetic and for evaluation purposes only.
 ---
 
 # END OF README
+
+Got it — I’ll convert it into a cleaner institutional / system architecture format so it reads like a proper control system spec instead of a casual repo note.
+Here’s your rewritten README:
+📘 Sextant Resilience Operations Console
+Institutional System Architecture Document (v2 – S1–S5 Engine)
+1. 🧭 System Overview
+The Sextant Resilience Control Room is a frontend-based financial resilience simulation system designed to model stress propagation across a simplified banking chain.
+It operates as a deterministic risk engine using an S1–S5 classification framework to simulate system stability under varying stress conditions.
+2. 🌐 Live Deployment
+Production UI (GitHub Pages)
+https://123agustien.github.io/sextant-resilience-operations-console/⁠�
+This is the authoritative runtime environment for the system.
+Characteristics:
+Frontend-only execution
+No backend dependency
+Real-time simulation rendering
+Deterministic risk engine (S1–S5)
+3. 🏗 System Architecture
+3.1 Frontend Layer (Control Room UI)
+Responsible for:
+System state visualization
+Risk scoring display
+Action classification
+Simulation execution
+Node-level FX / liquidity propagation display
+3.2 Simulation Engine (Core Logic)
+Implements a simplified financial stress model:
+RP-04 stress vector
+FX pressure propagation
+Banking liquidity chain
+Equity compression model
+Confidence decay function
+3.3 Risk Classification Layer (S1–S5)
+Grade
+Meaning
+S1
+Strong
+S2
+Stable
+S3
+Watch
+S4
+Stress
+S5
+Critical
+This layer determines system-wide state output.
+4. ⚠ Backend Dependency (Legacy / Deprecated)
+Previous versions attempted to connect to:
+
+http://127.0.0.1:8000/evaluate
+http://127.0.0.1:8000/evidence
+Status:
+❌ Not deployed in production
+❌ Not required for current system
+❌ Causes OFFLINE / FETCH failure states
+5. 🔄 Design Decision
+The system has been refactored into a:
+Frontend-only deterministic simulation architecture
+Key Benefits:
+Zero infrastructure dependency
+Stable GitHub Pages deployment
+No API failure risk
+Fully reproducible simulation output
+6. 📊 System Output Model
+Each simulation produces:
+System State (S1–S5)
+Risk Score (0.0 – 1.0)
+Action Signal (NO_ACTION / MONITOR / REDUCE EXPOSURE)
+FX → Bank → Liquidity propagation chain
+Time-series risk graph
+7. 🧠 Intended Use
+This system is designed for:
+Financial resilience modeling
+Stress testing simulation logic
+Systemic risk visualization
+Prototype banking architecture experimentation
+8. 🚀 Future Expansion Path
+Planned upgrades:
+Basel III capital buffer modeling
+Multi-bank contagion simulation
+Liquidity shock propagation network
+Macro FX stress coupling layer
+Scenario-based AI reasoning layer
+9. 🧭 System Status
+Current State: OPERATIONAL (Frontend Simulation Mode)
+Backend State: DEPRECATED
+Deployment: STABLE (GitHub Pages)
+If you want next upgrade, I can also convert this into:
+�⁠📄 PDF institutional report (MAS / bank style)
+�⁠🏦 “Tier-1 risk framework document”
+�⁠📊 architecture diagram + flowchart version
+or �⁠GitHub README with badges + visuals
+Just tell me 👍
