@@ -60,7 +60,7 @@ canvas {
 
 <h2>SEXTANT CONTROL ROOM v2</h2>
 
-<div id="status">BOOTING</div>
+<div id="status">READY</div>
 
 <button onclick="run('normal')">Normal</button>
 <button onclick="run('failure')">Failure</button>
@@ -83,11 +83,6 @@ canvas {
 <canvas id="graph" width="800" height="200"></canvas>
 
 <script>
-/**
- * =========================
- * RP-04 ENGINE (LOCAL ONLY)
- * =========================
- */
 function runRP04(type) {
 
     const rp04 = {
@@ -118,18 +113,8 @@ function runRP04(type) {
     };
 }
 
-/**
- * =========================
- * GLOBAL STATE
- * =========================
- */
 window.logs = [];
 
-/**
- * =========================
- * MAIN RUN FUNCTION
- * =========================
- */
 function run(type) {
 
     const result = runRP04(type);
@@ -151,11 +136,6 @@ function run(type) {
     drawGraph();
 }
 
-/**
- * =========================
- * NODE UPDATER
- * =========================
- */
 function setNode(id, v) {
 
     const el = document.getElementById(id);
@@ -170,11 +150,6 @@ function setNode(id, v) {
     el.innerText = id.toUpperCase() + ": " + v.toFixed(2);
 }
 
-/**
- * =========================
- * GRAPH
- * =========================
- */
 function drawGraph() {
 
     const canvas = document.getElementById("graph");
@@ -197,17 +172,12 @@ function drawGraph() {
     ctx.stroke();
 }
 
-/**
- * =========================
- * RESET
- * =========================
- */
 function resetSim() {
 
     window.logs = [];
 
-    document.getElementById("output").innerText = "RESET";
     document.getElementById("status").innerText = "RESET";
+    document.getElementById("output").innerText = "RESET";
 
     drawGraph();
 }
