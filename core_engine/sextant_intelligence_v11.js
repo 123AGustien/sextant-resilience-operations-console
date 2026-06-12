@@ -1,7 +1,7 @@
 /**
  * Sextant Intelligence v11
  * Natural language → simulation control layer
- * FINAL STABILIZED VERSION (FRONTEND ONLY SAFE)
+ * FINAL STABILIZED VERSION (FRONTEND ONLY SAFE + BANK UPGRADE S1–S5)
  */
 
 class SextantIntelligence {
@@ -9,6 +9,18 @@ class SextantIntelligence {
     constructor(orchestra, reasoning) {
         this.orchestra = orchestra;
         this.reasoning = reasoning;
+    }
+
+    /**
+     * 🏦 BANK RISK CLASSIFIER (S1–S5)
+     */
+    getRiskClass(stability) {
+
+        if (stability > 0.80) return "S1";
+        if (stability > 0.65) return "S2";
+        if (stability > 0.50) return "S3";
+        if (stability > 0.35) return "S4";
+        return "S5";
     }
 
     /**
@@ -51,7 +63,8 @@ class SextantIntelligence {
 
             return {
                 intent: "SIMULATION_RUN",
-                frame
+                frame,
+                riskClass: this.getRiskClass(frame?.stability || 0.8)
             };
         }
 
@@ -61,7 +74,8 @@ class SextantIntelligence {
 
             return {
                 intent: "FAILURE_SIMULATION",
-                frame
+                frame,
+                riskClass: this.getRiskClass(frame?.stability || 0.55)
             };
         }
 
@@ -71,7 +85,8 @@ class SextantIntelligence {
 
             return {
                 intent: "CASCADE_SIMULATION",
-                frame
+                frame,
+                riskClass: this.getRiskClass(frame?.stability || 0.25)
             };
         }
 
@@ -84,7 +99,8 @@ class SextantIntelligence {
 
             return {
                 intent: "RESET",
-                message: "System reset completed"
+                message: "System reset completed",
+                riskClass: "S1"
             };
         }
 
@@ -96,7 +112,8 @@ class SextantIntelligence {
             if (!this.reasoning || typeof this.reasoning.explainLatest !== "function") {
                 return {
                     status: "NO_REASONING",
-                    message: "Reasoning layer missing"
+                    message: "Reasoning layer missing",
+                    riskClass: "S3"
                 };
             }
 
@@ -104,12 +121,13 @@ class SextantIntelligence {
 
             return {
                 intent: "REASONING_QUERY",
-                explanation
+                explanation,
+                riskClass: "S3"
             };
         }
 
         // -------------------------
-        // STATUS QUERY (SAFE + FULLY COMPATIBLE)
+        // STATUS QUERY (SAFE + FULL BANK VIEW)
         // -------------------------
         if (q.includes("status") || q.includes("state")) {
 
@@ -118,6 +136,12 @@ class SextantIntelligence {
                 this.orchestra.timeline?.at(-1) ||
                 null;
 
+            const stability =
+                latest?.stability ||
+                latest?.engine?.stability ||
+                latest?.systemStability ||
+                0.75;
+
             return {
                 intent: "STATUS_QUERY",
                 state:
@@ -125,6 +149,9 @@ class SextantIntelligence {
                     latest?.engine?.state ||
                     latest?.systemState ||
                     "NO_DATA",
+
+                riskClass: this.getRiskClass(stability),
+
                 frame: latest
             };
         }
@@ -140,6 +167,7 @@ class SextantIntelligence {
         return {
             intent: "GENERAL_QUERY",
             message: "No mapping found. Try: run, failure, cascade, explain, reset, status",
+            riskClass: "S3",
             latestFrame: latest
         };
     }
