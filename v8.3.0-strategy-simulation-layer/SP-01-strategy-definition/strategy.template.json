@@ -1,25 +1,30 @@
 {
-  "strategy_name": "",
-  "asset_class": "FX",
-  "market": {
-    "base_currency": "SGD",
-    "quote_currency": "IDR"
+  "strategy_id": "AUTO_GENERATED",
+
+  "scenario_type": "",
+  "stress_level": "",
+  "intent": "",
+
+  "risk_profile": "",
+
+  "exposure_model": {
+    "market_exposure": 0,
+    "liquidity_exposure": 0,
+    "volatility_exposure": 0,
+    "systemic_exposure": 0
   },
-  "direction": "LONG | SHORT | NEUTRAL",
-  "entry_conditions": [
-    ""
-  ],
-  "exit_conditions": [
-    ""
-  ],
-  "risk_parameters": {
-    "max_drawdown": 0,
-    "position_size": 0,
-    "leverage": 1
+
+  "execution_mode": "",
+
+  "constraints": {
+    "max_drawdown": 0.3,
+    "liquidity_buffer": 0.2,
+    "confidence_threshold": 0.6
   },
-  "simulation_tags": [
-    "SP-02",
-    "SP-03",
-    "SP-04"
-  ]
+
+  "metadata": {
+    "created_by": "SP-01",
+    "version": "8.3.0",
+    "classification": "synthetic_simulation_only"
+  }
 }
