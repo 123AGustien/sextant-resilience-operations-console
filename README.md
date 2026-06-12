@@ -1,4 +1,13 @@
+## 🌐 Live System Screens
 
+### 🟢 Control Room (Main Dashboard)
+https://123agustien.github.io/sextant-resilience-operations-console/
+
+### 🟢 Scenario Simulator (S1–S5 Engine)
+https://123agustien.github.io/sextant-resilience-operations-console/simulator.html
+
+### 🟢 FX / Extended Dashboard
+https://123AGustien.github.io/sextant-fx-dashboard/
 ## 🌐 LIVE SYSTEM ACCESS
 
 ### Operations Console
