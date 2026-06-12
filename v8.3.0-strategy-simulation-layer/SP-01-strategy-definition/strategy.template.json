@@ -1,11 +1,13 @@
 {
-  "strategy_id": "AUTO_GENERATED",
+  "strategy_id": "",
 
   "scenario_type": "",
   "stress_level": "",
   "intent": "",
 
   "risk_profile": "",
+
+  "execution_mode": "",
 
   "exposure_model": {
     "market_exposure": 0,
@@ -14,16 +16,25 @@
     "systemic_exposure": 0
   },
 
-  "execution_mode": "",
-
   "constraints": {
     "max_drawdown": 0.3,
     "liquidity_buffer": 0.2,
     "confidence_threshold": 0.6
   },
 
+  "routing": {
+    "next_stage": "SP-02",
+    "pipeline": [
+      "SP-01",
+      "SP-02",
+      "SP-03",
+      "SP-04",
+      "SP-05"
+    ]
+  },
+
   "metadata": {
-    "created_by": "SP-01",
+    "layer": "SP-01",
     "version": "8.3.0",
     "classification": "synthetic_simulation_only"
   }
