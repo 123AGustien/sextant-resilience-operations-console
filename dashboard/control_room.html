@@ -1,153 +1,217 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sextant Control Room v8.1 Stable</title>
+<meta charset="UTF-8">
+<title>Sextant Control Room v2</title>
 
-    <style>
-        body {
-            font-family: Arial;
-            background: #05070d;
-            color: #d7f7ff;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-        }
+<style>
+body {
+    background:#05070d;
+    color:#2bd4ff;
+    font-family:Arial;
+    text-align:center;
+}
 
-        h2 {
-            margin-bottom: 10px;
-        }
+#status {
+    font-size:22px;
+    margin:10px;
+}
 
-        #status {
-            font-size: 22px;
-            margin: 10px;
-        }
+.node {
+    display:inline-block;
+    padding:10px;
+    margin:5px;
+    min-width:120px;
+    border:1px solid #2bd4ff;
+}
 
-        .GREEN { color: #2bd4ff; }
-        .AMBER { color: orange; }
-        .RED { color: red; }
-        .CRITICAL { color: red; font-weight: bold; }
+.green { color:lime; border-color:lime; }
+.amber { color:orange; border-color:orange; }
+.red { color:red; border-color:red; }
+.critical { color:magenta; border-color:magenta; }
 
-        /* SCREEN MODEL LAYER */
-        #output {
-            text-align: left;
-            max-width: 900px;
-            margin: auto;
-            background: #0b0f14;
-            padding: 12px;
-            border: 1px solid #2bd4ff;
-            min-height: 140px;
-            white-space: pre-wrap;
-        }
+button {
+    margin:5px;
+    padding:10px;
+    background:black;
+    color:#2bd4ff;
+    border:1px solid #2bd4ff;
+    cursor:pointer;
+}
 
-        /* GRAPH PANEL */
-        .panel {
-            margin-top: 20px;
-        }
+pre {
+    text-align:left;
+    max-width:900px;
+    margin:auto;
+    background:#0b0f14;
+    padding:10px;
+    border:1px solid #2bd4ff;
+}
 
-        button {
-            margin: 5px;
-            padding: 10px 14px;
-            background: #0b0f14;
-            color: #d7f7ff;
-            border: 1px solid #2bd4ff;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #111826;
-        }
-    </style>
+canvas {
+    background:#0a0f14;
+    margin-top:10px;
+    border:1px solid #2bd4ff;
+}
+</style>
 </head>
 
 <body>
 
-<h2>Control Room</h2>
+<h2>SEXTANT CONTROL ROOM v2</h2>
 
-<div id="status">READY</div>
+<div id="status">BOOTING</div>
 
-<!-- SCREEN MODEL (CRITICAL LAYER) -->
-<pre id="output">Waiting for simulation...</pre>
+<button onclick="run('normal')">Normal</button>
+<button onclick="run('failure')">Failure</button>
+<button onclick="run('cascade')">Cascade</button>
+<button onclick="resetSim()">Reset</button>
 
-<!-- GRAPH VIEW -->
-<div class="panel">
-    <h3>Risk Graph</h3>
-    <div id="riskGraph"></div>
-</div>
+<h3>System Nodes</h3>
 
-<!-- ENGINE -->
-<script src="../core_engine/simulation_engine.js"></script>
-<script src="../assets/risk_graph.js"></script>
+<div class="node" id="rp04">RP-04</div>
+<div class="node" id="fx">FX</div>
+<div class="node" id="bank">BANK</div>
+<div class="node" id="liq">LIQ</div>
+<div class="node" id="eq">EQ</div>
+<div class="node" id="conf">CONF</div>
+
+<h3>Output</h3>
+<pre id="output">Waiting...</pre>
+
+<h3>FX Risk Graph</h3>
+<canvas id="graph" width="800" height="200"></canvas>
 
 <script>
-let autoLoop = null;
+/**
+ * =========================
+ * RP-04 ENGINE (LOCAL ONLY)
+ * =========================
+ */
+function runRP04(type) {
 
-/* =========================
-   GRAPH BOOT (v8.1 SAFE)
-========================= */
-function bootGraph() {
-    if (window.RiskGraph) {
-        window.RiskGraph.push({ impact: 0 });
-        return;
-    }
-    setTimeout(bootGraph, 200);
+    const rp04 = {
+        stability:
+            type === "cascade" ? 0.25 :
+            type === "failure" ? 0.55 : 0.82,
+
+        pressure:
+            type === "cascade" ? 0.95 :
+            type === "failure" ? 0.60 : 0.28
+    };
+
+    const fx = rp04.pressure;
+    const bank = fx * 0.83;
+    const liq = bank * 0.88;
+    const eq = liq * 0.91;
+    const conf = eq * 0.94;
+
+    const state =
+        rp04.stability > 0.7 ? "STABLE" :
+        rp04.stability > 0.4 ? "RISK" :
+        "CASCADE";
+
+    return {
+        rp04,
+        system: { fx, bank, liq, eq, conf },
+        state
+    };
 }
 
-window.addEventListener("load", bootGraph);
+/**
+ * =========================
+ * GLOBAL STATE
+ * =========================
+ */
+window.logs = [];
 
-/* =========================
-   RUN SIMULATION
-========================= */
+/**
+ * =========================
+ * MAIN RUN FUNCTION
+ * =========================
+ */
 function run(type) {
 
-    const status = document.getElementById("status");
-    const output = document.getElementById("output");
+    const result = runRP04(type);
 
-    if (!window.runSimulation) {
-        output.innerText = "ENGINE NOT LOADED";
-        return;
-    }
+    document.getElementById("status").innerText = result.state;
 
-    const result = runSimulation({
-        name: type,
-        stress:
-            type === "cascade" ? 0.9 :
-            type === "failure" ? 0.6 : 0
+    document.getElementById("output").innerText =
+        JSON.stringify(result, null, 2);
+
+    window.logs.push(result);
+
+    setNode("rp04", result.rp04.stability);
+    setNode("fx", result.system.fx);
+    setNode("bank", result.system.bank);
+    setNode("liq", result.system.liq);
+    setNode("eq", result.system.eq);
+    setNode("conf", result.system.conf);
+
+    drawGraph();
+}
+
+/**
+ * =========================
+ * NODE UPDATER
+ * =========================
+ */
+function setNode(id, v) {
+
+    const el = document.getElementById(id);
+
+    let cls =
+        v < 0.3 ? "green" :
+        v < 0.6 ? "amber" :
+        v < 0.85 ? "red" :
+        "critical";
+
+    el.className = "node " + cls;
+    el.innerText = id.toUpperCase() + ": " + v.toFixed(2);
+}
+
+/**
+ * =========================
+ * GRAPH
+ * =========================
+ */
+function drawGraph() {
+
+    const canvas = document.getElementById("graph");
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0, 0, 800, 200);
+
+    ctx.beginPath();
+    ctx.strokeStyle = "#2bd4ff";
+
+    window.logs.forEach((l, i) => {
+
+        const x = i * 40;
+        const y = 180 - (l.system.fx * 150);
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
     });
 
-    // SCREEN MODEL FEED
-    output.innerText = JSON.stringify(result, null, 2);
-
-    // STATUS UPDATE
-    const state = result.final_state || "GREEN";
-    status.innerText = state;
-    status.className = state;
-
-    // GRAPH FEED
-    window.RiskGraph?.push(result);
+    ctx.stroke();
 }
 
-/* =========================
-   AUTO TEST MODE
-========================= */
-function startAuto() {
-    if (autoLoop) return;
+/**
+ * =========================
+ * RESET
+ * =========================
+ */
+function resetSim() {
 
-    autoLoop = setInterval(() => {
-        run("cascade");
-    }, 4000);
-}
+    window.logs = [];
 
-function stopAuto() {
-    clearInterval(autoLoop);
-    autoLoop = null;
+    document.getElementById("output").innerText = "RESET";
+    document.getElementById("status").innerText = "RESET";
+
+    drawGraph();
 }
 </script>
-
-<!-- CONTROLS -->
-<button onclick="run('cascade')">Cascade</button>
-<button onclick="run('failure')">Failure</button>
-<button onclick="startAuto()">Auto Start</button>
-<button onclick="stopAuto()">Stop</button>
 
 </body>
 </html>
