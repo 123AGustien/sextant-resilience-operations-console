@@ -2,24 +2,37 @@
   "rules": [
     {
       "if_contains": "USD",
-      "map_to": "FX_SHOCK"
+      "map_to": {
+        "scenario_type": "FX_SHOCK",
+        "stress_level": "HIGH"
+      }
     },
     {
       "if_contains": "IDR weakens",
-      "map_to": "CURRENCY_DEPRECIATION"
+      "map_to": {
+        "scenario_type": "CURRENCY_DEPRECIATION",
+        "stress_level": "HIGH"
+      }
     },
     {
       "if_contains": "liquidity",
-      "map_to": "LIQUIDITY_CONTRACTION"
+      "map_to": {
+        "scenario_type": "LIQUIDITY_CONTRACTION",
+        "stress_level": "MEDIUM"
+      }
     },
     {
       "if_contains": "volatility",
-      "map_to": "VOLATILITY_SPIKE"
+      "map_to": {
+        "scenario_type": "VOLATILITY_SPIKE",
+        "stress_level": "MEDIUM"
+      }
     }
   ],
+
   "output": {
-    "scenario_type": "",
-    "stress_level": "",
+    "default_scenario_type": "GENERAL_STRESS",
+    "default_stress_level": "LOW",
     "route": [
       "SP-01",
       "SP-02",
