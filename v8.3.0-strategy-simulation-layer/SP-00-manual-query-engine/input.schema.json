@@ -1,12 +1,34 @@
 {
-  "user_question": "",
-  "context": {
-    "asset_type": "FX",
-    "base_currency": "SGD",
-    "quote_currency": "IDR"
-  },
-  "intent": {
-    "type": "MANUAL_QUERY",
-    "risk_sensitivity": "MEDIUM"
+  "type": "object",
+  "required": ["input", "context"],
+
+  "properties": {
+
+    "input": {
+      "type": "string",
+      "description": "Raw strategy or scenario request"
+    },
+
+    "context": {
+      "type": "string",
+      "enum": [
+        "normal",
+        "stress",
+        "failure",
+        "cascade",
+        "systemic_event"
+      ]
+    },
+
+    "priority": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+
+    "source": {
+      "type": "string",
+      "description": "Origin of request (manual / api / simulation)"
+    }
   }
 }
