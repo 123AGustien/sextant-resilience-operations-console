@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sextant Control Room v8</title>
+
+<style>
+body {
+    background:#05070d;
+    color:#2bd4ff;
+    font-family:Arial;
+    text-align:center;
+}
+
+#status {
+    font-size:22px;
+    margin:10px;
+}
+
+.node {
+    display:inline-block;
+    padding:10px;
+    margin:5px;
+    min-width:120px;
+    border:1px solid #2bd4ff;
+}
+
+button {
+    margin:5px;
+    padding:10px;
+    background:black;
+    color:#2bd4ff;
+    border:1px solid #2bd4ff;
+    cursor:pointer;
+}
+
+pre {
+    text-align:left;
+    max-width:900px;
+    margin:auto;
+    background:#0b0f14;
+    padding:10px;
+    border:1px solid #2bd4ff;
+}
+</style>
+</head>
+
+<body>
+
+<h2>SEXTANT CONTROL ROOM v8</h2>
+
+<div id="status">BOOTING</div>
+
+<!-- ========================= -->
+<!-- CONNECTED BUTTONS (STEP 2) -->
+<!-- ========================= -->
+<div>
+    <button onclick="runSim('normal')">Normal</button>
+    <button onclick="runSim('failure')">Failure</button>
+    <button onclick="runSim('cascade')">Cascade</button>
+    <button onclick="resetSim()">Reset</button>
+</div>
+
+<h3>System Nodes</h3>
+
+<div class="node" id="rp04">RP-04</div>
+<div class="node" id="fx">FX</div>
+<div class="node" id="bank">BANK</div>
+<div class="node" id="liq">LIQ</div>
+<div class="node" id="eq">EQ</div>
+<div class="node" id="conf">CONF</div>
+
+<h3>Output</h3>
+<pre id="output">Waiting...</pre>
+
+<h3>Audit Log</h3>
+<pre id="audit">No activity yet</pre>
+
+<!-- ========================= -->
+<!-- EXECUTION BRIDGE -->
+<!-- ========================= -->
+<script>
+
+window.auditLog = [];
+
+/**
+ * MAIN EXECUTION FUNCTION (CONNECTS ALL BUTTONS)
+ */
+function runSim(type) {
+
+    if (!window.orchestra) {
+        document.getElementById("output").innerText =
+            "Orchestra not initialized";
+        return;
+    }
+
+    // 1. RUN SIMULATION
+    const frame = window.orchestra.runStep(type);
+
+    // 2. GET RISK REPORT (if exists)
+    const report = window.orchestra.getLastReport?.();
+
+    // 3. STORE AUDIT LOG
+    window.auditLog.push({
+        frame,
+        report,
+        timestamp: Date.now()
+    });
+
+    // 4. UPDATE UI OUTPUT
+    updateOutput(frame, report);
+
+    // 5. UPDATE AUDIT PANEL
+    updateAudit();
+}
+
+/**
+ * RESET FUNCTION
+ */
+function resetSim() {
+
+    if (!window.orchestra) return;
+
+    window.orchestra.reset();
+    window.auditLog = [];
+
+    document.getElementById("status").innerText = "RESET";
+    document.getElementById("output").innerText = "RESET COMPLETE";
+    document.getElementById("audit").innerText = "CLEARED";
+}
+
+/**
+ * OUTPUT PANEL
+ */
+function updateOutput(frame, report) {
+
+    document.getElementById("status").innerText =
+        frame.state || "RUNNING";
+
+    document.getElementById("output").innerText =
+        JSON.stringify({ frame, report }, null, 2);
+}
+
+/**
+ * AUDIT PANEL
+ */
+function updateAudit() {
+
+    const audit = document.getElementById("audit");
+
+    audit.innerHTML = window.auditLog
+        .slice(-10)
+        .map((log, i) => {
+
+            return `
+STEP ${log.frame.step} | ${log.frame.type} | 
+STATE: ${log.frame.state || "N/A"} | 
+RISK: ${log.report?.riskLevel || "N/A"}
+            `;
+        })
+        .join("\n-------------------\n");
+}
+
+</script>
+
+</body>
+</html>
