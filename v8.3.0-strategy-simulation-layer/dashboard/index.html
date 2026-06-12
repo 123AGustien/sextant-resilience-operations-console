@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sextant Institutional Control Room v8.3</title>
+
+<style>
+body {
+    margin: 0;
+    background: #05070d;
+    color: #2bd4ff;
+    font-family: Arial;
+}
+
+header {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #1a2a3a;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 10px;
+}
+
+.panel {
+    border: 1px solid #1f3b4d;
+    padding: 10px;
+    background: #0b0f14;
+}
+
+h3 {
+    margin-top: 0;
+    color: #6ee7ff;
+}
+
+.metric {
+    padding: 5px;
+    margin: 3px 0;
+    border-left: 3px solid #2bd4ff;
+}
+
+.good { color: lime; }
+.warn { color: orange; }
+.bad { color: red; }
+
+button {
+    background: black;
+    color: #2bd4ff;
+    border: 1px solid #2bd4ff;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+pre {
+    white-space: pre-wrap;
+    font-size: 12px;
+    color: #b6f3ff;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>SEXTANT INSTITUTIONAL CONTROL ROOM</h2>
+    <button onclick="runScenario('normal')">NORMAL</button>
+    <button onclick="runScenario('failure')">FAILURE</button>
+    <button onclick="runScenario('cascade')">CASCADE</button>
+</header>
+
+<div class="grid">
+
+    <div class="panel">
+        <h3>SP-02 SYSTEM STATE</h3>
+        <div id="state"></div>
+    </div>
+
+    <div class="panel">
+        <h3>SP-03 STRESS CASCADE</h3>
+        <div id="cascade"></div>
+    </div>
+
+    <div class="panel">
+        <h3>SP-04 RISK INTELLIGENCE</h3>
+        <div id="risk"></div>
+    </div>
+
+    <div class="panel">
+        <h3>SP-05 DECISION LAYER</h3>
+        <div id="decision"></div>
+    </div>
+
+</div>
+
+<script>
+
+function runRP04(type) {
+
+    const rp04 = {
+        stability: type === "cascade" ? 0.25 : type === "failure" ? 0.55 : 0.82,
+        pressure: type === "cascade" ? 0.95 : type === "failure" ? 0.6 : 0.28
+    };
+
+    const fx = rp04.pressure;
+    const bank = fx * 0.83;
+    const liq = bank * 0.88;
+    const eq = liq * 0.91;
+    const conf = eq * 0.94;
+
+    return {
+        rp04,
+        system: { fx, bank, liq, eq, conf },
+        state: rp04.stability > 0.6 ? "STABLE" : "RISK"
+    };
+}
+
+/* ---------------- SP-03 ---------------- */
+
+function runStress(state) {
+
+    let decay = 0.9;
+
+    let fx = state.fx;
+    let liq = state.liq;
+    let conf = state.conf;
+
+    const timeline = [];
+
+    for (let i = 0; i < 5; i++) {
+
+        fx *= decay;
+        liq *= decay;
+        conf *= decay;
+
+        timeline.push({ step: i, fx, liq, conf });
+    }
+
+    const degradation = (1 - conf) + (1 - liq) + state.fx;
+
+    return {
+        timeline,
+        degradation
+    };
+}
+
+/* ---------------- SP-04 ---------------- */
+
+function riskEngine(state, stress) {
+
+    const score =
+        (1 - state.conf) * 40 +
+        (1 - state.liq) * 30 +
+        state.fx * 20 +
+        stress.degradation * 10;
+
+    let grade = "A";
+    if (score > 30) grade = "B";
+    if (score > 55) grade = "C";
+    if (score > 75) grade = "D";
+
+    return {
+        score,
+        grade,
+        health: score < 40 ? "STABLE" : score < 70 ? "WARNING" : "CRITICAL"
+    };
+}
+
+/* ---------------- SP-05 ---------------- */
+
+function decisionLayer(risk) {
+
+    if (risk.score < 35) return "APPROVED";
+    if (risk.score < 65) return "REVIEW";
+    return "REJECTED";
+}
+
+/* ---------------- ORCHESTRATION ---------------- */
+
+function runScenario(type) {
+
+    const sp02 = runRP04(type);
+
+    const sp03 = runStress(sp02.system);
+
+    const sp04 = riskEngine(sp02.system, sp03);
+
+    const sp05 = decisionLayer(sp04);
+
+    document.getElementById("state").innerHTML =
+        `<pre>${JSON.stringify(sp02.system, null, 2)}</pre>`;
+
+    document.getElementById("cascade").innerHTML =
+        `<pre>${JSON.stringify(sp03, null, 2)}</pre>`;
+
+    document.getElementById("risk").innerHTML =
+        `<pre>${JSON.stringify(sp04, null, 2)}</pre>`;
+
+    document.getElementById("decision").innerHTML =
+        `<h2>${sp05}</h2>`;
+}
+
+</script>
+
+</body>
+</html>
