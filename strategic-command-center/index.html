@@ -1,1 +1,46 @@
 
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sextant Strategic Command Center</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head><body>  <header class="header">
+    <h1>SEXTANT STRATEGIC COMMAND CENTER</h1>
+    <p>Global Resilience Intelligence Platform</p>
+  </header>  <main class="container"><section class="panel">
+
+  <h2>Scenario Library</h2>
+
+  <button onclick="runScenario('us_china_trade')">US–China Trade Escalation</button>
+  <button onclick="runScenario('taiwan_crisis')">Taiwan Strait Crisis</button>
+  <button onclick="runScenario('semiconductor_shock')">Semiconductor Supply Shock</button>
+  <button onclick="runScenario('energy_crisis')">Energy Market Disruption</button>
+  <button onclick="runScenario('global_recession')">Global Recession</button>
+
+</section>
+
+<section class="panel">
+
+  <h2>Risk Dashboard</h2>
+
+  <div id="riskIndex">Risk Index: --</div>
+  <div id="impactSummary">Impact: Awaiting scenario execution</div>
+
+</section>
+
+<section class="panel">
+
+  <h2>Executive Intelligence Briefing</h2>
+
+  <pre id="briefing">
+
+Run a scenario to generate strategic output.
+</pre>
+
+</section>
+
+  </main>  <footer class="footer">
+    Sextant Protocol — Strategic Command Infrastructure
+  </footer>  <script src="script.js"></script></body>
+</html>
