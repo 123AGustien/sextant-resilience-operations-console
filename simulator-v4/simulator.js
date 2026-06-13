@@ -1,7 +1,13 @@
 /**
- * Sextant v4.0 - RUNTIME BOOTSTRAP GUARD v5
- * Guarantees Run Button Always Works
+ * Sextant v4.0 - RUNTIME BOOTSTRAP + SIMULATOR
+ * Guaranteed Run Button Stability Layer
  */
+
+let isRunning = false;
+
+/* =========================
+   BOOTSTRAP GUARANTEE LAYER
+========================= */
 
 window.SEXTANT_BOOT = {
   ready: false,
@@ -12,12 +18,12 @@ function ensureEngineReady() {
 
   window.SEXTANT_BOOT.attempts++;
 
-  // Try initialize WORLD safely
+  // Auto-initialize WORLD safely
   if (!window.CURRENT_WORLD && typeof WORLD !== "undefined") {
     window.CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
   }
 
-  // Check critical dependencies
+  // Validate dependencies
   const ok =
     typeof WORLD !== "undefined" &&
     typeof propagateShock === "function" &&
@@ -30,25 +36,20 @@ function ensureEngineReady() {
   return ok;
 }
 
-/**
- * Sextant v4.0 - Simulator Controller
- * Safe Runtime Version (FINAL CLEAN BUILD)
- */
+/* =========================
+   LOGGER
+========================= */
 
-let isRunning = false;
-
-/**
- * Logger helper
- */
 function log(message) {
   const logBox = document.getElementById("log");
   if (!logBox) return;
   logBox.innerText += message + "\n";
 }
 
-/**
- * DIAGNOSTICS
- */
+/* =========================
+   DIAGNOSTICS
+========================= */
+
 function runDiagnostics() {
 
   const logBox = document.getElementById("log");
@@ -70,18 +71,16 @@ function runDiagnostics() {
   logBox.innerText += "\n=== END DIAGNOSTIC ===\n";
 }
 
-/**
- * WORLD STATE
- */
-let CURRENT_WORLD = {};
+/* =========================
+   WORLD STATE (SAFE INIT)
+========================= */
 
-if (typeof WORLD !== "undefined") {
-  CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
-}
+let CURRENT_WORLD = window.CURRENT_WORLD || null;
 
-/**
- * MAIN SIMULATION RUN
- */
+/* =========================
+   MAIN SIMULATION ENGINE
+========================= */
+
 function runSimulation() {
 
   if (isRunning) return;
@@ -89,44 +88,41 @@ function runSimulation() {
 
   try {
 
-    if (typeof WORLD === "undefined") {
-      log("ERROR: WORLD missing");
+    // 🔥 GUARANTEE ENGINE IS READY
+    if (!ensureEngineReady()) {
+
+      log("BOOTSTRAP | Engine not ready, retrying...");
+
+      setTimeout(() => {
+        isRunning = false;
+        runSimulation();
+      }, 300);
+
       return;
     }
 
-    if (typeof applyLens !== "function") {
-      log("ERROR: applyLens missing");
+    if (!window.CURRENT_WORLD && typeof WORLD !== "undefined") {
+      window.CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
+    }
+
+    const worldRef = window.CURRENT_WORLD;
+
+    if (!worldRef) {
+      log("ERROR: WORLD not available");
       return;
     }
 
-    if (typeof propagateShock !== "function") {
-      log("ERROR: propagateShock missing");
-      return;
-    }
+    // Apply lens safely
+    const view = applyLens(JSON.parse(JSON.stringify(worldRef)));
 
-    if (typeof computeGlobalIndex !== "function") {
-      log("ERROR: computeGlobalIndex missing");
-      return;
-    }
-
-    if (typeof computeSystemHealth !== "function") {
-      log("ERROR: computeSystemHealth missing");
-      return;
-    }
-
-    // Apply lens view
-    const view = applyLens(
-      JSON.parse(JSON.stringify(CURRENT_WORLD))
-    );
-
-    // Base shock model
+    // Shock model
     const shock = {
       trade: 0.05,
       policy: 0.03,
       energy: 0.04
     };
 
-    // Propagate shock
+    // Propagate system shock
     propagateShock(view, "usa", shock);
 
     // Compute outputs
@@ -142,8 +138,7 @@ function runSimulation() {
     }
 
     if (decisionEl) {
-      decisionEl.innerText =
-        "System Health: " + health.toFixed(2);
+      decisionEl.innerText = "System Health: " + health.toFixed(2);
     }
 
     // Log output
@@ -156,13 +151,14 @@ function runSimulation() {
   }
 }
 
-/**
- * RESET SIMULATION
- */
+/* =========================
+   RESET ENGINE
+========================= */
+
 function resetSimulation() {
 
   if (typeof WORLD !== "undefined") {
-    CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
+    window.CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
   }
 
   log("RESET | System restored");
@@ -171,9 +167,10 @@ function resetSimulation() {
   runSimulation();
 }
 
-/**
- * SAFE LENS SWITCH
- */
+/* =========================
+   SAFE LENS SWITCH
+========================= */
+
 function changeLensSafe(lens) {
 
   if (typeof changeLens === "function") {
@@ -181,14 +178,16 @@ function changeLensSafe(lens) {
   }
 }
 
-/**
- * AUTO START (SINGLE ENTRY POINT)
- */
+/* =========================
+   BOOT SEQUENCE
+========================= */
+
 window.addEventListener("load", function () {
 
   runDiagnostics();
 
-  // optional startup delay for UI readiness
+  ensureEngineReady();
+
   setTimeout(function () {
     runSimulation();
   }, 500);
