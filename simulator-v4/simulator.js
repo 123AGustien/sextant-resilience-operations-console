@@ -1,3 +1,39 @@
+
+/**
+ * Sextant v4.0 - DIAGNOSTIC LAYER
+ * Runtime dependency checker (UI visible)
+ */
+
+function runDiagnostics() {
+
+  const logBox = document.getElementById("log");
+  if (!logBox) return;
+
+  function report(label, status) {
+    logBox.innerText += `${label}: ${status ? "OK" : "MISSING"}\n`;
+  }
+
+  logBox.innerText = "=== SEXTANT V4 DIAGNOSTIC START ===\n\n";
+
+  // CORE DATA
+  report("WORLD", typeof WORLD !== "undefined");
+  report("CURRENT_WORLD", typeof CURRENT_WORLD !== "undefined");
+
+  // ENGINE LAYER
+  report("propagateShock", typeof propagateShock === "function");
+  report("computeGlobalIndex", typeof computeGlobalIndex === "function");
+  report("computeSystemHealth", typeof computeSystemHealth === "function");
+
+  // LENS LAYER
+  report("applyLens", typeof applyLens === "function");
+  report("changeLens", typeof changeLens === "function");
+
+  // UI HELPERS
+  report("log()", typeof log === "function");
+
+  logBox.innerText += "\n=== END DIAGNOSTIC ===\n";
+}
+
 /**
  * Sextant v4.0 - Simulator Controller
  * Connects UI ↔ World Model ↔ Lens ↔ Macro Engine
