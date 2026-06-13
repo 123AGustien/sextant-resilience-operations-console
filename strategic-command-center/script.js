@@ -1,4 +1,11 @@
-/* Sextant Strategic Command Center - Logic Layer */
+/* Sextant Strategic Command Center - Intelligence Layer v2 */
+
+function getRiskLevel(score) {
+if (score >= 90) return "🔴 CRITICAL";
+if (score >= 80) return "🟠 HIGH";
+if (score >= 65) return "🟡 ELEVATED";
+return "🟢 STABLE";
+}
 
 function runScenario(type) {
 
@@ -7,20 +14,31 @@ const scenarios = {
 us_china_trade: {
   risk: 78,
   impact: "High disruption to global supply chains and semiconductor exports.",
+  probability: "Medium-High",
+  cascade: [
+    "Trade restrictions",
+    "Supply chain shock",
+    "Manufacturing delays",
+    "Inflation pressure"
+  ],
   briefing: `
 
-EXECUTIVE BRIEFING
+EXECUTIVE INTELLIGENCE REPORT
 
-US–China Trade Escalation Detected
+Scenario: US–China Trade Escalation
+
+Risk Level: ${getRiskLevel(78)}
+
+Probability: Medium-High
 
 Key Risks:
 
 - Semiconductor export restrictions
-- Supply chain fragmentation
-- FX volatility (USD / CNY / SGD)
+- Global supply chain fragmentation
+- FX volatility
 
-Cascading Effects:
-Trade barriers → Supply shock → Manufacturing delays → Inflation pressure
+Cascading Path:
+Trade barriers → Supply shock → Production delays → Inflation pressure
 
 Recommended Actions:
 
@@ -35,19 +53,30 @@ Recommended Actions:
   taiwan_crisis: {
   risk: 92,
   impact: "Critical semiconductor production disruption risk.",
+  probability: "High",
+  cascade: [
+  "Geopolitical escalation",
+  "Export disruption",
+  "Production halt",
+  "Global recession pressure"
+  ],
   briefing: `
-  EXECUTIVE BRIEFING
+  EXECUTIVE INTELLIGENCE REPORT
 
-Taiwan Strait Crisis Scenario
+Scenario: Taiwan Strait Crisis
+
+Risk Level: ${getRiskLevel(92)}
+
+Probability: High
 
 Key Risks:
 
 - Semiconductor supply collapse
-- Global tech market shock
+- Global tech shock
 - Shipping route disruption
 
-Cascading Effects:
-Geopolitical escalation → Export disruption → Production halt → Global recession pressure
+Cascading Path:
+Geopolitical escalation → Export disruption → Production halt → Global recession
 
 Recommended Actions:
 
@@ -62,19 +91,30 @@ Recommended Actions:
   semiconductor_shock: {
   risk: 85,
   impact: "Global chip supply chain breakdown.",
+  probability: "High",
+  cascade: [
+  "Chip shortage",
+  "Production slowdown",
+  "Revenue contraction",
+  "Market volatility"
+  ],
   briefing: `
-  EXECUTIVE BRIEFING
+  EXECUTIVE INTELLIGENCE REPORT
 
-Semiconductor Supply Shock
+Scenario: Semiconductor Shock
+
+Risk Level: ${getRiskLevel(85)}
+
+Probability: High
 
 Key Risks:
 
-- Automotive production slowdown
+- Automotive disruption
 - Cloud infrastructure delays
-- Consumer electronics shortage
+- Electronics shortage
 
-Cascading Effects:
-Chip shortage → Production slowdown → Revenue contraction → Market volatility
+Cascading Path:
+Chip shortage → Production slowdown → Revenue decline → Market volatility
 
 Recommended Actions:
 
@@ -86,20 +126,31 @@ Recommended Actions:
   
   energy_crisis: {
   risk: 80,
-  impact: "Energy price shock driving global inflation.",
+  impact: "Energy price volatility driving inflation.",
+  probability: "Medium-High",
+  cascade: [
+  "Energy shortage",
+  "Cost inflation",
+  "Demand reduction",
+  "Economic slowdown"
+  ],
   briefing: `
-  EXECUTIVE BRIEFING
+  EXECUTIVE INTELLIGENCE REPORT
 
-Energy Market Disruption
+Scenario: Energy Crisis
+
+Risk Level: ${getRiskLevel(80)}
+
+Probability: Medium-High
 
 Key Risks:
 
-- Oil & gas price volatility
+- Oil & gas volatility
 - Industrial cost surge
 - Transport disruption
 
-Cascading Effects:
-Energy shortage → Inflation spike → Demand reduction → Economic slowdown
+Cascading Path:
+Energy shortage → Inflation spike → Reduced demand → Slowdown
 
 Recommended Actions:
 
@@ -112,25 +163,36 @@ Recommended Actions:
   global_recession: {
   risk: 88,
   impact: "Global synchronized economic contraction.",
+  probability: "High",
+  cascade: [
+  "Credit contraction",
+  "Demand drop",
+  "Earnings decline",
+  "Market downturn"
+  ],
   briefing: `
-  EXECUTIVE BRIEFING
+  EXECUTIVE INTELLIGENCE REPORT
 
-Global Recession Scenario
+Scenario: Global Recession
+
+Risk Level: ${getRiskLevel(88)}
+
+Probability: High
 
 Key Risks:
 
 - Demand collapse
 - Credit tightening
-- Equity market drawdown
+- Equity drawdown
 
-Cascading Effects:
+Cascading Path:
 Credit contraction → Demand drop → Earnings decline → Market downturn
 
 Recommended Actions:
 
 - Increase liquidity buffers
 
-- Reduce high-risk exposure
+- Reduce risk exposure
 
 - Defensive positioning
   `
@@ -141,7 +203,7 @@ Recommended Actions:
   const data = scenarios[type];
   
   document.getElementById("riskIndex").innerText =
-  "Risk Index: " + data.risk;
+  "Risk Index: " + data.risk + " | " + getRiskLevel(data.risk);
   
   document.getElementById("impactSummary").innerText =
   "Impact: " + data.impact;
