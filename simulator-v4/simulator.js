@@ -1,100 +1,137 @@
 /**
-
-* Sextant v4.0 - DIAGNOSTIC LAYER
-  */
-
-function runDiagnostics() {
-
-const logBox = document.getElementById("log");
-if (!logBox) return;
-
-function report(label, status) {
-logBox.innerText += label + ": " + (status ? "OK" : "MISSING") + "\n";
-}
-
-logBox.innerText = "=== SEXTANT V4 DIAGNOSTIC START ===\n\n";
-
-report("WORLD", typeof WORLD !== "undefined");
-report("CURRENT_WORLD", typeof CURRENT_WORLD !== "undefined");
-
-report("propagateShock", typeof propagateShock === "function");
-report("computeGlobalIndex", typeof computeGlobalIndex === "function");
-report("computeSystemHealth", typeof computeSystemHealth === "function");
-
-report("applyLens", typeof applyLens === "function");
-report("changeLens", typeof changeLens === "function");
-
-report("log()", typeof log === "function");
-
-logBox.innerText += "\n=== END DIAGNOSTIC ===\n";
-}
-
-/**
-
-* Logging Helper
-  */
+ * Sextant v4.0 - Simulator Controller
+ * Safe Runtime Version
+ */
 
 function log(message) {
 
-const logBox = document.getElementById("log");
+  const logBox = document.getElementById("log");
 
-if (!logBox) return;
+  if (!logBox) return;
 
-logBox.innerText += message + "\n";
+  logBox.innerText += message + "\n";
 }
 
-/**
+function runDiagnostics() {
 
-* Sextant v4.0 - Simulator Controller
-  */
+  const logBox = document.getElementById("log");
 
-let CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
+  if (!logBox) return;
+
+  logBox.innerText = "=== SEXTANT V4 DIAGNOSTIC START ===\n\n";
+
+  function report(name, ok) {
+    logBox.innerText += name + ": " + (ok ? "OK" : "MISSING") + "\n";
+  }
+
+  report("WORLD", typeof WORLD !== "undefined");
+  report("propagateShock", typeof propagateShock === "function");
+  report("computeGlobalIndex", typeof computeGlobalIndex === "function");
+  report("computeSystemHealth", typeof computeSystemHealth === "function");
+  report("applyLens", typeof applyLens === "function");
+  report("changeLens", typeof changeLens === "function");
+
+  logBox.innerText += "\n=== END DIAGNOSTIC ===\n";
+}
+
+let CURRENT_WORLD = {};
+
+if (typeof WORLD !== "undefined") {
+  CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
+}
 
 function runSimulation() {
 
-const view = applyLens(CURRENT_WORLD);
+  try {
 
-const shock = {
-trade: 0.05,
-policy: 0.03,
-energy: 0.04
-};
+    if (typeof WORLD === "undefined") {
+      log("ERROR: WORLD missing");
+      return;
+    }
 
-propagateShock(view, "usa", shock);
+    if (typeof applyLens !== "function") {
+      log("ERROR: applyLens missing");
+      return;
+    }
 
-const index = computeGlobalIndex(view);
-const health = computeSystemHealth(view);
+    if (typeof propagateShock !== "function") {
+      log("ERROR: propagateShock missing");
+      return;
+    }
 
-const macroEl = document.getElementById("macroIndex");
-const decisionEl = document.getElementById("decision");
+    if (typeof computeGlobalIndex !== "function") {
+      log("ERROR: computeGlobalIndex missing");
+      return;
+    }
 
-if (macroEl) {
-macroEl.innerText = index.toFixed(2);
-}
+    if (typeof computeSystemHealth !== "function") {
+      log("ERROR: computeSystemHealth missing");
+      return;
+    }
 
-if (decisionEl) {
-decisionEl.innerText = "System Health: " + health.toFixed(2);
-}
+    const view = applyLens(
+      JSON.parse(JSON.stringify(CURRENT_WORLD))
+    );
 
-log("RUN | Macro Index: " + index.toFixed(2));
+    const shock = {
+      trade: 0.05,
+      policy: 0.03,
+      energy: 0.04
+    };
+
+    propagateShock(view, "usa", shock);
+
+    const index = computeGlobalIndex(view);
+    const health = computeSystemHealth(view);
+
+    const macroEl = document.getElementById("macroIndex");
+    const decisionEl = document.getElementById("decision");
+
+    if (macroEl) {
+      macroEl.innerText = index.toFixed(2);
+    }
+
+    if (decisionEl) {
+      decisionEl.innerText =
+        "System Health: " + health.toFixed(2);
+    }
+
+    log("RUN | Macro Index: " + index.toFixed(2));
+
+  } catch (err) {
+
+    log("ERROR: " + err.message);
+  }
 }
 
 function resetSimulation() {
 
-CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
+  if (typeof WORLD !== "undefined") {
+    CURRENT_WORLD =
+      JSON.parse(JSON.stringify(WORLD));
+  }
 
-log("RESET | System restored to baseline");
+  log("RESET | System restored");
 
-runSimulation();
+  runSimulation();
 }
 
 function changeLensSafe(lens) {
 
-if (typeof changeLens === "function") {
-changeLens(lens);
-}
+  if (typeof changeLens === "function") {
+    changeLens(lens);
+  }
 }
 
 window.addEventListener("load", function () {
-setTimeout(runDiagnostics, 300);
+
+  runDiagnostics();
+
+  setTimeout(function () {
+
+    if (typeof runSimulation === "function") {
+      runSimulation();
+    }
+
+  }, 500);
 });
