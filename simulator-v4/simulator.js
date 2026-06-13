@@ -1,95 +1,100 @@
-
 /**
- * Sextant v4.0 - DIAGNOSTIC LAYER
- * Runtime dependency checker (UI visible)
- */
+
+* Sextant v4.0 - DIAGNOSTIC LAYER
+  */
 
 function runDiagnostics() {
 
-  const logBox = document.getElementById("log");
-  if (!logBox) return;
+const logBox = document.getElementById("log");
+if (!logBox) return;
 
-  function report(label, status) {
-    logBox.innerText += `${label}: ${status ? "OK" : "MISSING"}\n`;
-  }
+function report(label, status) {
+logBox.innerText += label + ": " + (status ? "OK" : "MISSING") + "\n";
+}
 
-  logBox.innerText = "=== SEXTANT V4 DIAGNOSTIC START ===\n\n";
+logBox.innerText = "=== SEXTANT V4 DIAGNOSTIC START ===\n\n";
 
-  // CORE DATA
-  report("WORLD", typeof WORLD !== "undefined");
-  report("CURRENT_WORLD", typeof CURRENT_WORLD !== "undefined");
+report("WORLD", typeof WORLD !== "undefined");
+report("CURRENT_WORLD", typeof CURRENT_WORLD !== "undefined");
 
-  // ENGINE LAYER
-  report("propagateShock", typeof propagateShock === "function");
-  report("computeGlobalIndex", typeof computeGlobalIndex === "function");
-  report("computeSystemHealth", typeof computeSystemHealth === "function");
+report("propagateShock", typeof propagateShock === "function");
+report("computeGlobalIndex", typeof computeGlobalIndex === "function");
+report("computeSystemHealth", typeof computeSystemHealth === "function");
 
-  // LENS LAYER
-  report("applyLens", typeof applyLens === "function");
-  report("changeLens", typeof changeLens === "function");
+report("applyLens", typeof applyLens === "function");
+report("changeLens", typeof changeLens === "function");
 
-  // UI HELPERS
-  report("log()", typeof log === "function");
+report("log()", typeof log === "function");
 
-  logBox.innerText += "\n=== END DIAGNOSTIC ===\n";
+logBox.innerText += "\n=== END DIAGNOSTIC ===\n";
 }
 
 /**
- * Sextant v4.0 - Simulator Controller
- * Connects UI ↔ World Model ↔ Lens ↔ Macro Engine
- */
+
+* Logging Helper
+  */
+
+function log(message) {
+
+const logBox = document.getElementById("log");
+
+if (!logBox) return;
+
+logBox.innerText += message + "\n";
+}
+
+/**
+
+* Sextant v4.0 - Simulator Controller
+  */
 
 let CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
 
 function runSimulation() {
 
-  // 1. Apply lens view (non-destructive)
-  const view = applyLens(CURRENT_WORLD);
+const view = applyLens(CURRENT_WORLD);
 
-  // 2. Define base shock scenario (can be upgraded later)
-  const shock = {
-    trade: 0.05,
-    policy: 0.03,
-    energy: 0.04
-  };
+const shock = {
+trade: 0.05,
+policy: 0.03,
+energy: 0.04
+};
 
-  // 3. Propagate shock through system
-  propagateShock(view, "usa", shock);
+propagateShock(view, "usa", shock);
 
-  // 4. Compute macro outputs
-  const index = computeGlobalIndex(view);
-  const health = computeSystemHealth(view);
+const index = computeGlobalIndex(view);
+const health = computeSystemHealth(view);
 
-  // 5. Update UI safely
-  const macroEl = document.getElementById("macroIndex");
-  const decisionEl = document.getElementById("decision");
+const macroEl = document.getElementById("macroIndex");
+const decisionEl = document.getElementById("decision");
 
-  if (macroEl) {
-    macroEl.innerText = index.toFixed(2);
-  }
+if (macroEl) {
+macroEl.innerText = index.toFixed(2);
+}
 
-  if (decisionEl) {
-    decisionEl.innerText = "System Health: " + health.toFixed(2);
-  }
+if (decisionEl) {
+decisionEl.innerText = "System Health: " + health.toFixed(2);
+}
 
-  // 6. Log system event
-  log("RUN | Macro Index: " + index.toFixed(2));
+log("RUN | Macro Index: " + index.toFixed(2));
 }
 
 function resetSimulation() {
 
-  CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
+CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
 
-  log("RESET | System restored to baseline");
+log("RESET | System restored to baseline");
 
-  runSimulation();
+runSimulation();
 }
 
-/**
- * Optional manual trigger for lens switching safety hook
- */
 function changeLensSafe(lens) {
-  if (typeof changeLens === "function") {
-    changeLens(lens);
-  }
+
+if (typeof changeLens === "function") {
+changeLens(lens);
 }
+}
+
+window.addEventListener("load", function () {
+setTimeout(runDiagnostics, 300);
+});
