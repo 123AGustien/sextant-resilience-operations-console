@@ -1,39 +1,46 @@
 /**
- * Sextant v4.0 - Global Macro Engine
- * Aggregates all countries into a single system index
+ * Sextant v4.0 - Lens System
+ * Geopolitical perspective filter layer
  */
 
-function computeGlobalIndex(world) {
+let ACTIVE_LENS = "global";
 
-  let total = 0;
-  let count = 0;
-
-  Object.keys(world).forEach(key => {
-
-    const c = world[key];
-
-    // weighted sector model
-    const countryIndex =
-      (c.semis * 0.4) +
-      (c.industrial * 0.3) +
-      (c.nonTech * 0.3);
-
-    total += countryIndex;
-    count++;
-  });
-
-  return count > 0 ? total / count : 0;
+function changeLens(lens) {
+  ACTIVE_LENS = lens;
+  log("Lens switched → " + lens);
 }
 
-/**
- * Optional: normalized system health score (0–100)
- */
-function computeSystemHealth(world) {
+function applyLens(world) {
 
-  const rawIndex = computeGlobalIndex(world);
+  // deep copy so we don't mutate original world state
+  const modified = JSON.parse(JSON.stringify(world));
 
-  // normalize (based on your starting baseline ~100–130 range)
-  const health = Math.min(100, Math.max(0, (rawIndex / 1.3)));
+  Object.keys(modified).forEach(countryKey => {
 
-  return health;
+    const c = modified[countryKey];
+
+    // default = global (no change)
+    if (ACTIVE_LENS === "global") return;
+
+    // Singapore lens → export-sensitive economy boost
+    if (ACTIVE_LENS === "singapore") {
+      c.semis *= 1.25;
+      c.nonTech *= 1.05;
+    }
+
+    // USA lens → industrial + policy strength emphasis
+    if (ACTIVE_LENS === "usa") {
+      c.industrial *= 1.3;
+      c.nonTech *= 0.95;
+    }
+
+    // China lens → manufacturing-heavy view
+    if (ACTIVE_LENS === "china") {
+      c.industrial *= 1.35;
+      c.semis *= 0.9;
+    }
+
+  });
+
+  return modified;
 }
