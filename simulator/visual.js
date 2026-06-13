@@ -1,24 +1,26 @@
 /**
- * Sextant v4.0 - Visual Layer (FIXED)
- * Connects simulation history → trend rendering
+ * Sextant v4.0 - Visual Layer (CONTROL ROOM OBSERVABILITY)
+ * Tracks macro simulation evolution over time
  */
 
 let history = [];
 
 /**
  * PUSH STATE INTO HISTORY
- * Called from simulator.js after each run
+ * Called from simulator.js after each run cycle
  */
 function pushHistory(state) {
 
+  if (!state) return;
+
   history.push({
-    semis: state.semis,
-    industrial: state.industrial,
-    nonTech: state.nonTech,
-    macroIndex: state.macroIndex
+    semis: Number(state.semis || 0),
+    industrial: Number(state.industrial || 0),
+    nonTech: Number(state.nonTech || 0),
+    macroIndex: Number(state.macroIndex || 0)
   });
 
-  // keep last 30 cycles only
+  // keep last 30 cycles
   if (history.length > 30) {
     history.shift();
   }
@@ -27,30 +29,37 @@ function pushHistory(state) {
 }
 
 /**
- * RENDER SIMPLE CONTROL ROOM TREND VIEW
+ * RENDER CONTROL ROOM TREND VIEW
  */
 function renderChart() {
 
   const logBox = document.getElementById("log");
-
   if (!logBox) return;
 
   let output = "📊 MACRO INDEX TREND (LAST 30 CYCLES)\n\n";
 
-  history.forEach((h, i) => {
+  for (let i = 0; i < history.length; i++) {
 
-    const value = h.macroIndex || 0;
+    const h = history[i];
+    const value = h.macroIndex;
 
-    const bar = "█".repeat(Math.max(1, Math.floor(value / 10)));
+    const barLength = Math.max(1, Math.floor(value / 10));
+    const bar = "█".repeat(barLength);
 
-    output += `${String(i).padStart(2, "0")}: ${bar} (${value.toFixed(1)})\n`;
-  });
+    output +=
+      String(i).padStart(2, "0") +
+      ": " +
+      bar +
+      " (" +
+      value.toFixed(1) +
+      ")\n";
+  }
 
   logBox.innerText = output;
 }
 
 /**
- * OPTIONAL: CLEAR HISTORY
+ * CLEAR HISTORY (CONTROL RESET FUNCTION)
  */
 function clearHistory() {
   history = [];
