@@ -1,63 +1,56 @@
-name: Sextant Resilience CI v10 (Stable Validation Gate)
+name: Sextant CI (Validation Gate v10)
 
 on:
   workflow_dispatch:
+  push:
+    branches: ["main"]
 
 jobs:
   validate:
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Validate core structure (soft)
+      - name: Validate core structure
         run: |
-          echo "Validating Sextant repository structure..."
+          echo "Checking Sextant system..."
 
-          if [ -f index.html ]; then
-            echo "index.html OK"
-          else
-            echo "WARNING: index.html missing"
-          fi
+          test -f index.html || (echo "ERROR: index.html missing" && exit 1)
 
           if [ -f dashboard/index_v10.html ]; then
-            echo "dashboard v10 OK"
+            echo "Dashboard OK"
           else
-            echo "dashboard v10 missing (ignored)"
+            echo "WARNING: dashboard missing"
           fi
 
           if [ -f core_engine/rp04-engine-v10.js ]; then
             echo "RP-04 engine OK"
           else
-            echo "RP-04 engine missing (ignored in frontend mode)"
+            echo "WARNING: RP-04 missing"
           fi
 
-      - name: RP-04 JS validation (soft check)
+      - name: RP-04 validation
         run: |
           if [ -f core_engine/rp04-engine-v10.js ]; then
-            if grep -q "export function" core_engine/rp04-engine-v10.js; then
-              echo "ES module warning detected"
-            fi
+            grep -q "export function" core_engine/rp04-engine-v10.js && exit 1 || echo "OK"
           fi
 
-      - name: Dashboard wiring (soft)
+      - name: Dashboard wiring check
         run: |
           if [ -f dashboard/index_v10.html ]; then
-            grep -q "runRP04" dashboard/index_v10.html || echo "Warning: missing runRP04 binding"
+            grep -q "runRP04" dashboard/index_v10.html || echo "WARNING: missing runRP04"
           fi
 
       - name: Filename safety scan
         run: |
-          echo "Scanning filenames..."
           find . -type f | while read file; do
             name=$(basename "$file")
-
             if [ ${#name} -gt 120 ]; then
-              echo "WARNING long filename: $name"
+              echo "WARNING: long filename $name"
             fi
           done
 
-      - name: CI STABLE PASS
-        run: echo "Sextant CI v10: NON-BLOCKING VALIDATION COMPLETE"
+      - name: CI COMPLETE
+        run: echo "VALIDATION COMPLETE"
