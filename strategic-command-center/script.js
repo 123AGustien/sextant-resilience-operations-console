@@ -1,4 +1,4 @@
-/* Sextant Strategic Command Center - Visual Intelligence Layer v3 */
+/* Sextant Strategic Command Center - Cascading Intelligence Engine v4 */
 
 function getRiskLevel(score) {
 if (score >= 90) return "critical";
@@ -20,13 +20,29 @@ el.classList.remove(
 el.classList.add("risk-" + level);
 }
 
+/* Cascading Engine */
+function buildCascade(cascadeArray) {
+let output = "CASCADE IMPACT CHAIN\n\n";
+cascadeArray.forEach((step, index) => {
+output += "Layer ${index + 1}: ${step}\n";
+});
+return output;
+}
+
 function runScenario(type) {
 
 const scenarios = {
 
 us_china_trade: {
   risk: 78,
-  impact: "High disruption to global supply chains and semiconductor exports.",
+  impact: "High disruption to global supply chains.",
+  cascade: [
+    "Trade restrictions initiated",
+    "Supply chain fragmentation begins",
+    "Manufacturing delays spread globally",
+    "Inflation pressure increases",
+    "Market volatility rises"
+  ],
   briefing: `
 
 EXECUTIVE INTELLIGENCE REPORT
@@ -36,11 +52,16 @@ Scenario: US–China Trade Escalation
 Key Risks:
 
 - Semiconductor export restrictions
-- Supply chain fragmentation
+- Global supply chain fragmentation
 - FX volatility
 
-Cascading Effects:
-Trade barriers → Supply shock → Production delays → Inflation pressure
+${buildCascade([
+"Trade restrictions initiated",
+"Supply chain fragmentation begins",
+"Manufacturing delays spread globally",
+"Inflation pressure increases",
+"Market volatility rises"
+])}
 
 Recommended Actions:
 
@@ -54,7 +75,14 @@ Recommended Actions:
   
   taiwan_crisis: {
   risk: 92,
-  impact: "Critical semiconductor production disruption risk.",
+  impact: "Critical semiconductor production disruption.",
+  cascade: [
+  "Geopolitical escalation intensifies",
+  "Export channels disrupted",
+  "Semiconductor production halts",
+  "Global tech supply shock",
+  "Recession risk escalates"
+  ],
   briefing: `
   EXECUTIVE INTELLIGENCE REPORT
 
@@ -62,26 +90,38 @@ Scenario: Taiwan Strait Crisis
 
 Key Risks:
 
-- Semiconductor supply collapse
+- Semiconductor collapse
 - Global tech shock
 - Shipping disruption
 
-Cascading Effects:
-Geopolitical escalation → Export disruption → Production halt → Global recession risk
+${buildCascade([
+"Geopolitical escalation intensifies",
+"Export channels disrupted",
+"Semiconductor production halts",
+"Global tech supply shock",
+"Recession risk escalates"
+])}
 
 Recommended Actions:
 
 - Activate contingency sourcing
 
-- Reduce dependency
+- Reduce dependency on single region
 
-- Hedge exposure
+- Hedge equity exposure
   `
   },
   
   semiconductor_shock: {
   risk: 85,
-  impact: "Global chip supply chain breakdown.",
+  impact: "Global chip supply breakdown.",
+  cascade: [
+  "Chip production bottlenecks emerge",
+  "Automotive manufacturing slows",
+  "Cloud infrastructure delays increase",
+  "Consumer electronics shortage expands",
+  "Revenue contraction spreads"
+  ],
   briefing: `
   EXECUTIVE INTELLIGENCE REPORT
 
@@ -93,12 +133,17 @@ Key Risks:
 - Cloud delays
 - Electronics shortage
 
-Cascading Effects:
-Chip shortage → Production slowdown → Revenue decline → Market volatility
+${buildCascade([
+"Chip production bottlenecks emerge",
+"Automotive manufacturing slows",
+"Cloud infrastructure delays increase",
+"Consumer electronics shortage expands",
+"Revenue contraction spreads"
+])}
 
 Recommended Actions:
 
-- Secure long-term contracts
+- Secure long-term chip contracts
 
 - Multi-source suppliers
   `
@@ -106,7 +151,14 @@ Recommended Actions:
   
   energy_crisis: {
   risk: 80,
-  impact: "Energy price volatility driving inflation.",
+  impact: "Energy volatility drives inflation.",
+  cascade: [
+  "Energy supply tightens",
+  "Oil & gas prices spike",
+  "Industrial costs rise",
+  "Consumer inflation increases",
+  "Demand weakens"
+  ],
   briefing: `
   EXECUTIVE INTELLIGENCE REPORT
 
@@ -114,24 +166,36 @@ Scenario: Energy Crisis
 
 Key Risks:
 
-- Oil & gas volatility
+- Energy price volatility
 - Industrial cost surge
 - Transport disruption
 
-Cascading Effects:
-Energy shortage → Inflation spike → Demand drop → Slowdown
+${buildCascade([
+"Energy supply tightens",
+"Oil & gas prices spike",
+"Industrial costs rise",
+"Consumer inflation increases",
+"Demand weakens"
+])}
 
 Recommended Actions:
 
 - Hedge energy exposure
 
-- Optimize costs
+- Optimize operational costs
   `
   },
   
   global_recession: {
   risk: 88,
-  impact: "Global synchronized economic contraction.",
+  impact: "Global economic contraction.",
+  cascade: [
+  "Credit tightening begins",
+  "Demand collapse spreads",
+  "Corporate earnings fall",
+  "Investment slows",
+  "Market downturn accelerates"
+  ],
   briefing: `
   EXECUTIVE INTELLIGENCE REPORT
 
@@ -143,8 +207,13 @@ Key Risks:
 - Demand collapse
 - Market downturn
 
-Cascading Effects:
-Credit crunch → Demand drop → Earnings decline → Downturn
+${buildCascade([
+"Credit tightening begins",
+"Demand collapse spreads",
+"Corporate earnings fall",
+"Investment slows",
+"Market downturn accelerates"
+])}
 
 Recommended Actions:
 
@@ -170,6 +239,5 @@ Recommended Actions:
   document.getElementById("briefing").innerText =
   data.briefing;
   
-  // VISUAL INTELLIGENCE BINDING
   applyRiskStyle(level);
   }
