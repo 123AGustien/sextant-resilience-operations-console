@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sextant v4 Global Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="header">
+    <h1>Sextant v4.0</h1>
+    <p>Global Geopolitical Macro Simulator (Frontend Live System)</p>
+  </div>
+
+  <div class="panel">
+
+    <button onclick="runSimulation()">Run Simulation</button>
+    <button onclick="resetSimulation()">Reset</button>
+
+    <select onchange="changeLens(this.value)">
+      <option value="global">Global Lens</option>
+      <option value="singapore">Singapore Lens</option>
+      <option value="usa">USA Lens</option>
+      <option value="china">China Lens</option>
+    </select>
+
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+      <h3>Semiconductors</h3>
+      <div id="semis">0</div>
+    </div>
+
+    <div class="card">
+      <h3>Industrial</h3>
+      <div id="industrial">0</div>
+    </div>
+
+    <div class="card">
+      <h3>Non-Tech</h3>
+      <div id="nonTech">0</div>
+    </div>
+
+    <div class="card">
+      <h3>Macro Index</h3>
+      <div id="macroIndex">0</div>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <h3>Decision / Status</h3>
+    <div id="decision">---</div>
+  </div>
+
+  <div class="card">
+    <h3>System Log</h3>
+    <div id="log"></div>
+  </div>
+
+  <!-- CORE SYSTEM -->
+  <script src="core/world-model.js"></script>
+  <script src="core/propagation-engine.js"></script>
+  <script src="core/global-macro.js"></script>
+
+  <!-- LENS SYSTEM -->
+  <script src="lens.js"></script>
+
+  <!-- SIMULATOR CONTROLLER -->
+  <script src="simulator.js"></script>
+
+</body>
+</html>
