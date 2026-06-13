@@ -1,8 +1,6 @@
-import { runRP04 } from "../core_engine/rp04-engine-v10.js";
-
 /**
  * Sextant Orchestra Layer v2
- * Control + Risk Report Generation Layer above RP-04 engine
+ * Browser-safe control layer above RP-04
  */
 
 class SextantOrchestra {
@@ -10,8 +8,6 @@ class SextantOrchestra {
     constructor() {
         this.timeline = [];
         this.scenario = "default";
-
-        // 📊 latest generated risk report
         this.lastReport = null;
     }
 
@@ -23,7 +19,12 @@ class SextantOrchestra {
 
     runStep(type) {
 
-        const engine = runRP04(type);
+        // ✅ USE GLOBAL ENGINE (NO IMPORT)
+        if (!window.runRP04) {
+            throw new Error("RP-04 engine not loaded (window.runRP04 missing)");
+        }
+
+        const engine = window.runRP04(type);
 
         const frame = {
             step: this.timeline.length,
@@ -43,7 +44,6 @@ class SextantOrchestra {
 
         this.timeline.push(frame);
 
-        // 🔥 AUTO-GENERATE REPORT AFTER EACH STEP
         this.lastReport = this.generateRiskReport();
 
         return frame;
@@ -54,9 +54,6 @@ class SextantOrchestra {
         this.lastReport = null;
     }
 
-    /**
-     * 📊 MAIN RISK REPORT GENERATOR
-     */
     generateRiskReport() {
 
         if (this.timeline.length === 0) return null;
@@ -88,82 +85,43 @@ class SextantOrchestra {
         };
     }
 
-    /**
-     * ⚖️ RISK CLASSIFICATION ENGINE
-     */
     classifyRisk(conf) {
-
         if (conf > 80) return "🟢 Stable";
         if (conf > 60) return "🟡 Controlled Stress";
         if (conf > 40) return "🟠 Elevated Risk";
         return "🔴 Systemic Instability";
     }
 
-    /**
-     * 💡 INSIGHTS ENGINE
-     */
     generateInsights(latest) {
-
         const insights = [];
 
-        if (latest.liq < 50) {
-            insights.push("Liquidity stress is propagating across system layers.");
-        }
-
-        if (latest.bank < 50) {
-            insights.push("Bank subsystem instability detected under current scenario.");
-        }
-
-        if (latest.fx < 50) {
-            insights.push("FX volatility contributing to systemic pressure amplification.");
-        }
-
-        if (this.timeline.length > 3) {
-            insights.push("Multi-step cascade propagation detected across dependency layers.");
-        }
-
-        if (latest.conf < 60) {
-            insights.push("System confidence below operational threshold.");
-        }
+        if (latest.liq < 50) insights.push("Liquidity stress detected.");
+        if (latest.bank < 50) insights.push("Bank instability detected.");
+        if (latest.fx < 50) insights.push("FX volatility elevated.");
+        if (this.timeline.length > 3) insights.push("Cascade propagation detected.");
+        if (latest.conf < 60) insights.push("Confidence below threshold.");
 
         return insights;
     }
 
-    /**
-     * 📌 RECOMMENDATION ENGINE (BANK-STYLE OUTPUT)
-     */
     generateRecommendations(latest) {
-
         const recs = [];
 
-        if (latest.liq < 50) {
-            recs.push("Increase liquidity buffer thresholds and reserve stability mechanisms.");
-        }
-
-        if (latest.bank < 50) {
-            recs.push("Introduce subsystem redundancy in banking/settlement layer.");
-        }
-
-        if (latest.conf < 60) {
-            recs.push("Activate circuit-breaker logic for systemic stress containment.");
-        }
+        if (latest.liq < 50) recs.push("Increase liquidity buffers.");
+        if (latest.bank < 50) recs.push("Add banking redundancy.");
+        if (latest.conf < 60) recs.push("Activate circuit breakers.");
 
         return recs;
     }
 
-    /**
-     * 📤 GET CURRENT REPORT (FOR UI OR EXPORT)
-     */
     getLastReport() {
         return this.lastReport;
     }
 
-    /**
-     * 📊 GET FULL TIMELINE (FOR DEBUG / VISUALIZATION)
-     */
     getTimeline() {
         return this.timeline;
     }
 }
 
-export const orchestra = new SextantOrchestra();
+// ✅ GLOBAL EXPORT FOR BROWSER
+window.orchestra = new SextantOrchestra();
