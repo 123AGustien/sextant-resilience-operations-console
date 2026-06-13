@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sextant Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="header">
+    <h1>Sextant Export Resilience Simulator</h1>
+    <p>Control Room Simulation Layer</p>
+  </div>
+
+  <div class="panel">
+    <button onclick="runSimulation()">Run Simulation</button>
+    <button onclick="resetSimulation()">Reset</button>
+
+    <select id="scenarioSelect"></select>
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+      <h3>Export Index</h3>
+      <div id="exportIndex">0</div>
+    </div>
+
+    <div class="card">
+      <h3>Electronics</h3>
+      <div id="electronics">0</div>
+    </div>
+
+    <div class="card">
+      <h3>Non-Tech</h3>
+      <div id="nonTech">0</div>
+    </div>
+
+    <div class="card">
+      <h3>Shock Level</h3>
+      <div id="shock">0</div>
+    </div>
+
+  </div>
+
+  <div class="log" id="log"></div>
+
+  <script src="config.js"></script>
+  <script src="data.js"></script>
+  <script src="scenarios.js"></script>
+  <script src="engine.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
