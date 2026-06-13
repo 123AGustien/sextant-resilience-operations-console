@@ -1,7 +1,21 @@
+/**
+ * Sextant RP-04 Engine v10 (LOCKED)
+ * Deterministic resilience simulation core
+ * GitHub Pages / Browser-safe
+ */
+
 function runRP04(type) {
+
     const rp04 = {
-        stability: type === "cascade" ? 0.25 : type === "failure" ? 0.55 : 0.82,
-        pressure:  type === "cascade" ? 0.95 : type === "failure" ? 0.6 : 0.28
+        stability:
+            type === "cascade" ? 0.25 :
+            type === "failure" ? 0.55 :
+            0.82,
+
+        pressure:
+            type === "cascade" ? 0.95 :
+            type === "failure" ? 0.60 :
+            0.28
     };
 
     const fx = rp04.pressure;
@@ -18,5 +32,11 @@ function runRP04(type) {
     };
 }
 
-// expose to browser (IMPORTANT)
+/**
+ * 🌐 CRITICAL GLOBAL EXPORT
+ * Required for:
+ * - orchestra_engine.js
+ * - bootstrap.js
+ * - dashboard UI
+ */
 window.runRP04 = runRP04;
