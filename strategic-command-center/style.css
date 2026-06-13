@@ -1,16 +1,17 @@
-/* Sextant Strategic Command Center - UI Layer */
+/* Sextant Strategic Command Center - Intelligence UI Layer v2 */
 
 body {
 margin: 0;
 font-family: Arial, sans-serif;
-background: #0b0f1a;
+background: #070b14;
 color: #e6e6e6;
 }
 
+/* HEADER */
 .header {
 text-align: center;
-padding: 20px;
-background: #111827;
+padding: 22px;
+background: #0f172a;
 border-bottom: 1px solid #1f2937;
 }
 
@@ -22,70 +23,96 @@ letter-spacing: 1px;
 
 .header p {
 margin: 5px 0 0;
-color: #9ca3af;
+color: #94a3b8;
 }
 
+/* LAYOUT */
 .container {
 display: grid;
-grid-template-columns: 1fr;
-gap: 15px;
+gap: 16px;
 padding: 20px;
 }
 
+/* PANELS */
 .panel {
-background: #111827;
-padding: 15px;
-border-radius: 10px;
+background: #0f172a;
+padding: 16px;
+border-radius: 12px;
 border: 1px solid #1f2937;
 }
 
+/* TITLES */
 h2 {
-font-size: 16px;
+font-size: 15px;
 margin-bottom: 10px;
-color: #93c5fd;
+color: #60a5fa;
 }
 
+/* BUTTONS */
 button {
-display: block;
 width: 100%;
-margin: 5px 0;
-padding: 10px;
-background: #1f2937;
+margin: 6px 0;
+padding: 11px;
+background: #111827;
 border: 1px solid #374151;
 color: #e5e7eb;
+border-radius: 8px;
 cursor: pointer;
-border-radius: 6px;
 transition: 0.2s;
+font-weight: 500;
 }
 
 button:hover {
-background: #2563eb;
+background: #1d4ed8;
 border-color: #3b82f6;
 }
 
+/* RISK STATES */
 #riskIndex {
-font-size: 18px;
+font-size: 20px;
 margin-bottom: 10px;
-color: #fbbf24;
+font-weight: bold;
 }
 
+/* Color states injected via JS text */
+.risk-critical {
+color: #ef4444;
+}
+
+.risk-high {
+color: #f97316;
+}
+
+.risk-elevated {
+color: #facc15;
+}
+
+.risk-stable {
+color: #22c55e;
+}
+
+/* IMPACT */
 #impactSummary {
-color: #d1d5db;
+color: #cbd5e1;
+margin-bottom: 10px;
 }
 
+/* BRIEFING PANEL */
 #briefing {
-background: #0f172a;
-padding: 15px;
-border-radius: 8px;
+background: #020617;
+padding: 14px;
+border-radius: 10px;
 border: 1px solid #1f2937;
 white-space: pre-wrap;
-color: #e5e7eb;
-min-height: 150px;
+min-height: 180px;
+color: #e2e8f0;
 }
 
+/* FOOTER */
 .footer {
 text-align: center;
-padding: 10px;
+padding: 12px;
 font-size: 12px;
-color: #6b7280;
+color: #64748b;
+margin-top: 10px;
 }
