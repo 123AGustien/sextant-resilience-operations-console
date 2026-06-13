@@ -1,87 +1,59 @@
 /**
  * Sextant v4.0 - Simulator Controller
- * Unified control layer (run / reset / lens switching)
+ * Connects UI ↔ World Model ↔ Lens ↔ Macro Engine
  */
 
-// Ensure safe defaults
-let worldState = (typeof WORLD !== "undefined")
-  ? JSON.parse(JSON.stringify(WORLD))
-  : {};
+let CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
 
-let currentLens = "global";
-
-/**
- * MAIN RUN FUNCTION
- */
 function runSimulation() {
 
-  if (typeof runGlobalSimulation === "function") {
-    runGlobalSimulation();
+  // 1. Apply lens view (non-destructive)
+  const view = applyLens(CURRENT_WORLD);
+
+  // 2. Define base shock scenario (can be upgraded later)
+  const shock = {
+    trade: 0.05,
+    policy: 0.03,
+    energy: 0.04
+  };
+
+  // 3. Propagate shock through system
+  propagateShock(view, "usa", shock);
+
+  // 4. Compute macro outputs
+  const index = computeGlobalIndex(view);
+  const health = computeSystemHealth(view);
+
+  // 5. Update UI safely
+  const macroEl = document.getElementById("macroIndex");
+  const decisionEl = document.getElementById("decision");
+
+  if (macroEl) {
+    macroEl.innerText = index.toFixed(2);
   }
 
-  const view = (typeof getLensView === "function")
-    ? getLensView(worldState)
-    : worldState;
-
-  const index = (typeof getLensIndex === "function")
-    ? getLensIndex(worldState)
-    : 0;
-
-  if (typeof updateGlobalUI === "function") {
-    updateGlobalUI(view, index);
+  if (decisionEl) {
+    decisionEl.innerText = "System Health: " + health.toFixed(2);
   }
 
-  if (typeof logGlobal === "function") {
-    logGlobal("Simulation cycle executed");
-  }
+  // 6. Log system event
+  log("RUN | Macro Index: " + index.toFixed(2));
 }
 
-/**
- * RESET SYSTEM
- */
 function resetSimulation() {
 
-  if (typeof WORLD !== "undefined") {
-    worldState = JSON.parse(JSON.stringify(WORLD));
-  }
+  CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
 
-  if (typeof resetGlobalSimulation === "function") {
-    resetGlobalSimulation();
-  }
+  log("RESET | System restored to baseline");
 
-  if (typeof updateGlobalUI === "function") {
-    updateGlobalUI(worldState, 0);
-  }
-
-  if (typeof logGlobal === "function") {
-    logGlobal("System reset to baseline state");
-  }
+  runSimulation();
 }
 
 /**
- * LENS SWITCHING FROM UI
+ * Optional manual trigger for lens switching safety hook
  */
-function changeLens(lens) {
-
-  currentLens = lens;
-
-  if (typeof setLens === "function") {
-    setLens(lens);
-  }
-
-  const view = (typeof getLensView === "function")
-    ? getLensView(worldState)
-    : worldState;
-
-  const index = (typeof getLensIndex === "function")
-    ? getLensIndex(worldState)
-    : 0;
-
-  if (typeof updateGlobalUI === "function") {
-    updateGlobalUI(view, index);
-  }
-
-  if (typeof logGlobal === "function") {
-    logGlobal("Lens changed to: " + lens);
+function changeLensSafe(lens) {
+  if (typeof changeLens === "function") {
+    changeLens(lens);
   }
 }
