@@ -4,23 +4,24 @@
   <meta charset="UTF-8">
   <title>Sextant v3 Macro Intelligence System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="style.css">
+
+  <!-- v3.2: Chart Engine -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
   <div class="header">
-    <h1>Sextant v3.0</h1>
-    <p>Macro Intelligence Control System</p>
+    <h1>Sextant v3.2</h1>
+    <p>Macro Intelligence Control System — Bloomberg Mode</p>
   </div>
 
   <div class="panel">
-
     <button onclick="runSimulation()">Run Cycle</button>
     <button onclick="resetSimulation()">Reset</button>
-
     <select id="scenarioSelect"></select>
-
   </div>
 
   <div class="grid">
@@ -52,12 +53,26 @@
     <div id="decision">---</div>
   </div>
 
+  <!-- 📊 v3.2 DASHBOARD LAYER -->
+  <div class="card">
+    <h3>Macro Trend Dashboard</h3>
+    <canvas id="macroChart"></canvas>
+  </div>
+
+  <div class="card">
+    <h3>Sector Exposure</h3>
+    <canvas id="sectorChart"></canvas>
+  </div>
+
   <div id="log"></div>
 
   <!-- CORE ENGINE -->
   <script src="core/sector-model.js"></script>
   <script src="core/shock-engine.js"></script>
   <script src="core/macro-engine.js"></script>
+
+  <!-- HISTORY (v3.1 dependency) -->
+  <script src="core/history-engine.js"></script>
 
   <!-- SCENARIOS -->
   <script src="scenarios/baseline.js"></script>
@@ -68,6 +83,9 @@
   <script src="engine.js"></script>
   <script src="decision.js"></script>
   <script src="app.js"></script>
+
+  <!-- v3.2 VISUAL SYSTEM -->
+  <script src="dashboard.js"></script>
 
 </body>
 </html>
