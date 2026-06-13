@@ -65,3 +65,14 @@ function getLensIndex(world) {
 
   return count > 0 ? total / count : 0;
 }
+/**
+ * COMPATIBILITY LAYER (required by simulator.js)
+ */
+
+function changeLens(lens) {
+  setLens(lens);
+}
+
+function applyLens(world) {
+  return getLensView(world);
+}
