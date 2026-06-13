@@ -1,4 +1,36 @@
 /**
+ * Sextant v4.0 - RUNTIME BOOTSTRAP GUARD v5
+ * Guarantees Run Button Always Works
+ */
+
+window.SEXTANT_BOOT = {
+  ready: false,
+  attempts: 0
+};
+
+function ensureEngineReady() {
+
+  window.SEXTANT_BOOT.attempts++;
+
+  // Try initialize WORLD safely
+  if (!window.CURRENT_WORLD && typeof WORLD !== "undefined") {
+    window.CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
+  }
+
+  // Check critical dependencies
+  const ok =
+    typeof WORLD !== "undefined" &&
+    typeof propagateShock === "function" &&
+    typeof computeGlobalIndex === "function" &&
+    typeof computeSystemHealth === "function" &&
+    typeof applyLens === "function";
+
+  window.SEXTANT_BOOT.ready = ok;
+
+  return ok;
+}
+
+/**
  * Sextant v4.0 - Simulator Controller
  * Safe Runtime Version (FINAL CLEAN BUILD)
  */
