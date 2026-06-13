@@ -1,0 +1,73 @@
+# 🏦 Sextant FX Dashboard
+
+## FX & Liquidity Simulation Module
+
+The Sextant FX Dashboard is a deterministic simulation layer for modeling foreign exchange dynamics, liquidity flow, and cross-border financial stress propagation within the Sextant resilience system.
+
+---
+
+## 🌐 Live System
+
+- FX Dashboard (Live)  
+https://123agustien.github.io/sextant-fx-dashboard/
+
+---
+
+## 🗂 Repository
+
+- FX Module Source Code  
+https://github.com/123AGustien/sextant-fx-dashboard
+
+---
+
+## 🧠 System Functions
+
+- FX rate simulation (synthetic)
+- Liquidity flow propagation
+- Cross-currency stress modeling
+- Bank exposure sensitivity mapping
+- Macro shock transmission effects
+
+---
+
+## 🏦 Simulation Layer
+
+The system models:
+
+- Currency dependency networks  
+- Regional liquidity constraints  
+- FX shock amplification  
+- Multi-node financial coupling  
+
+---
+
+## ⚠ System Classification
+
+- Simulation-only system  
+- No real financial execution  
+- No market connectivity  
+- No banking integration  
+- Deterministic synthetic outputs only  
+
+---
+
+## 🔄 Integration
+
+Connected to Sextant ecosystem:
+
+- Control Room  
+  https://123agustien.github.io/sextant-resilience-operations-console/
+
+- v4 Macro Simulator  
+  https://123agustien.github.io/sextant-resilience-operations-console/simulator-v4/
+
+---
+
+## 🧭 Purpose
+
+This module is designed for:
+
+- FX risk analysis  
+- Liquidity stress testing  
+- Macro-financial simulation  
+- Cross-border dependency modeling
