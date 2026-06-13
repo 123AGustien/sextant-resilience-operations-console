@@ -52,6 +52,7 @@
     <div style="color:#00ff88;">● LIVE CONTROL ROOM</div>
   </div>
 
+  <!-- CONTROL PANEL -->
   <div class="card">
 
     <button onclick="runSimulation()">Run</button>
@@ -66,6 +67,7 @@
 
   </div>
 
+  <!-- METRICS -->
   <div class="card">
     <div id="semis">0</div>
     <div id="industrial">0</div>
@@ -73,10 +75,12 @@
     <div id="macroIndex">0</div>
   </div>
 
+  <!-- STATUS -->
   <div class="card">
     <div id="decision">---</div>
   </div>
 
+  <!-- LOG -->
   <div class="card">
     <div id="log"></div>
   </div>
@@ -92,15 +96,11 @@
   <!-- SIMULATOR -->
   <script src="simulator.js"></script>
 
-  <!-- AUTO START (1-CLICK MODE) -->
+  <!-- CLEAN BOOT (NO AUTO RUN) -->
   <script>
-    window.onload = function () {
-      setTimeout(() => {
-        if (typeof runSimulation === "function") {
-          runSimulation();
-        }
-      }, 700);
-    }
+    window.addEventListener("load", function () {
+      console.log("Sextant Ready - Manual Control Mode");
+    });
   </script>
 
 </body>
