@@ -1,40 +1,13 @@
 /**
- * Sextant v4.0 - RUNTIME BOOTSTRAP + SIMULATOR
- * Guaranteed Run Button Stability Layer
+ * Sextant v4.0 - Simulator Controller
+ * Clean Control Room Runtime (Stable Build)
  */
 
-let isRunning = false;
-
 /* =========================
-   BOOTSTRAP GUARANTEE LAYER
+   STATE
 ========================= */
 
-window.SEXTANT_BOOT = {
-  ready: false,
-  attempts: 0
-};
-
-function ensureEngineReady() {
-
-  window.SEXTANT_BOOT.attempts++;
-
-  // Auto-initialize WORLD safely
-  if (!window.CURRENT_WORLD && typeof WORLD !== "undefined") {
-    window.CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
-  }
-
-  // Validate dependencies
-  const ok =
-    typeof WORLD !== "undefined" &&
-    typeof propagateShock === "function" &&
-    typeof computeGlobalIndex === "function" &&
-    typeof computeSystemHealth === "function" &&
-    typeof applyLens === "function";
-
-  window.SEXTANT_BOOT.ready = ok;
-
-  return ok;
-}
+let CURRENT_WORLD = null;
 
 /* =========================
    LOGGER
@@ -47,7 +20,7 @@ function log(message) {
 }
 
 /* =========================
-   DIAGNOSTICS
+   DIAGNOSTICS (OPTIONAL)
 ========================= */
 
 function runDiagnostics() {
@@ -72,10 +45,14 @@ function runDiagnostics() {
 }
 
 /* =========================
-   WORLD STATE (SAFE INIT)
+   INIT WORLD SAFELY
 ========================= */
 
-let CURRENT_WORLD = window.CURRENT_WORLD || null;
+function initWorld() {
+  if (!CURRENT_WORLD && typeof WORLD !== "undefined") {
+    CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
+  }
+}
 
 /* =========================
    MAIN SIMULATION ENGINE
@@ -83,112 +60,84 @@ let CURRENT_WORLD = window.CURRENT_WORLD || null;
 
 function runSimulation() {
 
-  if (isRunning) return;
-  isRunning = true;
-
   try {
 
-    // 🔥 GUARANTEE ENGINE IS READY
-    if (!ensureEngineReady()) {
-
-      log("BOOTSTRAP | Engine not ready, retrying...");
-
-      setTimeout(() => {
-        isRunning = false;
-        runSimulation();
-      }, 300);
-
+    if (typeof WORLD === "undefined") {
+      log("ERROR: WORLD missing");
       return;
     }
 
-    if (!window.CURRENT_WORLD && typeof WORLD !== "undefined") {
-      window.CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
-    }
+    initWorld();
 
-    const worldRef = window.CURRENT_WORLD;
-
-    if (!worldRef) {
-      log("ERROR: WORLD not available");
+    if (!CURRENT_WORLD) {
+      log("ERROR: CURRENT_WORLD not initialized");
       return;
     }
 
-    // Apply lens safely
-    const view = applyLens(JSON.parse(JSON.stringify(worldRef)));
+    // Apply lens view
+    const view = applyLens(JSON.parse(JSON.stringify(CURRENT_WORLD)));
 
-    // Shock model
+    // Base shock model
     const shock = {
       trade: 0.05,
       policy: 0.03,
       energy: 0.04
     };
 
-    // Propagate system shock
+    // Propagate shock
     propagateShock(view, "usa", shock);
 
     // Compute outputs
     const index = computeGlobalIndex(view);
     const health = computeSystemHealth(view);
 
-    // Update UI
+    // UI update
     const macroEl = document.getElementById("macroIndex");
     const decisionEl = document.getElementById("decision");
 
-    if (macroEl) {
-      macroEl.innerText = index.toFixed(2);
-    }
+    if (macroEl) macroEl.innerText = index.toFixed(2);
+    if (decisionEl) decisionEl.innerText = "System Health: " + health.toFixed(2);
 
-    if (decisionEl) {
-      decisionEl.innerText = "System Health: " + health.toFixed(2);
-    }
-
-    // Log output
+    // Log
     log("RUN | Macro Index: " + index.toFixed(2));
 
   } catch (err) {
     log("ERROR: " + err.message);
-  } finally {
-    isRunning = false;
   }
 }
 
 /* =========================
-   RESET ENGINE
+   RESET SYSTEM
 ========================= */
 
 function resetSimulation() {
 
-  if (typeof WORLD !== "undefined") {
-    window.CURRENT_WORLD = JSON.parse(JSON.stringify(WORLD));
-  }
+  initWorld();
 
   log("RESET | System restored");
 
-  isRunning = false;
   runSimulation();
 }
 
 /* =========================
-   SAFE LENS SWITCH
+   LENS SAFETY WRAPPER
 ========================= */
 
 function changeLensSafe(lens) {
-
   if (typeof changeLens === "function") {
     changeLens(lens);
   }
 }
 
 /* =========================
-   BOOT SEQUENCE
+   BOOT (SAFE ONLY)
 ========================= */
 
 window.addEventListener("load", function () {
 
   runDiagnostics();
 
-  ensureEngineReady();
+  initWorld();
 
-  setTimeout(function () {
-    runSimulation();
-  }, 500);
+  log("SYSTEM READY");
 });
