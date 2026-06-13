@@ -1,6 +1,6 @@
 /**
  * Sextant v4.0 - Simulator Controller
- * Safe Runtime Version (FINAL STABLE)
+ * Safe Runtime Version (FINAL CLEAN BUILD)
  */
 
 let isRunning = false;
@@ -82,26 +82,26 @@ function runSimulation() {
       return;
     }
 
-    // 1. Apply lens view
+    // Apply lens view
     const view = applyLens(
       JSON.parse(JSON.stringify(CURRENT_WORLD))
     );
 
-    // 2. Base shock model
+    // Base shock model
     const shock = {
       trade: 0.05,
       policy: 0.03,
       energy: 0.04
     };
 
-    // 3. Propagate shock
+    // Propagate shock
     propagateShock(view, "usa", shock);
 
-    // 4. Compute outputs
+    // Compute outputs
     const index = computeGlobalIndex(view);
     const health = computeSystemHealth(view);
 
-    // 5. Update UI
+    // Update UI
     const macroEl = document.getElementById("macroIndex");
     const decisionEl = document.getElementById("decision");
 
@@ -114,7 +114,7 @@ function runSimulation() {
         "System Health: " + health.toFixed(2);
     }
 
-    // 6. Log output
+    // Log output
     log("RUN | Macro Index: " + index.toFixed(2));
 
   } catch (err) {
@@ -135,6 +135,7 @@ function resetSimulation() {
 
   log("RESET | System restored");
 
+  isRunning = false;
   runSimulation();
 }
 
@@ -149,12 +150,13 @@ function changeLensSafe(lens) {
 }
 
 /**
- * AUTO START
+ * AUTO START (SINGLE ENTRY POINT)
  */
 window.addEventListener("load", function () {
 
   runDiagnostics();
 
+  // optional startup delay for UI readiness
   setTimeout(function () {
     runSimulation();
   }, 500);
