@@ -2,22 +2,59 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sextant v4 Global Simulator</title>
+  <title>Sextant v4 Control Room</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background: #0b0f1a;
+      color: #d6e2ff;
+      font-family: Arial, sans-serif;
+    }
+
+    .header {
+      text-align: center;
+      padding: 15px;
+      border-bottom: 1px solid #1f2a44;
+    }
+
+    .card {
+      background: #121a2b;
+      margin: 10px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #1f2a44;
+    }
+
+    button {
+      background: #1f3b73;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      margin: 5px;
+      border-radius: 6px;
+    }
+
+    select {
+      padding: 6px;
+      border-radius: 6px;
+      background: #0f1626;
+      color: white;
+    }
+  </style>
 </head>
 
 <body>
 
   <div class="header">
     <h1>Sextant v4.0</h1>
-    <p>Global Geopolitical Macro Simulator (Frontend Live System)</p>
+    <p>Global Geopolitical Macro Simulator</p>
+    <div style="color:#00ff88;">● LIVE CONTROL ROOM</div>
   </div>
 
-  <div class="panel">
+  <div class="card">
 
-    <button onclick="runSimulation()">Run Simulation</button>
+    <button onclick="runSimulation()">Run</button>
     <button onclick="resetSimulation()">Reset</button>
 
     <select onchange="changeLens(this.value)">
@@ -29,37 +66,18 @@
 
   </div>
 
-  <div class="grid">
-
-    <div class="card">
-      <h3>Semiconductors</h3>
-      <div id="semis">0</div>
-    </div>
-
-    <div class="card">
-      <h3>Industrial</h3>
-      <div id="industrial">0</div>
-    </div>
-
-    <div class="card">
-      <h3>Non-Tech</h3>
-      <div id="nonTech">0</div>
-    </div>
-
-    <div class="card">
-      <h3>Macro Index</h3>
-      <div id="macroIndex">0</div>
-    </div>
-
+  <div class="card">
+    <div id="semis">0</div>
+    <div id="industrial">0</div>
+    <div id="nonTech">0</div>
+    <div id="macroIndex">0</div>
   </div>
 
   <div class="card">
-    <h3>Decision / Status</h3>
     <div id="decision">---</div>
   </div>
 
   <div class="card">
-    <h3>System Log</h3>
     <div id="log"></div>
   </div>
 
@@ -68,11 +86,22 @@
   <script src="core/propagation-engine.js"></script>
   <script src="core/global-macro.js"></script>
 
-  <!-- LENS SYSTEM -->
+  <!-- LENS -->
   <script src="lens.js"></script>
 
-  <!-- SIMULATOR CONTROLLER -->
+  <!-- SIMULATOR -->
   <script src="simulator.js"></script>
+
+  <!-- AUTO START (1-CLICK MODE) -->
+  <script>
+    window.onload = function () {
+      setTimeout(() => {
+        if (typeof runSimulation === "function") {
+          runSimulation();
+        }
+      }, 700);
+    }
+  </script>
 
 </body>
 </html>
