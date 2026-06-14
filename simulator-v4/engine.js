@@ -6,10 +6,6 @@
  * window.runRP04(type)
  */
 
-/**
- * SAFE GLOBAL ENGINE WRAPPER
- * Prevents UI crash if RP-04 is missing
- */
 (function () {
 
     /**
@@ -19,44 +15,50 @@
      */
     function runRP04(type) {
 
+        let engine;
+
         // -----------------------------------
         // SAFETY CHECK: RP-04 must exist
         // -----------------------------------
         if (!window.RP04Engine) {
             console.warn("⚠️ RP-04Engine not found. Using fallback mock engine.");
-
-            return createMockEngine(type);
+            engine = createMockEngine(type);
+        } else {
+            engine = window.RP04Engine.run(type);
+            engine = normalizeEngine(engine, type);
         }
 
-        // -----------------------------------
-        // CALL REAL ENGINE
-        // -----------------------------------
-        const engine = window.RP04Engine.run(type);
+        console.log("🧪 RP-04 RUN:", type, engine);
 
-        // Normalize structure (IMPORTANT for audit_bridge.js)
-        return normalizeEngine(engine, type);
+        return engine;
     }
 
     /**
      * NORMALISE ENGINE OUTPUT
-     * Ensures audit layer NEVER breaks
+     * Ensures audit + UI NEVER break
      */
     function normalizeEngine(engine, type) {
 
         return {
-            state: engine.state || "UNKNOWN",
+            state: engine?.state || "UNKNOWN",
 
             system: {
-                fx: engine.system?.fx ?? 0,
-                bank: engine.system?.bank ?? 0,
-                liq: engine.system?.liq ?? 0,
-                eq: engine.system?.eq ?? 0,
-                conf: engine.system?.conf ?? 0
+                fx: engine?.system?.fx ?? 0,
+                bank: engine?.system?.bank ?? 0,
+                liq: engine?.system?.liq ?? 0,
+                eq: engine?.system?.eq ?? 0,
+                conf: engine?.system?.conf ?? 0
             },
 
             meta: {
                 type: type,
                 timestamp: Date.now()
+            },
+
+            // 🧠 AUDIT COMPATIBILITY LAYER
+            audit: {
+                ready: true,
+                version: "v4-bridge"
             }
         };
     }
@@ -82,13 +84,18 @@
                 type: type,
                 timestamp: Date.now(),
                 warning: "RP-04 missing"
+            },
+
+            audit: {
+                ready: false,
+                version: "mock"
             }
         };
     }
 
     /**
      * GLOBAL EXPORT
-     * THIS is what orchestra calls
+     * This is what orchestra calls
      */
     window.runRP04 = runRP04;
 
