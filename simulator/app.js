@@ -1,57 +1,43 @@
 /**
- * Sextant Simulator - App Controller
- * v1.1.0-simulator-app
+ * Sextant Simulator App Controller
+ * Connects UI → Engine
  */
 
-let currentScenario = SCENARIOS.baseline;
+function runSimulation(type) {
+    if (!window.runEngine) return;
 
-window.onload = function () {
+    const frame = window.runEngine(type);
 
-  const select = document.getElementById("scenarioSelect");
-
-  for (let key in SCENARIOS) {
-    const opt = document.createElement("option");
-    opt.value = key;
-    opt.text = SCENARIOS[key].name;
-    select.appendChild(opt);
-  }
-
-  select.onchange = (e) => {
-    currentScenario = SCENARIOS[e.target.value];
-    log("Scenario selected: " + currentScenario.name);
-  };
-
-  updateUI();
-};
-
-function runSimulation() {
-  const result = runStep(currentScenario);
-  updateUI(result);
+    updateUI(frame);
 }
 
 function resetSimulation() {
-  resetState();
-  updateUI(state);
-  log("System reset");
+
+    const fields = ["exportIndex", "electronics", "nonTech", "shock"];
+
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = "--";
+    });
 }
 
-function updateUI(data = state) {
+function updateUI(frame) {
 
-  document.getElementById("exportIndex").innerText =
-    data.exportIndex.toFixed(2);
+    if (!frame) return;
 
-  document.getElementById("electronics").innerText =
-    data.electronics.toFixed(2);
+    const exportIndex = document.getElementById("exportIndex");
+    if (exportIndex) exportIndex.innerText = frame.system?.fx ?? 0;
 
-  document.getElementById("nonTech").innerText =
-    data.nonTech.toFixed(2);
+    const electronics = document.getElementById("electronics");
+    if (electronics) electronics.innerText = frame.system?.liq ?? 0;
 
-  document.getElementById("shock").innerText =
-    data.shock.toFixed(2);
+    const nonTech = document.getElementById("nonTech");
+    if (nonTech) nonTech.innerText = frame.system?.bank ?? 0;
+
+    const shock = document.getElementById("shock");
+    if (shock) shock.innerText = frame.state ?? "NONE";
 }
 
-function log(msg) {
-  const logBox = document.getElementById("log");
-  logBox.innerHTML += msg + "<br>";
-  logBox.scrollTop = logBox.scrollHeight;
-}
+/* expose */
+window.runSimulation = runSimulation;
+window.resetSimulation = resetSimulation;
