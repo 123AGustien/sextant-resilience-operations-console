@@ -1,24 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Sextant Simulator v4</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body>
 
-<h1>Sextant Simulator v4</h1>
+  <h1>Sextant Simulator v4</h1>
+  <p>Run Energy Crisis</p>
 
-<button onclick="runScenario('energy_crisis')">
-  Run Energy Crisis
-</button>
+  <!-- 🎯 SCENARIO BUTTON -->
+  <button onclick="runScenario('energy_crisis')">
+    Run Energy Crisis
+  </button>
 
-<div id="riskIndex"></div>
-<div id="impactSummary"></div>
-<pre id="briefing"></pre>
+  <hr>
 
-<script src="../simulator-v4/engine.js"></script>
-<script src="../audit_bridge.js"></script>
-<script src="../simulator-v4/ui.js"></script>
-<script src="../simulator-v4/script.js"></script>
+  <!-- 📊 DASHBOARD -->
+  <div>
+    <h3>Risk Index</h3>
+    <div id="riskIndex">--</div>
+  </div>
+
+  <div>
+    <h3>Impact Summary</h3>
+    <div id="impactSummary">--</div>
+  </div>
+
+  <div>
+    <h3>Executive Briefing</h3>
+    <pre id="briefing">Awaiting simulation...</pre>
+  </div>
+
+  <!-- 🔗 CORE SCRIPTS (ORDER MATTERS) -->
+
+  <script src="../simulator-v4/engine.js"></script>
+  <script src="../audit_bridge.js"></script>
+  <script src="../simulator-v4/ui.js"></script>
+  <script src="../simulator-v4/script.js"></script>
 
 </body>
 </html>
