@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Sextant Control Room v8 (RP-04 Deterministic Engine)</title>
+<title>Sextant Control Room v8 (Wired RP-04 Engine)</title>
 
 <style>
 body {
@@ -94,7 +94,46 @@ pre {
 <script>
 
 window.logs = [];
+window.auditLog = [];
 
+/* =========================
+   SAFE BOOT GUARD
+========================= */
+(function bootCheck() {
+
+    if (!window.runRP04) {
+        console.warn("RP-04 missing → SAFE MODE active");
+
+        window.runRP04 = function(type) {
+            return {
+                state: "SAFE_MODE",
+                system: {
+                    fx: 0.5,
+                    bank: 0.5,
+                    liq: 0.5,
+                    eq: 0.5,
+                    conf: 0.5
+                },
+                meta: { type }
+            };
+        };
+    }
+
+    if (!window.orchestra) {
+        window.orchestra = {
+            runStep: function(type) {
+                return window.runRP04(type);
+            },
+            getLastReport: function() { return null; },
+            reset: function() {}
+        };
+    }
+
+})();
+
+/* =========================
+   NODE UPDATE
+========================= */
 function setNode(id, v) {
     const el = document.getElementById(id);
 
@@ -107,54 +146,72 @@ function setNode(id, v) {
     el.innerText = id.toUpperCase() + ": " + v.toFixed(2);
 }
 
+/* =========================
+   MAIN SIMULATION RUN
+========================= */
 function runSim(type) {
 
-    const rp04 = {
-        stability: type === "cascade" ? 0.35 : type === "failure" ? 0.6 : 0.78,
-        pressure: type === "cascade" ? 0.9 : type === "failure" ? 0.5 : 0.3
+    const frame = window.orchestra.runStep(type);
+
+    const system = frame.system;
+
+    const state = frame.state || "UNKNOWN";
+
+    const audit = {
+        riskScore: system.fx * 100,
+        impact: type === "cascade" ? "System cascade failure"
+               : type === "failure" ? "Localized instability"
+               : "Stable operation",
+        stability: system.conf * 100,
+        grade: system.conf > 0.7 ? "A" : system.conf > 0.5 ? "B" : "C",
+        status: state
     };
 
-    const fx = rp04.pressure;
+    const fullFrame = {
+        frame,
+        audit,
+        timestamp: Date.now()
+    };
 
-    const bank = fx * 0.85;
-    const liq  = bank * 0.90;
-    const eq   = liq * 0.92;
-    const conf = eq * 0.95;
-
-    const system = { fx, bank, liq, eq, conf };
-
-    const state = rp04.stability > 0.6 ? "STABLE" : "RISK";
-
-    const result = { rp04, system, state };
-
-    window.logs.push(result);
+    window.logs.push(fullFrame);
+    window.auditLog.push(fullFrame);
 
     document.getElementById("status").innerText = state;
 
     document.getElementById("output").innerHTML =
-        "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
+        "<pre>" + JSON.stringify(fullFrame, null, 2) + "</pre>";
 
-    setNode("rp04", rp04.stability);
-    setNode("fx", fx);
-    setNode("bank", bank);
-    setNode("liq", liq);
-    setNode("eq", eq);
-    setNode("conf", conf);
+    setNode("rp04", system.conf);
+    setNode("fx", system.fx);
+    setNode("bank", system.bank);
+    setNode("liq", system.liq);
+    setNode("eq", system.eq);
+    setNode("conf", system.conf);
 
     document.getElementById("log").innerHTML =
         window.logs.map((l,i) =>
-            `<div>#${i} ${l.state}</div>`
+            `<div>#${i} ${l.audit.status} | GRADE: ${l.audit.grade}</div>`
         ).join("");
+
+    /* =========================
+       EVENT BUS (COMMAND CENTER)
+    ========================= */
+    window.dispatchEvent(new CustomEvent("sextant:run", {
+        detail: fullFrame
+    }));
 }
 
+/* =========================
+   MANUAL INPUT
+========================= */
 function runManual() {
     const text = document.getElementById("manualInput").value.toLowerCase();
 
     let type = "normal";
 
-    if (text.includes("crash") || text.includes("collapse") || text.includes("cascade")) {
+    if (text.includes("crash") || text.includes("cascade") || text.includes("collapse")) {
         type = "cascade";
-    } else if (text.includes("risk") || text.includes("drop") || text.includes("fall")) {
+    } else if (text.includes("risk") || text.includes("drop")) {
         type = "failure";
     }
 
