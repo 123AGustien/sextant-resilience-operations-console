@@ -9,21 +9,25 @@
 
 <body>
 
-  <!-- ================= HEADER ================= -->
+  <!-- HEADER -->
   <div class="header">
     <h1>Sextant Resilience Simulator</h1>
     <p>Scenario Failure Simulation Control Room</p>
   </div>
 
-  <!-- ================= CONTROLS ================= -->
+  <!-- CONTROLS -->
   <div class="panel">
     <button onclick="runSimulation()">Run Simulation</button>
     <button onclick="resetSimulation()">Reset</button>
 
-    <select id="scenarioSelect"></select>
+    <select id="scenarioSelect">
+      <option value="normal">Normal</option>
+      <option value="failure">Failure</option>
+      <option value="cascade">Cascade</option>
+    </select>
   </div>
 
-  <!-- ================= DASHBOARD ================= -->
+  <!-- DASHBOARD -->
   <div class="grid">
 
     <div class="card">
@@ -48,63 +52,65 @@
 
   </div>
 
-  <!-- ================= AUDIT OUTPUT ================= -->
+  <!-- AUDIT OUTPUT -->
   <div class="card">
     <h3>Audit Output</h3>
     <pre id="auditLog">Awaiting audit...</pre>
   </div>
 
-  <!-- ================= EVENT LOG ================= -->
+  <!-- EVENT LOG -->
   <div class="log" id="log"></div>
 
-  <!-- ================= CORE SYSTEM ================= -->
+  <!-- CORE SYSTEM -->
   <script src="../config.js"></script>
   <script src="../data.js"></script>
   <script src="../scenarios.js"></script>
+
+  <!-- ENGINE -->
   <script src="../engine.js"></script>
 
-  <!-- ================= AUDIT LAYER (IMPORTANT) ================= -->
+  <!-- BRIDGE (CRITICAL) -->
   <script src="../audit_bridge.js"></script>
 
-  <!-- ================= VISUAL LAYER ================= -->
+  <!-- VISUAL LAYER -->
   <script src="../visual.js"></script>
 
-  <!-- ================= CONTROLLER ================= -->
+  <!-- APP CONTROLLER -->
   <script src="../app.js"></script>
 
-  <!-- ================= BOOT STRAP FIX ================= -->
+  <!-- ================= CONTROL BOOTSTRAP ================= -->
   <script>
 
     function runSimulation() {
 
-        const engine = window.engine || window;
+        const scenario = document.getElementById("scenarioSelect").value;
 
-        const result = engine.runSimulation(
-            document.getElementById("scenarioSelect").value
-        );
+        // 1. RUN ENGINE (ONLY SOURCE OF TRUTH)
+        const result = window.runEngine
+            ? window.runEngine(scenario)
+            : window.engine.runSimulation(scenario);
 
-        // 🔥 AUDIT INJECTION (CRITICAL LINK)
-        const audit = window.auditScenarioResult(
-            result.scenario,
-            {
-                riskScore: result.shock,
-                impact: result.exportIndex,
-                stability: 100 - result.shock
-            }
-        );
+        // 2. UI UPDATE (if exists)
+        if (window.updateUI) {
+            window.updateUI(result);
+        }
 
-        result.audit = audit;
+        // 3. AUTO AUDIT VIA BRIDGE (NO MANUAL BUILD)
+        if (window.SextantBridge && window.SextantBridge.captureSimulationResult) {
 
-        updateUI(result);
+            const audit = window.SextantBridge.captureSimulationResult(result);
 
-        // DISPLAY AUDIT
-        document.getElementById("auditLog").innerText =
-            JSON.stringify(audit, null, 2);
+            document.getElementById("auditLog").innerText =
+                JSON.stringify(audit, null, 2);
+        }
     }
 
     function resetSimulation() {
+
         if (window.reset) window.reset();
-        document.getElementById("auditLog").innerText = "Awaiting audit...";
+
+        document.getElementById("auditLog").innerText =
+            "Awaiting audit...";
     }
 
   </script>
