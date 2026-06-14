@@ -1,44 +1,69 @@
 /**
- * Sextant Simulator - Engine Module
- * v1.1.0-simulator-engine
+ * Sextant Simulator Engine — Bridge Native Core
+ * Outputs standardized frame → auto audit + Control Room sync
  */
 
-let state = JSON.parse(JSON.stringify(BASE_DATA));
+/* =========================
+   FRAME CONTRACT
+=========================
 
-function applyShock(state, scenario) {
-  state.shock = scenario.shock * 10;
-  return state;
+frame = {
+  rp04: { stability, pressure },
+  system: { fx, bank, liq, eq, conf },
+  state: "STABLE" | "RISK",
+  scenario: "normal" | "failure" | "cascade",
+  timestamp: number
 }
 
-function calculateModel(state, scenario) {
+========================= */
 
-  let electronics = state.electronics * (1.05 / scenario.shock);
-  let nonTech = state.nonTech * (0.98);
+function runEngine(type) {
 
-  let exportIndex = (electronics + nonTech) / scenario.shock;
+    const rp04 = {
+        stability: type === "cascade" ? 0.25 : type === "failure" ? 0.55 : 0.82,
+        pressure: type === "cascade" ? 0.95 : type === "failure" ? 0.60 : 0.28
+    };
 
-  return {
-    electronics,
-    nonTech,
-    exportIndex
-  };
+    const fx = rp04.pressure;
+
+    const system = {
+        fx,
+        bank: fx * 0.83,
+        liq: fx * 0.83 * 0.88,
+        eq: fx * 0.83 * 0.88 * 0.91,
+        conf: fx * 0.83 * 0.83 * 0.91 * 0.94
+    };
+
+    const state = rp04.stability > 0.6 ? "STABLE" : "RISK";
+
+    const frame = {
+        rp04,
+        system,
+        state,
+        scenario: type,
+        timestamp: Date.now()
+    };
+
+    return emitFrame(frame);
 }
 
-function runStep(scenario) {
+/* =========================
+   BRIDGE EMITTER (CORE)
+========================= */
+function emitFrame(frame) {
 
-  state = applyShock(state, scenario);
+    // UI event stream
+    window.dispatchEvent(new CustomEvent("sextant:run", {
+        detail: frame
+    }));
 
-  const result = calculateModel(state, scenario);
+    // Audit bridge (CONTROL ROOM LINK)
+    if (window.SextantBridge?.captureSimulationResult) {
+        window.SextantBridge.captureSimulationResult(frame);
+    }
 
-  state.electronics = result.electronics;
-  state.nonTech = result.nonTech;
-  state.exportIndex = result.exportIndex;
-
-  log("Simulation step: " + scenario.name);
-
-  return state;
+    return frame;
 }
 
-function resetState() {
-  state = JSON.parse(JSON.stringify(BASE_DATA));
-}
+/* expose */
+window.runEngine = runEngine;
