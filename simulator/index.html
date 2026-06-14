@@ -66,13 +66,13 @@
   <script src="../data.js"></script>
   <script src="../scenarios.js"></script>
 
-  <!-- ENGINE -->
-  <script src="../engine.js"></script>
+  <!-- ENGINE (ONLY SOURCE OF TRUTH) -->
+  <script src="../rp04-engine.js"></script>
 
-  <!-- BRIDGE (CRITICAL) -->
+  <!-- AUDIT BRIDGE -->
   <script src="../audit_bridge.js"></script>
 
-  <!-- VISUAL LAYER -->
+  <!-- VISUAL LAYER (OPTIONAL) -->
   <script src="../visual.js"></script>
 
   <!-- APP CONTROLLER -->
@@ -85,46 +85,35 @@
 
         const scenario = document.getElementById("scenarioSelect").value;
 
-        // 1. ENGINE (single source of truth)
-        const result =
-            (window.runEngine && window.runEngine(scenario)) ||
-            (window.engine?.runSimulation?.(scenario));
-
-        if (!result) {
-            console.error("Engine returned no result");
+        // 1. ENGINE (SINGLE SOURCE OF TRUTH)
+        if (!window.runRP04) {
+            console.error("RP-04 engine missing");
             return;
         }
 
-        // 2. NORMALIZED FRAME (IMPORTANT FOR BRIDGE)
-        const frame = {
-            rp04: result.rp04 || {},
-            system: result.system || {},
-            state: result.state || "UNKNOWN",
-            scenario: result.scenario || scenario,
-            timestamp: Date.now()
-        };
+        const frame = window.runRP04(scenario);
 
-        // 3. UI UPDATE
+        if (!frame) {
+            console.error("Engine returned no frame");
+            return;
+        }
+
+        // 2. UI UPDATE (DISPLAY ONLY)
         if (window.updateUI) {
             window.updateUI(frame);
         }
 
-        // 4. AUDIT PIPE (BRIDGE-NATIVE)
-        let audit = null;
-
-        if (window.SextantBridge?.captureSimulationResult) {
-            audit = window.SextantBridge.captureSimulationResult(frame);
-        }
-
+        // 3. AUDIT PIPE (BRIDGE)
+        const audit = window.SextantBridge?.captureSimulationResult(frame) || null;
         frame.audit = audit;
 
-        // 5. AUDIT DISPLAY
+        // 4. AUDIT DISPLAY
         const auditLog = document.getElementById("auditLog");
         if (auditLog) {
             auditLog.innerText = JSON.stringify(audit || {}, null, 2);
         }
 
-        // 6. EVENT STREAM (CONTROL ROOM SYNC)
+        // 5. EVENT STREAM (CONTROL CENTER SYNC)
         window.dispatchEvent(new CustomEvent("sextant:run", {
             detail: frame
         }));
