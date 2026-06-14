@@ -1,3 +1,77 @@
+
+/**
+ * Sextant Live Audit Bridge Connector
+ * Connects simulator-v4 → audit engine → command center UI
+ */
+
+/* ===============================
+   LIVE EVENT FROM SIMULATOR
+================================ */
+window.addEventListener("sextant:run", function (e) {
+
+    const frame = e.detail || {};
+
+    const audit = frame.audit || {};
+    const system = frame.system || {};
+
+    // ============================
+    // RISK INDEX (LIVE OVERRIDE)
+    // ============================
+    const riskEl = document.getElementById("riskIndex");
+    if (riskEl) {
+
+        const score =
+            audit.riskScore ??
+            system.conf ??
+            0;
+
+        const level = getRiskLevel(score);
+
+        riskEl.innerText =
+            frame.scenario + " | Risk: " + score + " | " + level.toUpperCase();
+
+        applyRiskStyle(level);
+    }
+
+    // ============================
+    // IMPACT SUMMARY (LIVE)
+    // ============================
+    const impactEl = document.getElementById("impactSummary");
+    if (impactEl) {
+        impactEl.innerText =
+            audit.impact ??
+            system.liq ??
+            "No impact data";
+    }
+
+    // ============================
+    // EXECUTIVE BRIEFING (LIVE)
+    // ============================
+    const briefingEl = document.getElementById("briefing");
+    if (briefingEl) {
+
+        briefingEl.innerText =
+`EXECUTIVE INTELLIGENCE REPORT
+
+Scenario: ${frame.scenario || "unknown"}
+State: ${frame.state || "unknown"}
+
+Risk Score: ${audit.riskScore ?? system.conf ?? 0}
+Impact: ${audit.impact ?? "N/A"}
+Stability: ${audit.stability ?? "N/A"}
+
+Grade: ${audit.grade || "NO_GRADE"}
+Status: ${audit.status || "NO_STATUS"}
+
+FX: ${system.fx ?? 0}
+BANK: ${system.bank ?? 0}
+LIQ: ${system.liq ?? 0}
+CONF: ${system.conf ?? 0}
+`;
+    }
+
+});
+
 /* Sextant Strategic Command Center - Portfolio Risk Engine v7 */
 
 function getRiskLevel(score) {
