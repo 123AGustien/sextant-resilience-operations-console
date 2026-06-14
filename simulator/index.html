@@ -2,18 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sextant Simulator</title>
+  <title>Sextant Simulator Control Room</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../style.css">
 </head>
 
 <body>
 
+  <!-- ================= HEADER ================= -->
   <div class="header">
-    <h1>Sextant Export Resilience Simulator</h1>
-    <p>Control Room Simulation Layer v1.2.0</p>
+    <h1>Sextant Resilience Simulator</h1>
+    <p>Scenario Failure Simulation Control Room</p>
   </div>
 
+  <!-- ================= CONTROLS ================= -->
   <div class="panel">
     <button onclick="runSimulation()">Run Simulation</button>
     <button onclick="resetSimulation()">Reset</button>
@@ -21,6 +23,7 @@
     <select id="scenarioSelect"></select>
   </div>
 
+  <!-- ================= DASHBOARD ================= -->
   <div class="grid">
 
     <div class="card">
@@ -45,19 +48,66 @@
 
   </div>
 
+  <!-- ================= AUDIT OUTPUT ================= -->
+  <div class="card">
+    <h3>Audit Output</h3>
+    <pre id="auditLog">Awaiting audit...</pre>
+  </div>
+
+  <!-- ================= EVENT LOG ================= -->
   <div class="log" id="log"></div>
 
-  <!-- CORE SCRIPTS -->
-  <script src="config.js"></script>
-  <script src="data.js"></script>
-  <script src="scenarios.js"></script>
-  <script src="engine.js"></script>
+  <!-- ================= CORE SYSTEM ================= -->
+  <script src="../config.js"></script>
+  <script src="../data.js"></script>
+  <script src="../scenarios.js"></script>
+  <script src="../engine.js"></script>
 
-  <!-- UPGRADE VISUAL LAYER -->
-  <script src="visual.js"></script>
+  <!-- ================= AUDIT LAYER (IMPORTANT) ================= -->
+  <script src="../audit_bridge.js"></script>
 
-  <!-- APP CONTROLLER -->
-  <script src="app.js"></script>
+  <!-- ================= VISUAL LAYER ================= -->
+  <script src="../visual.js"></script>
+
+  <!-- ================= CONTROLLER ================= -->
+  <script src="../app.js"></script>
+
+  <!-- ================= BOOT STRAP FIX ================= -->
+  <script>
+
+    function runSimulation() {
+
+        const engine = window.engine || window;
+
+        const result = engine.runSimulation(
+            document.getElementById("scenarioSelect").value
+        );
+
+        // 🔥 AUDIT INJECTION (CRITICAL LINK)
+        const audit = window.auditScenarioResult(
+            result.scenario,
+            {
+                riskScore: result.shock,
+                impact: result.exportIndex,
+                stability: 100 - result.shock
+            }
+        );
+
+        result.audit = audit;
+
+        updateUI(result);
+
+        // DISPLAY AUDIT
+        document.getElementById("auditLog").innerText =
+            JSON.stringify(audit, null, 2);
+    }
+
+    function resetSimulation() {
+        if (window.reset) window.reset();
+        document.getElementById("auditLog").innerText = "Awaiting audit...";
+    }
+
+  </script>
 
 </body>
 </html>
