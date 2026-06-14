@@ -1,61 +1,67 @@
 /**
- * Sextant v3.0 - App Controller
- * Connects UI ↔ Engine ↔ Rendering
+ * Sextant Simulator v3 — Controller Layer (RESTORED)
+ * Step 2: Safe wiring into SextantRun pipeline
  */
 
-window.onload = function () {
+/**
+ * MAIN SIMULATION ENTRY POINT
+ */
+function runSimulation(type) {
 
-  const select = document.getElementById("scenarioSelect");
+    // Single safe pipeline entry
+    const result = window.SextantRun(type, {
+        onUpdate: updateUI
+    });
 
-  // populate dropdown
-  const scenarios = [
-    BASELINE_SCENARIO,
-    AI_CYCLE_SCENARIO,
-    TARIFF_WAR_SCENARIO
-  ];
-
-  scenarios.forEach(sc => {
-    const opt = document.createElement("option");
-    opt.value = sc.name;
-    opt.text = sc.name;
-    select.appendChild(opt);
-  });
-
-  // default selection
-  select.onchange = (e) => {
-    selectScenario(e.target.value);
-  };
-
-  selectScenario(BASELINE_SCENARIO.name);
-
-  updateUI({
-    semis: 0,
-    industrial: 0,
-    nonTech: 0,
-    macroIndex: 0
-  }, "---");
-};
-
-function updateUI(data, decision) {
-
-  document.getElementById("semis").innerText =
-    data.semis.toFixed(2);
-
-  document.getElementById("industrial").innerText =
-    data.industrial.toFixed(2);
-
-  document.getElementById("nonTech").innerText =
-    data.nonTech.toFixed(2);
-
-  document.getElementById("macroIndex").innerText =
-    data.macroIndex.toFixed(2);
-
-  document.getElementById("decision").innerText =
-    decision;
+    updateUI(result);
 }
 
-function log(msg) {
-  const logBox = document.getElementById("log");
-  logBox.innerHTML += msg + "<br>";
-  logBox.scrollTop = logBox.scrollHeight;
+/**
+ * RESET UI
+ */
+function resetSimulation() {
+
+    const fields = [
+        "exportIndex",
+        "electronics",
+        "nonTech",
+        "shock"
+    ];
+
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = "--";
+    });
+}
+
+/**
+ * UI UPDATE FUNCTION
+ */
+function updateUI(frame) {
+
+    if (!frame) return;
+
+    // Export Index
+    const exportIndex = document.getElementById("exportIndex");
+    if (exportIndex) {
+        exportIndex.innerText = frame.audit?.riskScore ?? 0;
+    }
+
+    // Electronics
+    const electronics = document.getElementById("electronics");
+    if (electronics) {
+        electronics.innerText = frame.audit?.impact ?? 0;
+    }
+
+    // Non-Tech
+    const nonTech = document.getElementById("nonTech");
+    if (nonTech) {
+        electronics.innerText = frame.system?.liq ?? 0;
+    }
+
+    // Shock Level
+    const shock = document.getElementById("shock");
+    if (shock) {
+        shock.innerText = frame.audit?.grade ?? "NONE";
+    }
 }
