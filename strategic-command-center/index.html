@@ -61,7 +61,7 @@
 
     </section>
 
-    <!-- INTELLIGENCE BRIEFING -->
+    <!-- EXECUTIVE BRIEFING -->
     <section class="panel">
 
       <h2>Executive Intelligence Briefing</h2>
@@ -72,6 +72,21 @@ Run a scenario to generate strategic output.
 
     </section>
 
+    <!-- 🧠 NEW: AUDIT SYSTEM PANEL -->
+    <section class="panel">
+
+      <h2>System Audit Engine</h2>
+
+      <button onclick="runAudit()">
+        Run Full System Audit
+      </button>
+
+      <div id="auditResults">
+        Audit status: awaiting execution...
+      </div>
+
+    </section>
+
   </main>
 
   <footer class="footer">
@@ -79,6 +94,7 @@ Run a scenario to generate strategic output.
   </footer>
 
   <script src="script.js"></script>
+  <script src="audit_engine.js"></script>
 
 </body>
 </html>
