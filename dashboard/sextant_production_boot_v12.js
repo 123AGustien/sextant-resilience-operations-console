@@ -143,3 +143,22 @@
     window.addEventListener("load", bootCycle);
 
 })();
+// =============================
+// FORCE GLOBAL BINDING (FIX)
+// =============================
+window.runAudit = function () {
+
+    // optional: allow live simulator frame later
+    const frame = window.lastSimulationFrame || {};
+
+    const result = runAudit(frame);
+
+    const el = document.getElementById("auditResults");
+
+    if (el) {
+        el.innerHTML = formatAuditReport(result);
+    }
+
+    return result;
+};
+
