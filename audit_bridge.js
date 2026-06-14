@@ -1,5 +1,6 @@
 /**
  * Sextant Protocol — Audit Bridge Layer (STABLE CORE)
+ * Control Room v10 compatible runtime
  */
 
 window.SextantBridge = {
@@ -16,7 +17,7 @@ function captureSimulationResult(frame) {
     scenario: frame?.scenario || "unknown",
     timestamp: new Date().toISOString(),
 
-    // core metrics (SAFE)
+    // core metrics (SAFE MAPPING)
     riskScore: normalize(frame?.riskScore ?? frame?.system?.fx * 100),
     impact: normalize(frame?.impact ?? frame?.rp04?.pressure * 100),
     stability: normalize(frame?.stability ?? frame?.rp04?.stability * 100),
@@ -43,7 +44,7 @@ function auditScenarioResult(scenarioName, result) {
 }
 
 /* =========================
-   NORMALIZER (FIXED)
+   NORMALIZER (SAFE)
 ========================= */
 function normalize(value) {
   if (value === undefined || value === null || isNaN(value)) {
