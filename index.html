@@ -97,6 +97,9 @@ pre {
     <div id="log">Waiting for events...</div>
 </div>
 
+<!-- ✅ CRITICAL: LOAD BRIDGE -->
+<script src="./audit_bridge.js"></script>
+
 <script>
 
 window.logs = [];
@@ -173,7 +176,7 @@ function runSim(type) {
     drawGraph();
 
     /* =========================
-       1. LOCAL EVENT PIPE
+       EVENT PIPE
     ========================= */
     const frame = {
         rp04,
@@ -188,7 +191,7 @@ function runSim(type) {
     }));
 
     /* =========================
-       2. BRIDGE PIPE (NEW)
+       BRIDGE PIPE
     ========================= */
     if (window.SextantBridge && window.SextantBridge.captureSimulationResult) {
         window.SextantBridge.captureSimulationResult(frame);
