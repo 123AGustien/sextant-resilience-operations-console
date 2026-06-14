@@ -85,24 +85,49 @@
 
         const scenario = document.getElementById("scenarioSelect").value;
 
-        // 1. RUN ENGINE (ONLY SOURCE OF TRUTH)
-        const result = window.runEngine
-            ? window.runEngine(scenario)
-            : window.engine.runSimulation(scenario);
+        // 1. ENGINE (single source of truth)
+        const result =
+            (window.runEngine && window.runEngine(scenario)) ||
+            (window.engine?.runSimulation?.(scenario));
 
-        // 2. UI UPDATE (if exists)
+        if (!result) {
+            console.error("Engine returned no result");
+            return;
+        }
+
+        // 2. NORMALIZED FRAME (IMPORTANT FOR BRIDGE)
+        const frame = {
+            rp04: result.rp04 || {},
+            system: result.system || {},
+            state: result.state || "UNKNOWN",
+            scenario: result.scenario || scenario,
+            timestamp: Date.now()
+        };
+
+        // 3. UI UPDATE
         if (window.updateUI) {
-            window.updateUI(result);
+            window.updateUI(frame);
         }
 
-        // 3. AUTO AUDIT VIA BRIDGE (NO MANUAL BUILD)
-        if (window.SextantBridge && window.SextantBridge.captureSimulationResult) {
+        // 4. AUDIT PIPE (BRIDGE-NATIVE)
+        let audit = null;
 
-            const audit = window.SextantBridge.captureSimulationResult(result);
-
-            document.getElementById("auditLog").innerText =
-                JSON.stringify(audit, null, 2);
+        if (window.SextantBridge?.captureSimulationResult) {
+            audit = window.SextantBridge.captureSimulationResult(frame);
         }
+
+        frame.audit = audit;
+
+        // 5. AUDIT DISPLAY
+        const auditLog = document.getElementById("auditLog");
+        if (auditLog) {
+            auditLog.innerText = JSON.stringify(audit || {}, null, 2);
+        }
+
+        // 6. EVENT STREAM (CONTROL ROOM SYNC)
+        window.dispatchEvent(new CustomEvent("sextant:run", {
+            detail: frame
+        }));
     }
 
     function resetSimulation() {
