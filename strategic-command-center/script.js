@@ -212,14 +212,3 @@ document.getElementById("briefing").innerText = report;
 
 applyRiskStyle(level);
 }
-if (window.runAudit) {
-    window.runAudit({
-        system: {
-            fx: s.risk / 100,
-            bank: (s.risk / 100) * 0.85,
-            liq: (s.risk / 100) * 0.75,
-            eq: (s.risk / 100) * 0.65,
-            conf: (s.risk / 100) * 0.55
-        }
-    });
-}
