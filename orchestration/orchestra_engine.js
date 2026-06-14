@@ -1,5 +1,5 @@
 /**
- * Sextant Orchestra Layer v2.1 — Bridge Native Clean
+ * Sextant Orchestra Layer v2.2 — Production Stable Bridge Node
  */
 
 window.auditScenarioResult = window.auditScenarioResult || function () {
@@ -30,25 +30,29 @@ class SextantOrchestra {
     runStep(type) {
 
         if (!window.runRP04) {
-            throw new Error("RP-04 engine not loaded (window.runRP04 missing)");
+            throw new Error("RP-04 engine not loaded");
         }
 
         const engine = window.runRP04(type);
 
-        // ✅ STANDARD FRAME (MATCHS BRIDGE EXACTLY)
+        // ✅ SAFE ENGINE NORMALIZATION
+        const system = engine.system || {};
+        const rp04 = engine.rp04 || {};
+        const state = engine.state || "UNKNOWN";
+
+        // ✅ STANDARD FRAME (BRIDGE CONTRACT)
         const frame = {
-            rp04: engine.rp04,
-            system: engine.system,
-            state: engine.state,
+            rp04,
+            system,
+            state,
             scenario: type,
             timestamp: Date.now()
         };
 
         // ================================
-        // ✅ AUDIT (FIXED: FULL FRAME INPUT)
+        // ✅ AUDIT PIPE (SAFE)
         // ================================
         const audit = window.auditScenarioResult(type, frame);
-
         frame.audit = audit;
 
         this.timeline.push(frame);
@@ -65,9 +69,10 @@ class SextantOrchestra {
 
     generateRiskReport() {
 
-        if (this.timeline.length === 0) return null;
+        if (!this.timeline.length) return null;
 
         const latest = this.timeline[this.timeline.length - 1];
+        const s = latest.system || {};
 
         return {
             title: "Sextant Protocol Risk Report",
@@ -75,14 +80,14 @@ class SextantOrchestra {
             timestamp: Date.now(),
 
             summary: {
-                fx: latest.system.fx,
-                bank: latest.system.bank,
-                liquidity: latest.system.liq,
-                equity: latest.system.eq,
-                confidence: latest.system.conf
+                fx: s.fx || 0,
+                bank: s.bank || 0,
+                liquidity: s.liq || 0,
+                equity: s.eq || 0,
+                confidence: s.conf || 0
             },
 
-            riskLevel: this.classifyRisk(latest.system.conf),
+            riskLevel: this.classifyRisk(s.conf || 0),
             cascadeDepth: this.timeline.length,
             systemState: latest.state,
 
@@ -100,7 +105,8 @@ class SextantOrchestra {
     }
 
     generateInsights(latest) {
-        const s = latest.system;
+
+        const s = latest.system || [];
         const insights = [];
 
         if (s.liq < 0.5) insights.push("Liquidity stress detected.");
@@ -113,7 +119,8 @@ class SextantOrchestra {
     }
 
     generateRecommendations(latest) {
-        const s = latest.system;
+
+        const s = latest.system || [];
         const recs = [];
 
         if (s.liq < 0.5) recs.push("Increase liquidity buffers.");
