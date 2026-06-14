@@ -2,6 +2,8 @@
 
 **Sextant Resilience Operations Console** is a real-time systems intelligence and resilience engineering framework designed for complex operational environments.
 
+Resilience intelligence platform for failure-mode simulation, operational risk analysis, scenario modeling, and adaptive system orchestration.
+
 It focuses on:
 
 - Failure-mode simulation in interconnected systems  
