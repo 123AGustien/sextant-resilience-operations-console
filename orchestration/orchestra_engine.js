@@ -1,4 +1,4 @@
-// Optional global audit hook (safe browser mode
+// Optional global audit hook (safe browser mode)
 // Safe global audit hook (auto-detects audit_bridge.js if loaded)
 window.auditScenarioResult = window.auditScenarioResult || function () {
     return {
@@ -32,7 +32,7 @@ class SextantOrchestra {
 
     runStep(type) {
 
-        // ✅ USE GLOBAL ENGINE (NO IMPORT)
+        // USE GLOBAL ENGINE (NO IMPORT)
         if (!window.runRP04) {
             throw new Error("RP-04 engine not loaded (window.runRP04 missing)");
         }
@@ -54,6 +54,17 @@ class SextantOrchestra {
             state: engine.state,
             timestamp: Date.now()
         };
+
+        // ================================
+        // ✅ AUDIT BRIDGE INTEGRATION (FIXED)
+        // ================================
+        const audit = window.auditScenarioResult(type, {
+            riskScore: engine.system.conf,
+            impact: engine.system.bank,
+            stability: engine.system.liq
+        });
+
+        frame.audit = audit;
 
         this.timeline.push(frame);
 
@@ -91,6 +102,9 @@ class SextantOrchestra {
             cascadeDepth: this.timeline.length,
 
             systemState: latest.state,
+
+            // 🔥 AUDIT OUTPUT NOW INCLUDED
+            audit: latest.audit,
 
             insights: this.generateInsights(latest),
 
@@ -136,5 +150,5 @@ class SextantOrchestra {
     }
 }
 
-// ✅ GLOBAL EXPORT FOR BROWSER
+// GLOBAL EXPORT FOR BROWSER
 window.orchestra = new SextantOrchestra();
