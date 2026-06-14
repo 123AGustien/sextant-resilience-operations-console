@@ -205,3 +205,16 @@ drawGraph();
 
 </body>
 </html>
+// =========================
+// AUDIT EVENT BRIDGE
+// =========================
+window.dispatchEvent(new CustomEvent("sextant:run", {
+    detail: {
+        system,
+        rp04,
+        state,
+        scenario: type,
+        timestamp: Date.now()
+    }
+}));
+
