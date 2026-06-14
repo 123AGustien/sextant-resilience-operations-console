@@ -124,7 +124,6 @@ function runSim(type) {
 
     const fx = rp04.pressure;
 
-    // unified deterministic cascade
     const bank = fx * 0.83;
     const liq  = bank * 0.88;
     const eq   = liq * 0.91;
@@ -152,10 +151,28 @@ function runSim(type) {
 
     drawGraph();
     renderLog();
+
+    /* =========================
+       AUDIT EVENT BRIDGE (FIXED)
+    ========================= */
+    window.dispatchEvent(new CustomEvent("sextant:run", {
+        detail: {
+            system,
+            rp04,
+            state,
+            scenario: type,
+            audit: {
+                source: "RP-04",
+                version: "v10",
+                integrity: "ok"
+            },
+            timestamp: Date.now()
+        }
+    }));
 }
 
 /* =========================
-   GRAPH RENDER (RP-04 TRACE)
+   GRAPH RENDER
 ========================= */
 function drawGraph() {
     const canvas = document.getElementById("graph");
@@ -198,23 +215,9 @@ function resetSim() {
     drawGraph();
 }
 
-/* init */
 drawGraph();
 
 </script>
 
 </body>
 </html>
-// =========================
-// AUDIT EVENT BRIDGE
-// =========================
-window.dispatchEvent(new CustomEvent("sextant:run", {
-    detail: {
-        system,
-        rp04,
-        state,
-        scenario: type,
-        timestamp: Date.now()
-    }
-}));
-
