@@ -1,15 +1,11 @@
 // =====================================
-// SEXTANT AUDIT ENGINE v2 (INTEGRATED)
-// simulator + command center aware
+// SEXTANT AUDIT ENGINE v2.1 (CORRECTED)
+// fully weighted system-level model
 // =====================================
 
-/* =========================
-   CORE AUDIT FUNCTION
-========================= */
 function runAudit(frame) {
 
-    // If simulator frame is passed, use it
-    const system = frame?.frame?.system || frame?.system || {};
+    const system = frame?.system || frame || {};
 
     const fx = system.fx ?? 0;
     const bank = system.bank ?? 0;
@@ -17,10 +13,21 @@ function runAudit(frame) {
     const eq = system.eq ?? 0;
     const conf = system.conf ?? 0;
 
-    const riskScore = (fx * 100);
+    // -----------------------------
+    // WEIGHTED SYSTEM RISK MODEL
+    // -----------------------------
+    const riskScore =
+        (fx * 0.30 +
+         bank * 0.25 +
+         liq * 0.20 +
+         eq * 0.15 +
+         (1 - conf) * 0.10) * 100;
+
+    const systemScore =
+        ((bank + liq + eq + conf) / 4) * 10;
 
     const readiness =
-        conf > 0.7 ? "HIGH"
+        conf > 0.75 ? "HIGH"
         : conf > 0.5 ? "MEDIUM"
         : "LOW";
 
@@ -30,7 +37,7 @@ function runAudit(frame) {
         : "LOW";
 
     return {
-        systemScore: conf * 10,
+        systemScore,
         riskScore,
         readiness,
         riskLevel,
@@ -40,9 +47,9 @@ function runAudit(frame) {
     };
 }
 
-/* =========================
-   HTML REPORT FORMATTER
-========================= */
+// -----------------------------
+// FORMATTER
+// -----------------------------
 function formatAuditReport(audit) {
 
     return `
@@ -57,9 +64,9 @@ function formatAuditReport(audit) {
     `;
 }
 
-/* =========================
-   UI HOOK (MANUAL TRIGGER)
-========================= */
+// -----------------------------
+// UI HOOK
+// -----------------------------
 window.runAudit = function (frame) {
 
     const result = runAudit(frame);
@@ -73,9 +80,9 @@ window.runAudit = function (frame) {
     return result;
 };
 
-/* =========================
-   LIVE EVENT INTEGRATION
-========================= */
+// -----------------------------
+// LIVE EVENT BRIDGE
+// -----------------------------
 window.addEventListener("sextant:run", function (e) {
 
     const frame = e.detail;
