@@ -59,6 +59,37 @@ Sextant Protocol is a **resilience intelligence system**, not a dashboard.
 
 It is designed to model how complex systems fail before failure occurs.
 
+## 🧠 Live Simulation Interfaces
+
+### 🚀 Sextant Strategic Command Center (Audit + Failure Intelligence)
+https://123agustien.github.io/sextant-resilience-operations-console/strategic-command-center/index.html
+
+This is the **global failure analysis screen** for:
+- US–China trade escalation
+- Taiwan Strait crisis
+- Semiconductor shock
+- Energy disruption
+- Global recession modeling
+
+It provides:
+- Risk Index
+- Impact analysis
+- Executive briefing
+- System audit engine output
+
+---
+
+### ⚙️ Main Simulation Control Room
+https://123agustien.github.io/sextant-resilience-operations-console/simulator.html
+
+This is the **scenario execution layer** that triggers:
+- Failure simulations
+- Macro stress events
+- System shock propagation
+
+It feeds results into the Strategic Command Center via the audit pipeline.
+
+
 ---
 
 ## 🧠 Core Capabilities
