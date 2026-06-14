@@ -1,5 +1,7 @@
-// Optional global audit hook (safe browser mode)
-// Safe global audit hook (auto-detects audit_bridge.js if loaded)
+/**
+ * Sextant Orchestra Layer v2.1 — Bridge Native Clean
+ */
+
 window.auditScenarioResult = window.auditScenarioResult || function () {
     return {
         scenario: "audit_not_loaded",
@@ -10,11 +12,6 @@ window.auditScenarioResult = window.auditScenarioResult || function () {
         status: "DISCONNECTED"
     };
 };
-
-/**
- * Sextant Orchestra Layer v2
- * Browser-safe control layer above RP-04
- */
 
 class SextantOrchestra {
 
@@ -32,37 +29,25 @@ class SextantOrchestra {
 
     runStep(type) {
 
-        // USE GLOBAL ENGINE (NO IMPORT)
         if (!window.runRP04) {
             throw new Error("RP-04 engine not loaded (window.runRP04 missing)");
         }
 
         const engine = window.runRP04(type);
 
+        // ✅ STANDARD FRAME (MATCHS BRIDGE EXACTLY)
         const frame = {
-            step: this.timeline.length,
-            scenario: this.scenario,
-            type,
-            engine,
-
-            fx: engine.system.fx,
-            bank: engine.system.bank,
-            liq: engine.system.liq,
-            eq: engine.system.eq,
-            conf: engine.system.conf,
-
+            rp04: engine.rp04,
+            system: engine.system,
             state: engine.state,
+            scenario: type,
             timestamp: Date.now()
         };
 
         // ================================
-        // ✅ AUDIT BRIDGE INTEGRATION (FIXED)
+        // ✅ AUDIT (FIXED: FULL FRAME INPUT)
         // ================================
-        const audit = window.auditScenarioResult(type, {
-            riskScore: engine.system.conf,
-            impact: engine.system.bank,
-            stability: engine.system.liq
-        });
+        const audit = window.auditScenarioResult(type, frame);
 
         frame.audit = audit;
 
@@ -90,24 +75,19 @@ class SextantOrchestra {
             timestamp: Date.now(),
 
             summary: {
-                fx: latest.fx,
-                bank: latest.bank,
-                liquidity: latest.liq,
-                equity: latest.eq,
-                confidence: latest.conf
+                fx: latest.system.fx,
+                bank: latest.system.bank,
+                liquidity: latest.system.liq,
+                equity: latest.system.eq,
+                confidence: latest.system.conf
             },
 
-            riskLevel: this.classifyRisk(latest.conf),
-
+            riskLevel: this.classifyRisk(latest.system.conf),
             cascadeDepth: this.timeline.length,
-
             systemState: latest.state,
 
-            // 🔥 AUDIT OUTPUT NOW INCLUDED
             audit: latest.audit,
-
             insights: this.generateInsights(latest),
-
             recommendation: this.generateRecommendations(latest)
         };
     }
@@ -120,23 +100,25 @@ class SextantOrchestra {
     }
 
     generateInsights(latest) {
+        const s = latest.system;
         const insights = [];
 
-        if (latest.liq < 50) insights.push("Liquidity stress detected.");
-        if (latest.bank < 50) insights.push("Bank instability detected.");
-        if (latest.fx < 50) insights.push("FX volatility elevated.");
+        if (s.liq < 0.5) insights.push("Liquidity stress detected.");
+        if (s.bank < 0.5) insights.push("Bank instability detected.");
+        if (s.fx < 0.5) insights.push("FX volatility elevated.");
         if (this.timeline.length > 3) insights.push("Cascade propagation detected.");
-        if (latest.conf < 60) insights.push("Confidence below threshold.");
+        if (s.conf < 0.6) insights.push("Confidence below threshold.");
 
         return insights;
     }
 
     generateRecommendations(latest) {
+        const s = latest.system;
         const recs = [];
 
-        if (latest.liq < 50) recs.push("Increase liquidity buffers.");
-        if (latest.bank < 50) recs.push("Add banking redundancy.");
-        if (latest.conf < 60) recs.push("Activate circuit breakers.");
+        if (s.liq < 0.5) recs.push("Increase liquidity buffers.");
+        if (s.bank < 0.5) recs.push("Add banking redundancy.");
+        if (s.conf < 0.6) recs.push("Activate circuit breakers.");
 
         return recs;
     }
@@ -150,5 +132,5 @@ class SextantOrchestra {
     }
 }
 
-// GLOBAL EXPORT FOR BROWSER
+// GLOBAL EXPORT
 window.orchestra = new SextantOrchestra();
