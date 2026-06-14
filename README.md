@@ -133,3 +133,7 @@ https://github.com/123AGustien/sextant-resilience-operations-console/releases/ta
 Sextant Protocol is built for environments where failure is not linear, but systemic.
 
 It provides a structured way to simulate instability before it becomes reality.
+
+🏷️ Repository Topics
+
+Resilience Engineering • Operational Resilience • Failure Mode Analysis • Scenario Simulation • Risk Analysis • Complex Systems • Systems Engineering • Operational Intelligence • Simulation Platform • Decision Support
