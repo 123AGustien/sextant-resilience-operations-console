@@ -97,7 +97,7 @@ pre {
     <div id="log">Waiting for events...</div>
 </div>
 
-<!-- ✅ CRITICAL: LOAD BRIDGE -->
+<!-- BRIDGE -->
 <script src="./audit_bridge.js"></script>
 
 <script>
@@ -176,23 +176,27 @@ function runSim(type) {
     drawGraph();
 
     /* =========================
-       EVENT PIPE
+       FRAME (FULLY ALIGNED CONTRACT)
     ========================= */
     const frame = {
         rp04,
         system,
         state,
         scenario: type,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+
+        // 🔥 EXPLICIT METRICS (NOW FULLY COMPATIBLE WITH BRIDGE)
+        riskScore: system.fx * 100,
+        impact: rp04.pressure * 100,
+        stability: rp04.stability * 100
     };
 
+    /* EVENT PIPE */
     window.dispatchEvent(new CustomEvent("sextant:run", {
         detail: frame
     }));
 
-    /* =========================
-       BRIDGE PIPE
-    ========================= */
+    /* BRIDGE PIPE */
     if (window.SextantBridge && window.SextantBridge.captureSimulationResult) {
         window.SextantBridge.captureSimulationResult(frame);
     }
