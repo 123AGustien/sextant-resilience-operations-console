@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Sextant Control Room v10 (Hardened)</title>
+<meta charset="UTF-8">
+<title>Sextant Control Room v10 (Unified Runtime)</title>
 
 <style>
 body {
@@ -171,16 +172,27 @@ function runSim(type) {
 
     drawGraph();
 
-    /* EMIT AUDIT EVENT */
+    /* =========================
+       1. LOCAL EVENT PIPE
+    ========================= */
+    const frame = {
+        rp04,
+        system,
+        state,
+        scenario: type,
+        timestamp: Date.now()
+    };
+
     window.dispatchEvent(new CustomEvent("sextant:run", {
-        detail: {
-            rp04,
-            system,
-            state,
-            scenario: type,
-            timestamp: Date.now()
-        }
+        detail: frame
     }));
+
+    /* =========================
+       2. BRIDGE PIPE (NEW)
+    ========================= */
+    if (window.SextantBridge && window.SextantBridge.captureSimulationResult) {
+        window.SextantBridge.captureSimulationResult(frame);
+    }
 }
 
 /* =========================
@@ -217,19 +229,14 @@ function resetSim() {
 
     window.logs = [];
 
-    const logEl = document.getElementById("log");
-    if (logEl) logEl.innerHTML = "Waiting for events...";
-
-    const out = document.getElementById("output");
-    if (out) out.innerHTML = "Waiting...";
-
-    const status = document.getElementById("status");
-    if (status) status.innerText = "RESET";
+    document.getElementById("log").innerHTML = "Waiting for events...";
+    document.getElementById("output").innerHTML = "Waiting...";
+    document.getElementById("status").innerText = "RESET";
 
     drawGraph();
 }
 
-/* expose to HTML buttons (CRITICAL FIX) */
+/* expose */
 window.runSim = runSim;
 window.resetSim = resetSim;
 
