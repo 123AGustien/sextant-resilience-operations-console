@@ -1,5 +1,15 @@
-// Optional global audit hook (safe browser mode)
-window.auditScenarioResult = window.auditScenarioResult || null;
+// Optional global audit hook (safe browser mode
+// Safe global audit hook (auto-detects audit_bridge.js if loaded)
+window.auditScenarioResult = window.auditScenarioResult || function () {
+    return {
+        scenario: "audit_not_loaded",
+        riskScore: 0,
+        impact: 0,
+        stability: 0,
+        grade: "NO_AUDIT",
+        status: "DISCONNECTED"
+    };
+};
 
 /**
  * Sextant Orchestra Layer v2
