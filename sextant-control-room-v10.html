@@ -93,13 +93,32 @@ pre {
 
 <div class="panel">
     <h3>AUDIT LOG</h3>
-    <div id="log"></div>
+    <div id="log">Waiting for events...</div>
 </div>
 
 <script>
 
 window.logs = [];
 
+/* =========================
+   AUDIT EVENT LISTENER (FIX)
+========================= */
+window.addEventListener("sextant:run", function (e) {
+
+    const frame = e.detail || {};
+
+    window.logs.push(frame);
+
+    document.getElementById("log").innerHTML =
+        window.logs.map((l,i) =>
+            `<div>#${i} | ${l.state} | FX:${l.system.fx.toFixed(2)}</div>`
+        ).join("");
+
+});
+
+/* =========================
+   NODE COLOR ENGINE
+========================= */
 function setNode(id, v) {
     const el = document.getElementById(id);
 
@@ -113,7 +132,7 @@ function setNode(id, v) {
 }
 
 /* =========================
-   RP-04 UNIFIED ENGINE v10
+   RP-04 ENGINE
 ========================= */
 function runSim(type) {
 
@@ -135,8 +154,6 @@ function runSim(type) {
 
     const result = { rp04, system, state };
 
-    window.logs.push(result);
-
     document.getElementById("status").innerText = state;
 
     document.getElementById("output").innerHTML =
@@ -150,10 +167,9 @@ function runSim(type) {
     setNode("conf", conf);
 
     drawGraph();
-    renderLog();
 
     /* =========================
-       AUDIT EVENT BRIDGE (FIXED)
+       EMIT AUDIT EVENT
     ========================= */
     window.dispatchEvent(new CustomEvent("sextant:run", {
         detail: {
@@ -161,18 +177,13 @@ function runSim(type) {
             rp04,
             state,
             scenario: type,
-            audit: {
-                source: "RP-04",
-                version: "v10",
-                integrity: "ok"
-            },
             timestamp: Date.now()
         }
     }));
 }
 
 /* =========================
-   GRAPH RENDER
+   GRAPH
 ========================= */
 function drawGraph() {
     const canvas = document.getElementById("graph");
@@ -195,22 +206,12 @@ function drawGraph() {
 }
 
 /* =========================
-   AUDIT LOG
-========================= */
-function renderLog() {
-    document.getElementById("log").innerHTML =
-        window.logs.map((l,i) =>
-            `<div>#${i} | ${l.state} | FX:${l.system.fx.toFixed(2)}</div>`
-        ).join("");
-}
-
-/* =========================
-   RESET ENGINE
+   RESET
 ========================= */
 function resetSim() {
     window.logs = [];
+    document.getElementById("log").innerHTML = "Waiting for events...";
     document.getElementById("output").innerHTML = "Waiting...";
-    document.getElementById("log").innerHTML = "";
     document.getElementById("status").innerText = "RESET";
     drawGraph();
 }
