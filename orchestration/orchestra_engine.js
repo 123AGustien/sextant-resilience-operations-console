@@ -1,3 +1,6 @@
+// Optional global audit hook (safe browser mode)
+window.auditScenarioResult = window.auditScenarioResult || null;
+
 /**
  * Sextant Orchestra Layer v2
  * Browser-safe control layer above RP-04
