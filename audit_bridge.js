@@ -1,7 +1,5 @@
 /**
- * Sextant Protocol — Audit Bridge Layer (ROOT)
- * Global browser runtime (GitHub Pages compatible)
- * Connects simulation engine → audit layer → future dashboards
+ * Sextant Protocol — Audit Bridge Layer (STABLE CORE)
  */
 
 window.SextantBridge = {
@@ -9,21 +7,21 @@ window.SextantBridge = {
   auditScenarioResult
 };
 
-/**
- * MAIN ENTRY — called by Control Room v10
- */
+/* =========================
+   MAIN ENTRY
+========================= */
 function captureSimulationResult(frame) {
 
   const auditReport = {
     scenario: frame?.scenario || "unknown",
     timestamp: new Date().toISOString(),
 
-    // core simulation outputs (safe mapping)
+    // core metrics (SAFE)
     riskScore: normalize(frame?.riskScore ?? frame?.system?.fx * 100),
     impact: normalize(frame?.impact ?? frame?.rp04?.pressure * 100),
     stability: normalize(frame?.stability ?? frame?.rp04?.stability * 100),
 
-    // derived intelligence layer
+    // intelligence layer
     totalScore: computeTotal(frame),
     grade: computeGrade(frame),
     status: classifyRisk(frame)
@@ -34,9 +32,9 @@ function captureSimulationResult(frame) {
   return auditReport;
 }
 
-/**
- * BACKWARD COMPATIBILITY WRAPPER
- */
+/* =========================
+   BACKWARD COMPATIBILITY
+========================= */
 function auditScenarioResult(scenarioName, result) {
   return captureSimulationResult({
     scenario: scenarioName,
@@ -44,9 +42,9 @@ function auditScenarioResult(scenarioName, result) {
   });
 }
 
-/**
- * SAFE NORMALIZER (prevents NaN crash)
- */
+/* =========================
+   NORMALIZER (FIXED)
+========================= */
 function normalize(value) {
   if (value === undefined || value === null || isNaN(value)) {
     return 0;
@@ -54,20 +52,20 @@ function normalize(value) {
   return Number(value);
 }
 
-/**
- * TOTAL RISK ENGINE
- */
+/* =========================
+   TOTAL SCORE ENGINE
+========================= */
 function computeTotal(frame) {
-  const risk = normalize(frame?.riskScore ?? 0);
-  const impact = normalize(frame?.impact ?? 0);
-  const stability = normalize(frame?.stability ?? 0);
+  const risk = normalize(frame?.riskScore);
+  const impact = normalize(frame?.impact);
+  const stability = normalize(frame?.stability);
 
   return risk + impact + (100 - stability);
 }
 
-/**
- * GRADING ENGINE
- */
+/* =========================
+   GRADING ENGINE
+========================= */
 function computeGrade(frame) {
   const score = computeTotal(frame);
 
@@ -78,11 +76,11 @@ function computeGrade(frame) {
   return "STABLE";
 }
 
-/**
- * RISK CLASSIFICATION ENGINE
- */
+/* =========================
+   RISK CLASSIFICATION
+========================= */
 function classifyRisk(frame) {
-  const risk = normalize(frame?.riskScore ?? 0);
+  const risk = normalize(frame?.riskScore);
 
   if (risk >= 75) return "SYSTEMIC_RISK";
   if (risk >= 50) return "ELEVATED_RISK";
