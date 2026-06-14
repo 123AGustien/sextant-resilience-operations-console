@@ -1,45 +1,110 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Sextant Simulator v4</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Sextant Simulator v4 (Bridge Connected)</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0b0f19;
+    color: #e6f7ff;
+    text-align: center;
+}
+
+button {
+    margin: 10px;
+    padding: 12px;
+    background: black;
+    color: #2bd4ff;
+    border: 1px solid #2bd4ff;
+    cursor: pointer;
+}
+
+.panel {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 12px;
+    border: 1px solid #2bd4ff;
+    background: #111827;
+}
+
+pre {
+    text-align: left;
+    background: #0a0a0a;
+    padding: 10px;
+    overflow: auto;
+}
+</style>
 </head>
 
 <body>
 
-  <h1>Sextant Simulator v4</h1>
-  <p>Run Energy Crisis</p>
+<h2>SEXTANT SIMULATOR v4</h2>
+<h3>Status: <span id="status">READY</span></h3>
 
-  <!-- 🎯 SCENARIO BUTTON -->
-  <button onclick="runScenario('energy_crisis')">
-    Run Energy Crisis
-  </button>
+<div class="panel">
+    <button onclick="runScenario('normal')">Normal</button>
+    <button onclick="runScenario('failure')">Failure</button>
+    <button onclick="runScenario('cascade')">Cascade</button>
+</div>
 
-  <hr>
+<div class="panel">
+    <h3>OUTPUT FRAME</h3>
+    <div id="output">Waiting...</div>
+</div>
 
-  <!-- 📊 DASHBOARD -->
-  <div>
-    <h3>Risk Index</h3>
-    <div id="riskIndex">--</div>
-  </div>
+<!-- IMPORTANT: LOAD BRIDGE -->
+<script src="../audit_bridge.js"></script>
 
-  <div>
-    <h3>Impact Summary</h3>
-    <div id="impactSummary">--</div>
-  </div>
+<script>
 
-  <div>
-    <h3>Executive Briefing</h3>
-    <pre id="briefing">Awaiting simulation...</pre>
-  </div>
+function runScenario(type) {
 
-  <!-- 🔗 CORE SCRIPTS (ORDER MATTERS) -->
+    // 1. CORE SIMULATION ENGINE
+    const rp04 = {
+        stability: type === "cascade" ? 0.2 : type === "failure" ? 0.5 : 0.85,
+        pressure: type === "cascade" ? 0.95 : type === "failure" ? 0.6 : 0.3
+    };
 
-  <script src="../simulator-v4/engine.js"></script>
-  <script src="../audit_bridge.js"></script>
-  <script src="../simulator-v4/ui.js"></script>
-  <script src="../simulator-v4/script.js"></script>
+    const fx = rp04.pressure;
+
+    const system = {
+        fx,
+        bank: fx * 0.8,
+        liq: fx * 0.7,
+        eq: fx * 0.6,
+        conf: fx * 0.5
+    };
+
+    const state = rp04.stability > 0.6 ? "STABLE" : "RISK";
+
+    // 2. FRAME (THIS IS WHAT AUDIT NEEDS)
+    const frame = {
+        rp04,
+        system,
+        state,
+        scenario: type,
+        timestamp: Date.now()
+    };
+
+    // 3. UI DISPLAY
+    document.getElementById("status").innerText = state;
+    document.getElementById("output").innerHTML =
+        "<pre>" + JSON.stringify(frame, null, 2) + "</pre>";
+
+    // 4. EVENT PIPE (for listeners)
+    window.dispatchEvent(new CustomEvent("sextant:run", {
+        detail: frame
+    }));
+
+    // 5. BRIDGE PIPE (REAL AUDIT CONNECTION)
+    if (window.SextantBridge?.captureSimulationResult) {
+        window.SextantBridge.captureSimulationResult(frame);
+    }
+}
+
+</script>
 
 </body>
 </html>
