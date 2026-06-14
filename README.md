@@ -136,4 +136,13 @@ It provides a structured way to simulate instability before it becomes reality.
 
 🏷️ Repository Topics
 
-Resilience Engineering • Operational Resilience • Failure Mode Analysis • Scenario Simulation • Risk Analysis • Complex Systems • Systems Engineering • Operational Intelligence • Simulation Platform • Decision Support
+- Resilience Engineering
+- Operational Resilience
+- Failure Mode Analysis
+- Scenario Simulation
+- Risk Analysis
+- Complex Systems
+- Systems Engineering
+- Operational Intelligence
+- Simulation Platform
+- Decision Support
