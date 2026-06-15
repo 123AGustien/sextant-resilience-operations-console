@@ -1,5 +1,5 @@
 /**
- * Sextant Scenario Trigger Layer v1.0
+ * Sextant Scenario Trigger Layer v1.1 (STABLE)
  * SINGLE ENTRY POINT FOR COMMAND CENTER
  */
 
@@ -18,18 +18,32 @@ window.runScenario = function (scenario) {
         return null;
     }
 
-    // 2. EXTRACT AUDIT
+    // 2. SAFE FALLBACK DATA SOURCES
     const audit = frame.audit || {};
+    const sys = frame.system || {};
 
-    // 3. UPDATE DASHBOARD (SAFE DOM BINDING)
-    update("riskIndex", audit.riskScore);
-    update("impact", audit.impact);
-    update("auditStatus", audit.status);
+    // =========================
+    // UI UPDATE (ROBUST LAYERED FALLBACK)
+    // =========================
 
-    // 4. GLOBAL STATE SYNC
+    update("riskIndex",
+        audit.riskScore ?? (sys.fx * 100).toFixed(2)
+    );
+
+    update("impact",
+        audit.impact ?? (sys.bank * 100).toFixed(2)
+    );
+
+    update("auditStatus",
+        audit.status ?? "RUNNING"
+    );
+
+    // =========================
+    // GLOBAL STATE SYNC
+    // =========================
     window.__SEXTANT_FRAME__ = frame;
 
-    console.log("🚀 Scenario executed:", scenario);
+    console.log("🚀 Scenario executed:", scenario, frame);
 
     return frame;
 };
@@ -39,5 +53,21 @@ window.runScenario = function (scenario) {
 ========================= */
 function update(id, value) {
     const el = document.getElementById(id);
-    if (el) el.innerText = value ?? "--";
+    if (!el) return;
+
+    el.innerText =
+        value !== undefined && value !== null
+            ? value
+            : "--";
 }
+
+/* =========================
+   BOOT CHECK (OPTIONAL)
+========================= */
+window.addEventListener("load", () => {
+    console.log("🧠 Command Center Ready");
+
+    if (window.selfTestRP04) {
+        console.log("🧪 SELF TEST:", selfTestRP04());
+    }
+});
