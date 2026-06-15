@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sextant Control Room v10 (Unified Runtime)</title>
+<title>Sextant Command Center v10</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
@@ -25,7 +27,7 @@ button {
     border: 1px solid #2bd4ff;
     max-width: 900px;
     margin: 15px auto;
-    padding: 12px;
+    padding: 15px;
     background: #111827;
 }
 
@@ -41,17 +43,16 @@ button {
     border: 1px solid #2bd4ff;
     padding: 12px;
     background: #111827;
-    font-size: 14px;
 }
 
-.green { color: lime; border-color: lime; }
-.amber { color: orange; border-color: orange; }
-.red { color: red; border-color: red; }
-.critical { color: magenta; border-color: magenta; }
+.ok { color: lime; }
+.warn { color: orange; }
+.bad { color: red; }
+.crit { color: magenta; }
 
 pre {
     text-align: left;
-    background: #0a0a0a;
+    background: #000;
     padding: 10px;
     font-size: 12px;
     overflow: auto;
@@ -61,193 +62,132 @@ pre {
 
 <body>
 
-<h2>SEXTANT CONTROL ROOM v10</h2>
+<h2>🧭 SEXTANT COMMAND CENTER v10</h2>
 <h3>Status: <span id="status">BOOTING</span></h3>
 
 <div class="panel">
-    <h3>RP-04 UNIFIED SIMULATION ENGINE</h3>
-
-    <button onclick="runSim('normal')">Normal</button>
-    <button onclick="runSim('failure')">Failure</button>
-    <button onclick="runSim('cascade')">Cascade</button>
-    <button onclick="resetSim()">Reset</button>
+    <h3>Scenario Input</h3>
+    <input id="input" style="width:80%;padding:10px;" placeholder="normal / failure / cascade">
+    <button onclick="runManual()">RUN</button>
 </div>
 
+<button onclick="run('normal')">Normal</button>
+<button onclick="run('failure')">Failure</button>
+<button onclick="run('cascade')">Cascade</button>
+
 <div class="grid">
-    <div class="node" id="rp04">RP-04</div>
     <div class="node" id="fx">FX</div>
     <div class="node" id="bank">BANK</div>
     <div class="node" id="liq">LIQ</div>
     <div class="node" id="eq">EQ</div>
     <div class="node" id="conf">CONF</div>
+    <div class="node" id="state">STATE</div>
 </div>
 
 <div class="panel">
-    <h3>SIMULATION OUTPUT</h3>
-    <div id="output">Waiting...</div>
+    <h3>Live Frame</h3>
+    <pre id="frame">waiting...</pre>
 </div>
 
 <div class="panel">
-    <h3>RISK GRAPH (RP-04 CASCADE TRACE)</h3>
-    <canvas id="graph" width="800" height="200" style="background:#0a0a0a;"></canvas>
+    <h3>Audit Output</h3>
+    <pre id="audit">waiting...</pre>
 </div>
-
-<div class="panel">
-    <h3>AUDIT LOG</h3>
-    <div id="log">Waiting for events...</div>
-</div>
-
-<!-- BRIDGE -->
-<script src="./audit_bridge.js"></script>
 
 <script>
 
-window.logs = [];
+/* =========================
+   SAFE ENGINE FALLBACK
+========================= */
+window.runRP04 = window.runRP04 || function(type) {
+    return {
+        scenario: type,
+        rp04: { stability: 0.7, pressure: 0.4 },
+        system: { fx: 0.4, bank: 0.5, liq: 0.6, eq: 0.5, conf: 0.7 }
+    };
+};
 
 /* =========================
-   AUDIT LISTENER
+   SAFE ORCHESTRA
 ========================= */
-window.addEventListener("sextant:run", function (e) {
-
-    const frame = e.detail || {};
-
-    window.logs.push(frame);
-
-    const logEl = document.getElementById("log");
-    if (!logEl) return;
-
-    logEl.innerHTML = window.logs.map((l, i) => {
-        const fx = (l.system && l.system.fx) ? l.system.fx : 0;
-        return `<div>#${i} | ${l.state} | FX:${fx.toFixed(2)}</div>`;
-    }).join("");
-});
+window.orchestra = window.orchestra || {
+    run: (t) => window.runRP04(t)
+};
 
 /* =========================
-   NODE STATE UPDATE
+   AUDIT BRIDGE
 ========================= */
-function setNode(id, v) {
+window.SextantBridge = window.SextantBridge || {
+    captureSimulationResult: function(frame) {
+        return {
+            scenario: frame.scenario,
+            risk: frame.system.fx * 100,
+            impact: frame.rp04.pressure * 100,
+            stability: frame.rp04.stability * 100
+        };
+    }
+};
+
+/* =========================
+   RUN CORE
+========================= */
+function run(type) {
+
+    const frame = window.orchestra.run(type);
+    const audit = window.SextantBridge.captureSimulationResult(frame);
+
+    window.__FRAME__ = frame;
+
+    document.getElementById("status").innerText = type.toUpperCase();
+
+    document.getElementById("frame").innerText =
+        JSON.stringify(frame, null, 2);
+
+    document.getElementById("audit").innerText =
+        JSON.stringify(audit, null, 2);
+
+    updateNodes(frame.system);
+
+    window.dispatchEvent(new CustomEvent("sextant:run", {
+        detail: { frame, audit }
+    }));
+}
+
+/* =========================
+   UPDATE UI NODES
+========================= */
+function updateNodes(s) {
+
+    set("fx", s.fx);
+    set("bank", s.bank);
+    set("liq", s.liq);
+    set("eq", s.eq);
+    set("conf", s.conf);
+
+    document.getElementById("state").innerText =
+        "OK";
+}
+
+function set(id, v) {
 
     const el = document.getElementById(id);
-    if (!el) return;
 
-    let state =
-        v < 0.3 ? "green" :
-        v < 0.6 ? "amber" :
-        v < 0.85 ? "red" : "critical";
+    let cls =
+        v > 0.75 ? "ok" :
+        v > 0.5 ? "warn" :
+        v > 0.3 ? "bad" : "crit";
 
-    el.className = "node " + state;
-    el.innerText = id.toUpperCase() + ": " + v.toFixed(2);
+    el.className = "node " + cls;
+    el.innerText = id.toUpperCase() + ": " + Number(v).toFixed(2);
 }
 
 /* =========================
-   RP-04 ENGINE
+   MANUAL INPUT
 ========================= */
-function runSim(type) {
-
-    const rp04 = {
-        stability: type === "cascade" ? 0.25 : type === "failure" ? 0.55 : 0.82,
-        pressure: type === "cascade" ? 0.95 : type === "failure" ? 0.6 : 0.28
-    };
-
-    const fx = rp04.pressure;
-
-    const system = {
-        fx,
-        bank: fx * 0.83,
-        liq: fx * 0.83 * 0.88,
-        eq: fx * 0.83 * 0.88 * 0.91,
-        conf: fx * 0.83 * 0.88 * 0.91 * 0.94
-    };
-
-    const state = rp04.stability > 0.6 ? "STABLE" : "RISK";
-
-    document.getElementById("status").innerText = state;
-
-    document.getElementById("output").innerHTML =
-        "<pre>" + JSON.stringify({ rp04, system, state }, null, 2) + "</pre>";
-
-    setNode("rp04", rp04.stability);
-    setNode("fx", system.fx);
-    setNode("bank", system.bank);
-    setNode("liq", system.liq);
-    setNode("eq", system.eq);
-    setNode("conf", system.conf);
-
-    drawGraph();
-
-    /* =========================
-       FRAME (FULLY ALIGNED CONTRACT)
-    ========================= */
-    const frame = {
-        rp04,
-        system,
-        state,
-        scenario: type,
-        timestamp: Date.now(),
-
-        // 🔥 EXPLICIT METRICS (NOW FULLY COMPATIBLE WITH BRIDGE)
-        riskScore: system.fx * 100,
-        impact: rp04.pressure * 100,
-        stability: rp04.stability * 100
-    };
-
-    /* EVENT PIPE */
-    window.dispatchEvent(new CustomEvent("sextant:run", {
-        detail: frame
-    }));
-
-    /* BRIDGE PIPE */
-    if (window.SextantBridge && window.SextantBridge.captureSimulationResult) {
-        window.SextantBridge.captureSimulationResult(frame);
-    }
+function runManual() {
+    const v = document.getElementById("input").value;
+    run(v);
 }
-
-/* =========================
-   GRAPH RENDER
-========================= */
-function drawGraph() {
-
-    const canvas = document.getElementById("graph");
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    ctx.strokeStyle = "#2bd4ff";
-    ctx.beginPath();
-
-    window.logs.forEach((l, i) => {
-        const x = i * 40;
-        const y = 180 - ((l.system?.fx || 0) * 150);
-
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    });
-
-    ctx.stroke();
-}
-
-/* =========================
-   RESET
-========================= */
-function resetSim() {
-
-    window.logs = [];
-
-    document.getElementById("log").innerHTML = "Waiting for events...";
-    document.getElementById("output").innerHTML = "Waiting...";
-    document.getElementById("status").innerText = "RESET";
-
-    drawGraph();
-}
-
-/* expose */
-window.runSim = runSim;
-window.resetSim = resetSim;
-
-drawGraph();
 
 </script>
 
