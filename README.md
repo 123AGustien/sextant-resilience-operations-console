@@ -1,7 +1,10 @@
 git commit --allow-empty -m "Trigger GitHub Pages rebuild"
 git push origin mainntextant Protocol — Strategic Command Infrastructuredeployment
+
+
 deployment:
 123agustien.github.io
+
 
 Overview
 
