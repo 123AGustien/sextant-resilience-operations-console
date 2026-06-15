@@ -18,33 +18,17 @@
   <!-- SCENARIO LIBRARY -->
   <div class="panel">
 
-    <button onclick="runScenario('US–China Trade Escalation')">
-      US–China Trade Escalation
-    </button>
+    <button onclick="runScenario('US–China Trade Escalation')">US–China Trade Escalation</button>
+    <button onclick="runScenario('Taiwan Strait Crisis')">Taiwan Strait Crisis</button>
+    <button onclick="runScenario('Semiconductor Supply Shock')">Semiconductor Supply Shock</button>
+    <button onclick="runScenario('Energy Market Disruption')">Energy Market Disruption</button>
+    <button onclick="runScenario('Global Recession')">Global Recession</button>
 
-    <button onclick="runScenario('Taiwan Strait Crisis')">
-      Taiwan Strait Crisis
-    </button>
-
-    <button onclick="runScenario('Semiconductor Supply Shock')">
-      Semiconductor Supply Shock
-    </button>
-
-    <button onclick="runScenario('Energy Market Disruption')">
-      Energy Market Disruption
-    </button>
-
-    <button onclick="runScenario('Global Recession')">
-      Global Recession
-    </button>
-
-    <button onclick="orchestra?.runAll()">
-      Run Full Sequence
-    </button>
+    <button onclick="orchestra?.runAll()">Run Full Sequence</button>
 
   </div>
 
-  <!-- RISK DASHBOARD -->
+  <!-- DASHBOARD -->
   <div class="grid">
 
     <div class="card">
@@ -73,28 +57,56 @@
   <!-- EVENT LOG -->
   <div class="log" id="log"></div>
 
-  <!-- CORE SYSTEM -->
+  <!-- =========================
+       CORE SYSTEM
+  ========================= -->
   <script src="../config.js"></script>
   <script src="../data.js"></script>
   <script src="../scenarios.js"></script>
 
-  <!-- ENGINE -->
+  <!-- =========================
+       ENGINE LAYER
+  ========================= -->
   <script src="../rp04-engine.js"></script>
 
-  <!-- AUDIT -->
+  <!-- =========================
+       AUDIT SYSTEM
+  ========================= -->
   <script src="../audit_bridge.js"></script>
-
-  <!-- SELF TEST -->
   <script src="../audit_self_test.js"></script>
 
-  <!-- ORCHESTRA -->
+  <!-- =========================
+       ORCHESTRA LAYER
+  ========================= -->
   <script src="../orchestra_engine.js"></script>
 
-  <!-- TRIGGER LAYER -->
+  <!-- =========================
+       CONTROL LAYER
+  ========================= -->
   <script src="../runScenario.js"></script>
 
-  <!-- LIVE FEED -->
-  <script src="../live_feed.js"></script>
+  <!-- =========================
+       BOOT SEQUENCE (CRITICAL)
+  ========================= -->
+  <script>
+    window.addEventListener("load", () => {
+
+      console.log("🧠 Sextant Command Center Booted");
+
+      if (window.selfTestRP04) {
+        console.log("🧪 SELF TEST:", selfTestRP04());
+      }
+
+      if (!window.runScenario) {
+        console.error("❌ runScenario missing");
+      }
+
+      if (!window.orchestra) {
+        console.error("❌ orchestra missing");
+      }
+
+    });
+  </script>
 
 </body>
 </html>
