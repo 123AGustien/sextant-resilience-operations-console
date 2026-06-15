@@ -102,8 +102,6 @@ window.auditLog = [];
 (function bootCheck() {
 
     if (!window.runRP04) {
-        console.warn("RP-04 missing → SAFE MODE active");
-
         window.runRP04 = function(type) {
             return {
                 state: "SAFE_MODE",
@@ -119,15 +117,11 @@ window.auditLog = [];
         };
     }
 
-    if (!window.orchestra || !window.orchestra.run) {
+    if (!window.orchestra) {
         window.orchestra = {
             run: function(type) {
                 return window.runRP04(type);
-            },
-            getLastReport: function() {
-                return null;
-            },
-            reset: function() {}
+            }
         };
     }
 
@@ -193,9 +187,17 @@ function runSim(type) {
             `<div>#${i} ${l.audit.status} | GRADE: ${l.audit.grade}</div>`
         ).join("");
 
+    /* =========================
+       🔷 AUDIT BRIDGE (NEW FIX)
+    ========================= */
+
     window.dispatchEvent(new CustomEvent("sextant:run", {
         detail: fullFrame
     }));
+
+    if (window.runAuditTest) {
+        window.runAuditTest(fullFrame);
+    }
 }
 
 /* =========================
