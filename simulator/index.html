@@ -63,7 +63,7 @@
   <script src="../scenarios.js"></script>
   <script src="../engine.js"></script>
 
-  <!-- ================= AUDIT LAYER (IMPORTANT) ================= -->
+  <!-- ================= AUDIT LAYER ================= -->
   <script src="../audit_bridge.js"></script>
 
   <!-- ================= VISUAL LAYER ================= -->
@@ -72,39 +72,97 @@
   <!-- ================= CONTROLLER ================= -->
   <script src="../app.js"></script>
 
-  <!-- ================= BOOT STRAP FIX ================= -->
+  <!-- ================= SAFE BOOT FIX ================= -->
   <script>
+
+    function safe(val, fallback = 0) {
+      return (val === undefined || val === null) ? fallback : val;
+    }
 
     function runSimulation() {
 
-        const engine = window.engine || window;
+      try {
 
-        const result = engine.runSimulation(
-            document.getElementById("scenarioSelect").value
-        );
+        const engine = window.engine;
 
-        // 🔥 AUDIT INJECTION (CRITICAL LINK)
-        const audit = window.auditScenarioResult(
-            result.scenario,
-            {
-                riskScore: result.shock,
-                impact: result.exportIndex,
-                stability: 100 - result.shock
-            }
-        );
+        if (!engine || typeof engine.runSimulation !== "function") {
+          throw new Error("Engine not loaded or invalid");
+        }
 
-        result.audit = audit;
+        const scenarioSelect = document.getElementById("scenarioSelect");
+        const scenario = scenarioSelect ? scenarioSelect.value : "default";
 
-        updateUI(result);
+        const result = engine.runSimulation(scenario);
 
-        // DISPLAY AUDIT
+        if (!result) {
+          throw new Error("Simulation returned empty result");
+        }
+
+        // SAFE RESULT WRAPPER
+        const safeResult = {
+          scenario: safe(result.scenario, "UNKNOWN"),
+          exportIndex: safe(result.exportIndex),
+          electronics: safe(result.electronics),
+          nonTech: safe(result.nonTech),
+          shock: safe(result.shock)
+        };
+
+        // SAFE AUDIT
+        let audit = null;
+
+        try {
+          if (typeof window.auditScenarioResult === "function") {
+            audit = window.auditScenarioResult(
+              safeResult.scenario,
+              {
+                riskScore: safeResult.shock,
+                impact: safeResult.exportIndex,
+                stability: 100 - safeResult.shock
+              }
+            );
+          } else {
+            audit = { status: "audit_bridge_missing" };
+          }
+        } catch (e) {
+          audit = {
+            status: "audit_failed",
+            error: e.message
+          };
+        }
+
+        safeResult.audit = audit;
+
+        // SAFE UI UPDATE
+        if (typeof updateUI === "function") {
+          updateUI(safeResult);
+        }
+
         document.getElementById("auditLog").innerText =
-            JSON.stringify(audit, null, 2);
+          JSON.stringify(audit, null, 2);
+
+      } catch (err) {
+
+        console.error("Simulation crash:", err);
+
+        document.getElementById("auditLog").innerText =
+          "SYSTEM ERROR: " + err.message;
+      }
     }
 
     function resetSimulation() {
-        if (window.reset) window.reset();
-        document.getElementById("auditLog").innerText = "Awaiting audit...";
+
+      try {
+
+        if (typeof window.reset === "function") {
+          window.reset();
+        }
+
+        document.getElementById("auditLog").innerText =
+          "Awaiting audit...";
+
+      } catch (err) {
+        console.error("Reset error:", err);
+      }
     }
 
   </script>
