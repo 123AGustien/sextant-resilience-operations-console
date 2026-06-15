@@ -1,3 +1,148 @@
+Sextant Protocol — Strategic Command Infrastructure
+
+Overview
+
+Sextant Protocol is a strategic resilience simulation platform designed to support scenario analysis, systemic risk assessment, and operational decision support.
+
+The platform enables governments, enterprises, critical infrastructure operators, and research institutions to simulate complex failure scenarios and evaluate system resilience under stress.
+
+---
+
+Core Architecture
+
+1. RP-04 Engine (Simulation Core)
+
+The RP-04 Engine serves as the single source of truth for all scenario execution.
+
+Responsibilities:
+
+- Execute scenario simulations
+- Calculate systemic impacts
+- Generate standardized simulation frames
+- Maintain deterministic simulation outputs
+
+Standard Frame:
+
+{
+  "rp04": {
+    "stability": 0.82,
+    "pressure": 0.28
+  },
+  "system": {
+    "fx": 0.28,
+    "bank": 0.23,
+    "liq": 0.20,
+    "eq": 0.18,
+    "conf": 0.17
+  },
+  "state": "STABLE",
+  "scenario": "normal",
+  "timestamp": 1234567890
+}
+
+---
+
+2. Audit Bridge (Verification Layer)
+
+The Audit Bridge validates and interprets RP-04 simulation output.
+
+Responsibilities:
+
+- Receive simulation frames
+- Generate audit assessments
+- Produce risk scores
+- Generate system grades
+- Record execution history
+- Support governance and review processes
+
+Flow:
+
+RP-04 Engine
+→ Simulation Frame
+→ Audit Bridge
+→ Audit Report
+
+---
+
+3. Strategic Command Center
+
+The Strategic Command Center provides the operational interface for scenario execution.
+
+Capabilities:
+
+- Scenario selection
+- Risk dashboard visualization
+- Executive briefing generation
+- Audit review
+- System monitoring
+- Event stream analysis
+
+Example scenarios:
+
+- US–China Trade Escalation
+- Taiwan Strait Crisis
+- Semiconductor Supply Shock
+- Energy Market Disruption
+- Global Recession
+
+---
+
+4. System Self-Test Framework
+
+Before scenario execution:
+
+- RP-04 Engine validation
+- Audit Bridge validation
+- Dashboard validation
+- Event pipeline validation
+
+After scenario execution:
+
+- Audit generation verification
+- Dashboard synchronization verification
+- Event logging verification
+- System health verification
+
+---
+
+5. GitHub Pages Deployment
+
+The platform is deployed through GitHub Pages.
+
+Deployment Flow:
+
+Repository
+→ Main Branch
+→ GitHub Pages
+→ Live Strategic Command Center
+
+Core deployment assets:
+
+- index.html
+- rp04-engine.js
+- audit_bridge.js
+- simulator/
+- orchestration/
+
+---
+
+Operational Workflow
+
+Scenario Selection
+→ RP-04 Execution
+→ Audit Generation
+→ Dashboard Update
+→ Executive Briefing
+→ Audit Record
+
+---
+
+Mission
+
+To provide a transparent, auditable, and extensible resilience intelligence platform capable of supporting strategic decision-making under uncertainty and systemic stress.
+
+Sextant Protocol is designed as an operational framework for resilience analysis, scenario exploration, and institutional preparedness.
+
 # 🌐 Sextant Protocol — Resilience Intelligence System
 
 **Sextant Resilience Operations Console** is a real-time systems intelligence and resilience engineering framework designed for complex operational environments.
