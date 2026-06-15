@@ -17,14 +17,20 @@
 
   <!-- CONTROLS -->
   <div class="panel">
+
     <button onclick="runSimulation()">Run Simulation</button>
     <button onclick="resetSimulation()">Reset</button>
+
+    <button onclick="orchestra?.runAll()">
+      Run Full Sequence
+    </button>
 
     <select id="scenarioSelect">
       <option value="normal">Normal</option>
       <option value="failure">Failure</option>
       <option value="cascade">Cascade</option>
     </select>
+
   </div>
 
   <!-- DASHBOARD -->
@@ -66,13 +72,19 @@
   <script src="../data.js"></script>
   <script src="../scenarios.js"></script>
 
-  <!-- ENGINE (ONLY SOURCE OF TRUTH) -->
+  <!-- RP-04 ENGINE (SOURCE OF TRUTH) -->
   <script src="../rp04-engine.js"></script>
 
   <!-- AUDIT BRIDGE -->
   <script src="../audit_bridge.js"></script>
 
-  <!-- VISUAL LAYER (OPTIONAL) -->
+  <!-- SELF TEST LAYER -->
+  <script src="../audit_self_test.js"></script>
+
+  <!-- ORCHESTRA LAYER -->
+  <script src="../orchestra_engine.js"></script>
+
+  <!-- VISUAL LAYER -->
   <script src="../visual.js"></script>
 
   <!-- APP CONTROLLER -->
@@ -83,45 +95,41 @@
 
     function runSimulation() {
 
-        const scenario = document.getElementById("scenarioSelect").value;
+        const scenario =
+            document.getElementById("scenarioSelect").value;
 
-        // 1. ENGINE (SINGLE SOURCE OF TRUTH)
-        if (!window.runRP04) {
-            console.error("RP-04 engine missing");
+        if (!window.orchestra) {
+            console.error("Orchestra not loaded");
             return;
         }
 
-        const frame = window.runRP04(scenario);
+        // ORCHESTRATION ENTRY POINT
+        const frame = window.orchestra.run(scenario);
 
-        if (!frame) {
-            console.error("Engine returned no frame");
-            return;
-        }
+        if (!frame) return;
 
-        // 2. UI UPDATE (DISPLAY ONLY)
-        if (window.updateUI) {
-            window.updateUI(frame);
-        }
+        // UI UPDATE (optional layer)
+        window.updateUI?.(frame);
 
-        // 3. AUDIT PIPE (BRIDGE)
-        const audit = window.SextantBridge?.captureSimulationResult(frame) || null;
-        frame.audit = audit;
-
-        // 4. AUDIT DISPLAY
+        // AUDIT DISPLAY
         const auditLog = document.getElementById("auditLog");
-        if (auditLog) {
-            auditLog.innerText = JSON.stringify(audit || {}, null, 2);
+
+        if (auditLog && frame.audit) {
+            auditLog.innerText =
+                JSON.stringify(frame.audit, null, 2);
         }
 
-        // 5. EVENT STREAM (CONTROL CENTER SYNC)
-        window.dispatchEvent(new CustomEvent("sextant:run", {
-            detail: frame
-        }));
+        // EVENT STREAM (CONTROL CENTER SYNC)
+        window.dispatchEvent(
+            new CustomEvent("sextant:run", {
+                detail: frame
+            })
+        );
     }
 
     function resetSimulation() {
 
-        if (window.reset) window.reset();
+        window.orchestra?.reset();
 
         document.getElementById("auditLog").innerText =
             "Awaiting audit...";
