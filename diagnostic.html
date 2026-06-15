@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Sextant Root Diagnostic Panel</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><style>
 body {
     font-family: Arial;
     background: #0b0f19;
@@ -20,42 +17,35 @@ body {
     background: #111827;
 }
 
-.ok { color: lime; }
-.fail { color: red; }
+.ok {
+    color: lime;
+}
+
+.fail {
+    color: red;
+}
 
 pre {
     background: #000;
     padding: 10px;
     overflow: auto;
 }
-</style>
-</head>
-
-<body>
-
-<h2>🧭 SEXTANT ROOT DIAGNOSTIC</h2>
-
-<div class="box" id="engine">Engine: checking...</div>
+</style></head><body><h2>🧭 SEXTANT ROOT DIAGNOSTIC</h2><div class="box" id="engine">Engine: checking...</div>
 <div class="box" id="bus">Event Bus: checking...</div>
 <div class="box" id="orchestra">Orchestra: checking...</div>
-<div class="box" id="scenario">Scenario: checking...</div>
-
-<div class="box">
+<div class="box" id="scenario">Scenario: checking...</div><div class="box">
 <h3>Live Frame Feed</h3>
 <pre id="feed">waiting...</pre>
-</div>
-
-<div class="box">
+</div><div class="box">
 <h3>System State</h3>
 <pre id="state"></pre>
-</div>
-
-<script>
+</div><!-- SEXTANT RUNTIME --><script src="./rp04-engine.js"></script><script src="./event_bus.js"></script><script src="./orchestra_engine.js"></script><script src="./runScenario.js"></script><script>
 
 /* =========================
    STATUS UPDATE
 ========================= */
 function set(id, ok, msg) {
+
     const el = document.getElementById(id);
     if (!el) return;
 
@@ -68,22 +58,26 @@ function set(id, ok, msg) {
 ========================= */
 function check() {
 
-    set("engine",
+    set(
+        "engine",
         !!window.runRP04,
         "Engine: " + (window.runRP04 ? "LOADED" : "MISSING")
     );
 
-    set("bus",
+    set(
+        "bus",
         !!window.SextantBus,
         "Event Bus: " + (window.SextantBus ? "LOADED" : "MISSING")
     );
 
-    set("orchestra",
+    set(
+        "orchestra",
         !!window.orchestra,
         "Orchestra: " + (window.orchestra ? "LOADED" : "MISSING")
     );
 
-    set("scenario",
+    set(
+        "scenario",
         !!window.runScenario,
         "Scenario: " + (window.runScenario ? "LOADED" : "MISSING")
     );
@@ -98,13 +92,14 @@ function check() {
 }
 
 /* =========================
-   FRAME LISTENER (DUAL SUPPORT)
+   FRAME LISTENER
 ========================= */
 function attachListener() {
 
-    if (window.SextantBus) {
+    if (window.SextantBus && window.SextantBus.on) {
 
         window.SextantBus.on((frame) => {
+
             document.getElementById("feed").innerText =
                 JSON.stringify(frame, null, 2);
         });
@@ -112,6 +107,7 @@ function attachListener() {
     } else {
 
         window.addEventListener("sextant:run", (e) => {
+
             document.getElementById("feed").innerText =
                 JSON.stringify(e.detail, null, 2);
         });
@@ -119,13 +115,17 @@ function attachListener() {
 }
 
 /* =========================
-   LOOP
+   BOOT
 ========================= */
-setInterval(check, 1000);
-check();
-attachListener();
+window.addEventListener("load", () => {
 
-</script>
+    check();
+    attachListener();
 
-</body>
+    setInterval(check, 1000);
+
+    console.log("🧭 Sextant Diagnostic Loaded");
+});
+
+</script></body>
 </html>
