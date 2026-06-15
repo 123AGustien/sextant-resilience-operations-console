@@ -1,10 +1,28 @@
-git commit --allow-empty -m "Trigger GitHub Pages rebuild"
-git push origin mainntextant Protocol — Strategic Command Infrastructuredeployment
 
 
-deployment:
-123agustien.github.io
+🧪 Root Diagnostic Panel
 
+Use the diagnostic page to verify runtime loading and deployment status.
+
+Diagnostic URL:
+
+https://123agustien.github.io/sextant-resilience-operations-console/diagnostic.html
+
+Checks:
+
+- RP-04 Engine
+- Event Bus
+- Orchestra Layer
+- Scenario Runtime
+- Live Frame Feed
+- System State
+
+Expected Status:
+
+Engine: LOADED
+Event Bus: LOADED
+Orchestra: LOADED
+Scenario: LOADED
 
 Overview
 
