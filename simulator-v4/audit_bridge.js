@@ -1,81 +1,44 @@
 /**
- * Sextant Audit Bridge v4 — Control Layer Sync Core
- * Connects simulator-v4 → Control Room → Orchestra
+ * Sextant Audit Bridge v1.0
+ * Receives RP-04 frame and generates audit output
  */
 
-window.SextantBridge = window.SextantBridge || {};
+window.SextantBridge = {
 
-/* =========================
-   MAIN AUDIT ENTRY
-========================= */
-window.SextantBridge.captureSimulationResult = function (frame) {
+    captureSimulationResult(frame) {
 
-    const audit = {
-        scenario: frame?.scenario || "unknown",
-        timestamp: Date.now(),
+        if (!frame || !frame.system) {
+            return {
+                scenario: "invalid_frame",
+                riskScore: 0,
+                impact: 0,
+                stability: 0,
+                grade: "ERROR",
+                status: "FRAME_MISSING"
+            };
+        }
 
-        // SAFE METRICS
-        riskScore: normalize(frame?.system?.fx * 100),
-        impact: normalize(frame?.system?.bank * 100),
-        stability: normalize(frame?.rp04?.stability * 100),
+        const system = frame.system;
 
-        // INTELLIGENCE LAYER
-        totalScore: computeTotal(frame),
-        grade: computeGrade(frame),
-        status: classifyRisk(frame)
-    };
+        // Core scoring logic
+        const riskScore = system.conf * 100;
+        const impact = system.bank * 100;
+        const stability = system.liq * 100;
 
-    console.log("🧠 V4 AUDIT:", audit);
+        let grade = "STABLE";
 
-    // push global hook (for Control Room sync)
-    window.__SEXTANT_AUDIT__ = audit;
+        if (riskScore < 40) grade = "CRITICAL";
+        else if (riskScore < 60) grade = "HIGH_RISK";
+        else if (riskScore < 80) grade = "MODERATE_RISK";
 
-    return audit;
+        return {
+            scenario: frame.scenario,
+            riskScore: riskScore.toFixed(2),
+            impact: impact.toFixed(2),
+            stability: stability.toFixed(2),
+            grade,
+            status: "OK",
+            timestamp: Date.now()
+        };
+    }
 };
-
-/* =========================
-   SAFE NORMALIZER
-========================= */
-function normalize(v) {
-    if (v === undefined || v === null || isNaN(v)) return 0;
-    return Number(v);
-}
-
-/* =========================
-   TOTAL SCORE ENGINE
-========================= */
-function computeTotal(frame) {
-
-    const fx = normalize(frame?.system?.fx * 100);
-    const bank = normalize(frame?.system?.bank * 100);
-    const stability = normalize(frame?.rp04?.stability * 100);
-
-    return fx + bank + (100 - stability);
-}
-
-/* =========================
-   GRADE ENGINE
-========================= */
-function computeGrade(frame) {
-
-    const score = computeTotal(frame);
-
-    if (score > 250) return "CRITICAL";
-    if (score > 200) return "HIGH";
-    if (score > 150) return "MEDIUM";
-    if (score > 100) return "LOW";
-    return "STABLE";
-}
-
-/* =========================
-   RISK CLASSIFIER
-========================= */
-function classifyRisk(frame) {
-
-    const risk = normalize(frame?.system?.fx * 100);
-
-    if (risk > 75) return "SYSTEMIC_RISK";
-    if (risk > 50) return "ELEVATED_RISK";
-    if (risk > 25) return "WATCHLIST";
-    return "NORMAL";
-}
