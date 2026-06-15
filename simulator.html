@@ -97,37 +97,39 @@ window.logs = [];
 window.auditLog = [];
 
 /* =========================
+   SAFE BOOT GUARD
+========================= */
 (function bootCheck() {
 
-if (!window.runRP04) {
-    console.warn("RP-04 missing → SAFE MODE active");
+    if (!window.runRP04) {
+        console.warn("RP-04 missing → SAFE MODE active");
 
-    window.runRP04 = function(type) {
-        return {
-            state: "SAFE_MODE",
-            system: {
-                fx: 0.5,
-                bank: 0.5,
-                liq: 0.5,
-                eq: 0.5,
-                conf: 0.5
-            },
-            meta: { type }
+        window.runRP04 = function(type) {
+            return {
+                state: "SAFE_MODE",
+                system: {
+                    fx: 0.5,
+                    bank: 0.5,
+                    liq: 0.5,
+                    eq: 0.5,
+                    conf: 0.5
+                },
+                meta: { type }
+            };
         };
-    };
-}
+    }
 
-if (!window.orchestra || !window.orchestra.run) {
-    window.orchestra = {
-        run: function(type) {
-            return window.runRP04(type);
-        },
-        getLastReport: function() {
-            return null;
-        },
-        reset: function() {}
-    };
-}
+    if (!window.orchestra || !window.orchestra.run) {
+        window.orchestra = {
+            run: function(type) {
+                return window.runRP04(type);
+            },
+            getLastReport: function() {
+                return null;
+            },
+            reset: function() {}
+        };
+    }
 
 })();
 
@@ -152,9 +154,7 @@ function setNode(id, v) {
 function runSim(type) {
 
     const frame = window.orchestra.run(type);
-
     const system = frame.system;
-
     const state = frame.state || "UNKNOWN";
 
     const audit = {
@@ -193,9 +193,6 @@ function runSim(type) {
             `<div>#${i} ${l.audit.status} | GRADE: ${l.audit.grade}</div>`
         ).join("");
 
-    /* =========================
-       EVENT BUS (COMMAND CENTER)
-    ========================= */
     window.dispatchEvent(new CustomEvent("sextant:run", {
         detail: fullFrame
     }));
