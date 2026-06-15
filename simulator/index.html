@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sextant Simulator Control Room</title>
+  <title>Sextant Strategic Command Center</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../style.css">
 </head>
@@ -11,57 +11,63 @@
 
   <!-- HEADER -->
   <div class="header">
-    <h1>Sextant Resilience Simulator</h1>
-    <p>Scenario Failure Simulation Control Room</p>
+    <h1>Sextant Strategic Command Center</h1>
+    <p>Global Resilience Intelligence Platform</p>
   </div>
 
-  <!-- CONTROLS -->
+  <!-- SCENARIO LIBRARY -->
   <div class="panel">
 
-    <button onclick="runSimulation()">Run Simulation</button>
-    <button onclick="resetSimulation()">Reset</button>
+    <button onclick="runScenario('US–China Trade Escalation')">
+      US–China Trade Escalation
+    </button>
+
+    <button onclick="runScenario('Taiwan Strait Crisis')">
+      Taiwan Strait Crisis
+    </button>
+
+    <button onclick="runScenario('Semiconductor Supply Shock')">
+      Semiconductor Supply Shock
+    </button>
+
+    <button onclick="runScenario('Energy Market Disruption')">
+      Energy Market Disruption
+    </button>
+
+    <button onclick="runScenario('Global Recession')">
+      Global Recession
+    </button>
 
     <button onclick="orchestra?.runAll()">
       Run Full Sequence
     </button>
 
-    <select id="scenarioSelect">
-      <option value="normal">Normal</option>
-      <option value="failure">Failure</option>
-      <option value="cascade">Cascade</option>
-    </select>
-
   </div>
 
-  <!-- DASHBOARD -->
+  <!-- RISK DASHBOARD -->
   <div class="grid">
 
     <div class="card">
-      <h3>Export Index</h3>
-      <div id="exportIndex">0</div>
+      <h3>Risk Index</h3>
+      <div id="riskIndex">--</div>
     </div>
 
     <div class="card">
-      <h3>Electronics</h3>
-      <div id="electronics">0</div>
+      <h3>Impact</h3>
+      <div id="impact">--</div>
     </div>
 
     <div class="card">
-      <h3>Non-Tech</h3>
-      <div id="nonTech">0</div>
-    </div>
-
-    <div class="card">
-      <h3>Shock Level</h3>
-      <div id="shock">0</div>
+      <h3>Audit Status</h3>
+      <div id="auditStatus">awaiting execution...</div>
     </div>
 
   </div>
 
-  <!-- AUDIT OUTPUT -->
+  <!-- EXECUTIVE BRIEFING -->
   <div class="card">
-    <h3>Audit Output</h3>
-    <pre id="auditLog">Awaiting audit...</pre>
+    <h3>Executive Intelligence Briefing</h3>
+    <pre id="auditLog">Run a scenario to generate output...</pre>
   </div>
 
   <!-- EVENT LOG -->
@@ -72,70 +78,23 @@
   <script src="../data.js"></script>
   <script src="../scenarios.js"></script>
 
-  <!-- RP-04 ENGINE (SOURCE OF TRUTH) -->
+  <!-- ENGINE -->
   <script src="../rp04-engine.js"></script>
 
-  <!-- AUDIT BRIDGE -->
+  <!-- AUDIT -->
   <script src="../audit_bridge.js"></script>
 
-  <!-- SELF TEST LAYER -->
+  <!-- SELF TEST -->
   <script src="../audit_self_test.js"></script>
 
-  <!-- ORCHESTRA LAYER -->
+  <!-- ORCHESTRA -->
   <script src="../orchestra_engine.js"></script>
 
-  <!-- VISUAL LAYER -->
-  <script src="../visual.js"></script>
+  <!-- TRIGGER LAYER -->
+  <script src="../runScenario.js"></script>
 
-  <!-- APP CONTROLLER -->
-  <script src="../app.js"></script>
-
-  <!-- ================= CONTROL BOOTSTRAP ================= -->
-  <script>
-
-    function runSimulation() {
-
-        const scenario =
-            document.getElementById("scenarioSelect").value;
-
-        if (!window.orchestra) {
-            console.error("Orchestra not loaded");
-            return;
-        }
-
-        // ORCHESTRATION ENTRY POINT
-        const frame = window.orchestra.run(scenario);
-
-        if (!frame) return;
-
-        // UI UPDATE (optional layer)
-        window.updateUI?.(frame);
-
-        // AUDIT DISPLAY
-        const auditLog = document.getElementById("auditLog");
-
-        if (auditLog && frame.audit) {
-            auditLog.innerText =
-                JSON.stringify(frame.audit, null, 2);
-        }
-
-        // EVENT STREAM (CONTROL CENTER SYNC)
-        window.dispatchEvent(
-            new CustomEvent("sextant:run", {
-                detail: frame
-            })
-        );
-    }
-
-    function resetSimulation() {
-
-        window.orchestra?.reset();
-
-        document.getElementById("auditLog").innerText =
-            "Awaiting audit...";
-    }
-
-  </script>
+  <!-- LIVE FEED -->
+  <script src="../live_feed.js"></script>
 
 </body>
 </html>
