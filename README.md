@@ -1,5 +1,15 @@
 
-
+Sextant Command Center v10 — Live Diagnostic
+The Sextant Operations Console includes a real-time macro stress simulation and system resilience audit engine.
+🔴 Live Diagnostic Console
+Tap to open the active system:
+👉 https://123agustien.github.io/sextant-resilience-operations-console/⁠�
+🧪 What it does
+Runs macro stress scenarios (FX / BANK / LIQ / EQ / CONF)
+Generates live system state (stability + pressure model)
+Outputs automated risk / impact / stability scoring
+🧠 Purpose
+This module functions as a real-time resilience interpreter, mapping financial stress conditions into a structured system stability index for simulation and analysis.
 🧪 Root Diagnostic Panel
 
 Use the diagnostic page to verify runtime loading and deployment status.
