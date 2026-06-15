@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sextant Root Diagnostic Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    font-family: Arial;
+    background: #0b0f19;
+    color: #e6f7ff;
+    padding: 20px;
+}
+
+.box {
+    border: 1px solid #2bd4ff;
+    padding: 12px;
+    margin: 10px 0;
+    background: #111827;
+}
+
+.ok { color: lime; }
+.fail { color: red; }
+
+pre {
+    background: #000;
+    padding: 10px;
+    overflow: auto;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🧭 SEXTANT ROOT DIAGNOSTIC</h2>
+
+<div class="box" id="engine">Engine: checking...</div>
+<div class="box" id="bus">Event Bus: checking...</div>
+<div class="box" id="orchestra">Orchestra: checking...</div>
+<div class="box" id="scenario">Scenario: checking...</div>
+
+<div class="box">
+<h3>Live Frame Feed</h3>
+<pre id="feed">waiting...</pre>
+</div>
+
+<div class="box">
+<h3>System State</h3>
+<pre id="state"></pre>
+</div>
+
+<script>
+
+/* =========================
+   STATUS UPDATE
+========================= */
+function set(id, ok, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.className = "box " + (ok ? "ok" : "fail");
+    el.innerText = msg;
+}
+
+/* =========================
+   SYSTEM CHECK
+========================= */
+function check() {
+
+    set("engine",
+        !!window.runRP04,
+        "Engine: " + (window.runRP04 ? "LOADED" : "MISSING")
+    );
+
+    set("bus",
+        !!window.SextantBus,
+        "Event Bus: " + (window.SextantBus ? "LOADED" : "MISSING")
+    );
+
+    set("orchestra",
+        !!window.orchestra,
+        "Orchestra: " + (window.orchestra ? "LOADED" : "MISSING")
+    );
+
+    set("scenario",
+        !!window.runScenario,
+        "Scenario: " + (window.runScenario ? "LOADED" : "MISSING")
+    );
+
+    document.getElementById("state").innerText =
+        JSON.stringify({
+            runRP04: !!window.runRP04,
+            SextantBus: !!window.SextantBus,
+            orchestra: !!window.orchestra,
+            runScenario: !!window.runScenario
+        }, null, 2);
+}
+
+/* =========================
+   FRAME LISTENER (DUAL SUPPORT)
+========================= */
+function attachListener() {
+
+    if (window.SextantBus) {
+
+        window.SextantBus.on((frame) => {
+            document.getElementById("feed").innerText =
+                JSON.stringify(frame, null, 2);
+        });
+
+    } else {
+
+        window.addEventListener("sextant:run", (e) => {
+            document.getElementById("feed").innerText =
+                JSON.stringify(e.detail, null, 2);
+        });
+    }
+}
+
+/* =========================
+   LOOP
+========================= */
+setInterval(check, 1000);
+check();
+attachListener();
+
+</script>
+
+</body>
+</html>
