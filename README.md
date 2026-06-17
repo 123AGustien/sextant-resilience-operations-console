@@ -1,4 +1,16 @@
+SELF GENERATOR
+↓
+DISCOVER CASCADES
+↓
+SIMULATOR
+↓
+TEST INTERVENTIONS
+↓
+OPERATIONS CONSOLE
+↓
+VISUALIZE RESILIENCE
 
+GitHub reprisory link to paste at the top
 Sextant Command Center v10 — Live Diagnostic
 The Sextant Operations Console includes a real-time macro stress simulation and system resilience audit engine.
 🔴 Live Diagnostic Console
