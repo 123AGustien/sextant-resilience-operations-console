@@ -76,6 +76,26 @@ OPERATIONS CONSOLE
 VISUALIZE RESILIENCE
 
 GitHub reprisory link to paste at the top
+
+Stress Scale Methodology
+
+In the current prototype, subsystem stress values are user-defined scenario inputs.
+
+Each subsystem is assigned a normalized value between 0.00 and 1.00:
+
+0.00–0.20 Stable
+
+0.21–0.40 Watch
+
+0.41–0.60 Stress
+
+0.61–0.80 Severe Stress
+
+0.81–1.00 Crisis
+
+These values represent simulated pressure levels within the resilience model and are used to generate Risk, Impact, and Stability outputs.
+
+Future versions may include automated scenario classification and event-driven stress assignment, allowing the system to derive subsystem values from predefined events and institutional stress templates.
 Sextant Command Center v10 — Live Diagnostic
 The Sextant Operations Console includes a real-time macro stress simulation and system resilience audit engine.
 🔴 Live Diagnostic Console
