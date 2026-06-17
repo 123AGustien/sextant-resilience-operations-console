@@ -32,6 +32,10 @@ Diagnostic URL:
 
 https://123agustien.github.io/sextant-resilience-operations-console/diagnostic.html
 
+
+Live Console (GitHub Pages)
+This is your running upgraded system (simulator + dashboard + engine)
+hthps://123agustien.github.io/sextant-self-generator/
 Checks:
 
 - RP-04 Engine
