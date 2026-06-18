@@ -1,4 +1,31 @@
-SEXTANT PROTOCOL ECOSYSTEM
+SEXTANTEXTTOCOLsubmission is intended for exploratory review under innovation sandbox or experimental systems evaluation contexts.
+
+---
+
+## Live Prototype Access
+
+Control Gateway (System Entry)  
+https://123agustien.github.io/sextant-self-generator/
+
+Self Test Control Room  
+https://123agustien.github.io/sextant-self-generator/self-test.html
+
+Simulation Engine  
+https://123agustien.github.io/sextant-self-generator/simulation_screen_v1.html
+
+Scenario Router  
+https://123agustien.github.io/sextant-self-generator/scenario-router.html
+
+Operations Console  
+https://123agustien.github.io/sextant-self-generator/sextant-offline-command-center/
+
+---
+
+## Technical Reference
+
+GitHub Repository  
+https://github.com/123AGustien/sextant-self-generator
+TOCOLANT PROTOCOL ECOSYSTEM
 
 Live URLs
 
