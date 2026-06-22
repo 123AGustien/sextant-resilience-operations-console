@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sextant Command Center v10 — Siemens Pilot Screen</title>
+<title>Sextant Industrial Control Screen v1</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -16,79 +16,82 @@ body {
 /* HEADER */
 .header {
     text-align: center;
-    padding: 50px 20px;
+    padding: 40px 20px;
     border-bottom: 1px solid #1f2a38;
 }
 
 .title {
-    font-size: 30px;
+    font-size: 26px;
     font-weight: bold;
 }
 
 .status {
-    margin-top: 10px;
+    margin-top: 8px;
     color: #7ee787;
     font-size: 14px;
 }
 
-/* GRID */
+/* GRID LAYOUT */
 .grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    padding: 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    padding: 20px;
+    max-width: 1100px;
+    margin: auto;
 }
 
-/* CARD */
-.card {
-    width: 320px;
+/* PANELS */
+.panel {
     background: #111826;
     border: 1px solid #223044;
-    border-radius: 10px;
-    padding: 20px;
+    border-radius: 8px;
+    padding: 14px;
 }
 
-.card h3 {
+.panel h3 {
     margin-top: 0;
+    font-size: 14px;
 }
 
-.card p {
-    color: #9bb0c5;
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-/* BUTTON */
-a {
-    display: inline-block;
-    margin-top: 12px;
-    padding: 10px 14px;
-    background: #1f6feb;
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
+/* NODE STATUS */
+.node {
+    padding: 10px;
+    border: 1px solid #2bd4ff;
+    margin-bottom: 8px;
     font-size: 13px;
 }
 
-/* FOOTER */
+.ok { color: #7ee787; }
+.warn { color: #f1c40f; }
+.bad { color: #ff7b72; }
+.crit { color: #ff4d6d; }
+
+/* BUTTONS */
+button {
+    padding: 8px 10px;
+    margin: 4px;
+    background: #0b0f14;
+    color: #2bd4ff;
+    border: 1px solid #2bd4ff;
+    cursor: pointer;
+}
+
+/* LOG */
+pre {
+    background: #000;
+    padding: 10px;
+    font-size: 11px;
+    overflow: auto;
+    max-height: 250px;
+}
+
 .footer {
     text-align: center;
-    padding: 25px;
+    padding: 20px;
     font-size: 12px;
     color: #6b7c93;
     border-top: 1px solid #1f2a38;
-}
-
-/* STATUS BADGES (optional visual layer) */
-.badge {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 4px 8px;
-    border: 1px solid #2bd4ff;
-    color: #2bd4ff;
-    font-size: 12px;
-    border-radius: 4px;
 }
 </style>
 </head>
@@ -96,72 +99,121 @@ a {
 <body>
 
 <div class="header">
-    <div class="title">SEXTANT COMMAND CENTER v10</div>
-    <div class="status">SYSTEM STATUS: OPERATIONAL • SIEMENS PILOT SCREEN ACTIVE</div>
-    <div class="badge">NO RUNTIME DEPENDENCIES • SAFE MODE ENABLED</div>
+    <div class="title">SEXTANT INDUSTRIAL CONTROL SCREEN v1</div>
+    <div class="status" id="status">SYSTEM: INITIALIZING</div>
 </div>
 
+<!-- CONTROL PANEL -->
+<div class="panel" style="max-width:1100px;margin:15px auto;">
+    <h3>Operator Controls</h3>
+    <button onclick="run('normal')">Normal Operation</button>
+    <button onclick="run('load')">High Load</button>
+    <button onclick="run('fault')">Inject Fault</button>
+    <button onclick="run('cascade')">Cascade Test</button>
+</div>
+
+<!-- SYSTEM GRID -->
 <div class="grid">
 
-    <!-- SIMULATOR -->
-    <div class="card">
-        <h3>🧠 Simulation Engine</h3>
-        <p>
-            Deterministic scenario execution engine for FX, BANK, LIQ, EQ, CONF stress modeling.
-        </p>
-        <a href="simulator.html">Launch Simulator</a>
+    <div class="panel">
+        <h3>⚙ System Nodes</h3>
+        <div id="nodes"></div>
     </div>
 
-    <!-- STRATEGIC COMMAND CENTER -->
-    <div class="card">
-        <h3>🛰 Strategic Command Center</h3>
-        <p>
-            Advanced scenario analysis, audit layer, and systemic risk evaluation interface.
-        </p>
-        <a href="strategic-command-center/index.html">Open Command Center</a>
+    <div class="panel">
+        <h3>📊 Live Telemetry</h3>
+        <pre id="telemetry">waiting...</pre>
     </div>
 
-    <!-- DASHBOARD -->
-    <div class="card">
-        <h3>📊 Operations Dashboard</h3>
-        <p>
-            System visualization layer for operational monitoring and control intelligence.
-        </p>
-        <a href="dashboard/">Open Dashboard</a>
-    </div>
-
-    <!-- CORE ENGINE -->
-    <div class="card">
-        <h3>⚙ Core Engine</h3>
-        <p>
-            RP-04 simulation engine and orchestration logic (backend + cognitive core layer).
-        </p>
-        <a href="core_engine/">View Core Engine</a>
-    </div>
-
-    <!-- GITHUB -->
-    <div class="card">
-        <h3>📦 Source Repository</h3>
-        <p>
-            Full architecture, workflows, simulation logic, and engineering modules.
-        </p>
-        <a href="https://github.com/123AGustien/sextant-resilience-operations-console">View GitHub</a>
-    </div>
-
-    <!-- DOCS -->
-    <div class="card">
-        <h3>📘 Documentation</h3>
-        <p>
-            System architecture, scenario definitions, and institutional framework documentation.
-        </p>
-        <a href="docs/">Open Docs</a>
+    <div class="panel">
+        <h3>🧾 Event Log</h3>
+        <pre id="log">waiting...</pre>
     </div>
 
 </div>
 
 <div class="footer">
-    Sextant Simulation Engine v3 • Siemens-Compatible Control Screen • Safe Deployment Mode
+    Siemens Industrial Control Screen v1 • Digital Twin Simulation Layer • Sextant Engine
 </div>
+
+<script>
+
+/* =========================
+   SAFE SIMULATION ENGINE
+========================= */
+function engine(type) {
+
+    const base = {
+        normal: { power: 0.3, temp: 0.4, net: 0.2, health: 0.9 },
+        load:   { power: 0.7, temp: 0.6, net: 0.5, health: 0.7 },
+        fault:  { power: 0.5, temp: 0.8, net: 0.7, health: 0.4 },
+        cascade:{ power: 0.9, temp: 0.9, net: 0.95, health: 0.2 }
+    };
+
+    return {
+        mode: type,
+        system: base[type] || base.normal,
+        timestamp: Date.now()
+    };
+}
+
+/* =========================
+   RENDER NODE STATUS
+========================= */
+function renderNodes(s) {
+
+    const map = [
+        ["POWER GRID", s.power],
+        ["THERMAL", s.temp],
+        ["NETWORK", s.net],
+        ["HEALTH", s.health]
+    ];
+
+    let html = "";
+
+    map.forEach(n => {
+
+        let cls =
+            n[1] > 0.75 ? "ok" :
+            n[1] > 0.5 ? "warn" :
+            n[1] > 0.3 ? "bad" : "crit";
+
+        html += `<div class="node ${cls}">
+                    ${n[0]}: ${(n[1]*100).toFixed(0)}%
+                 </div>`;
+    });
+
+    document.getElementById("nodes").innerHTML = html;
+}
+
+/* =========================
+   MAIN RUN
+========================= */
+function run(type) {
+
+    const data = engine(type);
+
+    document.getElementById("status").innerText =
+        "SYSTEM: " + type.toUpperCase();
+
+    document.getElementById("telemetry").innerText =
+        JSON.stringify(data.system, null, 2);
+
+    document.getElementById("log").innerText =
+        `[${new Date().toISOString()}] MODE: ${type}\n` +
+        JSON.stringify(data, null, 2);
+
+    renderNodes(data.system);
+}
+
+/* =========================
+   AUTO BOOT
+========================= */
+window.onload = function() {
+    run("normal");
+};
+
+</script>
 
 </body>
 </html>
