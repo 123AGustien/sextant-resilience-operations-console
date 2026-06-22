@@ -1,5 +1,6 @@
-SEXTANTEXTTOCOLsubmission is intended for exploratory review under innovation sandbox or experimental systems evaluation contexts.
-
+interface suitable for early-stage evaluation and prototyping.
+🔷 Live System Access (Primary Interface)
+https://123agustien.github.io/sextant-resilience-operations-console/
 ---
 
 ## Live Prototype Access
