@@ -2,194 +2,166 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sextant Command Center v10</title>
-
+<title>Sextant Command Center v10 — Siemens Pilot Screen</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
-    font-family: Arial;
-    background: #0b0f19;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0b0f14;
     color: #e6f7ff;
+}
+
+/* HEADER */
+.header {
     text-align: center;
+    padding: 50px 20px;
+    border-bottom: 1px solid #1f2a38;
 }
 
-button {
-    margin: 6px;
-    padding: 10px;
-    background: black;
-    color: #2bd4ff;
-    border: 1px solid #2bd4ff;
-    cursor: pointer;
+.title {
+    font-size: 30px;
+    font-weight: bold;
 }
 
-.panel {
-    border: 1px solid #2bd4ff;
-    max-width: 900px;
-    margin: 15px auto;
-    padding: 15px;
-    background: #111827;
+.status {
+    margin-top: 10px;
+    color: #7ee787;
+    font-size: 14px;
 }
 
+/* GRID */
 .grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    max-width: 900px;
-    margin: 20px auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 40px;
 }
 
-.node {
-    border: 1px solid #2bd4ff;
-    padding: 12px;
-    background: #111827;
+/* CARD */
+.card {
+    width: 320px;
+    background: #111826;
+    border: 1px solid #223044;
+    border-radius: 10px;
+    padding: 20px;
 }
 
-.ok { color: lime; }
-.warn { color: orange; }
-.bad { color: red; }
-.crit { color: magenta; }
+.card h3 {
+    margin-top: 0;
+}
 
-pre {
-    text-align: left;
-    background: #000;
-    padding: 10px;
+.card p {
+    color: #9bb0c5;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* BUTTON */
+a {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #1f6feb;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    padding: 25px;
     font-size: 12px;
-    overflow: auto;
+    color: #6b7c93;
+    border-top: 1px solid #1f2a38;
+}
+
+/* STATUS BADGES (optional visual layer) */
+.badge {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 4px 8px;
+    border: 1px solid #2bd4ff;
+    color: #2bd4ff;
+    font-size: 12px;
+    border-radius: 4px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>🧭 SEXTANT COMMAND CENTER v10</h2>
-<h3>Status: <span id="status">BOOTING</span></h3>
-
-<div class="panel">
-    <h3>Scenario Input</h3>
-    <input id="input" style="width:80%;padding:10px;" placeholder="normal / failure / cascade">
-    <button onclick="runManual()">RUN</button>
+<div class="header">
+    <div class="title">SEXTANT COMMAND CENTER v10</div>
+    <div class="status">SYSTEM STATUS: OPERATIONAL • SIEMENS PILOT SCREEN ACTIVE</div>
+    <div class="badge">NO RUNTIME DEPENDENCIES • SAFE MODE ENABLED</div>
 </div>
-
-<button onclick="run('normal')">Normal</button>
-<button onclick="run('failure')">Failure</button>
-<button onclick="run('cascade')">Cascade</button>
 
 <div class="grid">
-    <div class="node" id="fx">FX</div>
-    <div class="node" id="bank">BANK</div>
-    <div class="node" id="liq">LIQ</div>
-    <div class="node" id="eq">EQ</div>
-    <div class="node" id="conf">CONF</div>
-    <div class="node" id="state">STATE</div>
+
+    <!-- SIMULATOR -->
+    <div class="card">
+        <h3>🧠 Simulation Engine</h3>
+        <p>
+            Deterministic scenario execution engine for FX, BANK, LIQ, EQ, CONF stress modeling.
+        </p>
+        <a href="simulator.html">Launch Simulator</a>
+    </div>
+
+    <!-- STRATEGIC COMMAND CENTER -->
+    <div class="card">
+        <h3>🛰 Strategic Command Center</h3>
+        <p>
+            Advanced scenario analysis, audit layer, and systemic risk evaluation interface.
+        </p>
+        <a href="strategic-command-center/index.html">Open Command Center</a>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="card">
+        <h3>📊 Operations Dashboard</h3>
+        <p>
+            System visualization layer for operational monitoring and control intelligence.
+        </p>
+        <a href="dashboard/">Open Dashboard</a>
+    </div>
+
+    <!-- CORE ENGINE -->
+    <div class="card">
+        <h3>⚙ Core Engine</h3>
+        <p>
+            RP-04 simulation engine and orchestration logic (backend + cognitive core layer).
+        </p>
+        <a href="core_engine/">View Core Engine</a>
+    </div>
+
+    <!-- GITHUB -->
+    <div class="card">
+        <h3>📦 Source Repository</h3>
+        <p>
+            Full architecture, workflows, simulation logic, and engineering modules.
+        </p>
+        <a href="https://github.com/123AGustien/sextant-resilience-operations-console">View GitHub</a>
+    </div>
+
+    <!-- DOCS -->
+    <div class="card">
+        <h3>📘 Documentation</h3>
+        <p>
+            System architecture, scenario definitions, and institutional framework documentation.
+        </p>
+        <a href="docs/">Open Docs</a>
+    </div>
+
 </div>
 
-<div class="panel">
-    <h3>Live Frame</h3>
-    <pre id="frame">waiting...</pre>
+<div class="footer">
+    Sextant Simulation Engine v3 • Siemens-Compatible Control Screen • Safe Deployment Mode
 </div>
-
-<div class="panel">
-    <h3>Audit Output</h3>
-    <pre id="audit">waiting...</pre>
-</div>
-
-<script>
-
-/* =========================
-   SAFE ENGINE FALLBACK
-========================= */
-window.runRP04 = window.runRP04 || function(type) {
-    return {
-        scenario: type,
-        rp04: { stability: 0.7, pressure: 0.4 },
-        system: { fx: 0.4, bank: 0.5, liq: 0.6, eq: 0.5, conf: 0.7 }
-    };
-};
-
-/* =========================
-   SAFE ORCHESTRA
-========================= */
-window.orchestra = window.orchestra || {
-    run: (t) => window.runRP04(t)
-};
-
-/* =========================
-   AUDIT BRIDGE
-========================= */
-window.SextantBridge = window.SextantBridge || {
-    captureSimulationResult: function(frame) {
-        return {
-            scenario: frame.scenario,
-            risk: frame.system.fx * 100,
-            impact: frame.rp04.pressure * 100,
-            stability: frame.rp04.stability * 100
-        };
-    }
-};
-
-/* =========================
-   RUN CORE
-========================= */
-function run(type) {
-
-    const frame = window.orchestra.run(type);
-    const audit = window.SextantBridge.captureSimulationResult(frame);
-
-    window.__FRAME__ = frame;
-
-    document.getElementById("status").innerText = type.toUpperCase();
-
-    document.getElementById("frame").innerText =
-        JSON.stringify(frame, null, 2);
-
-    document.getElementById("audit").innerText =
-        JSON.stringify(audit, null, 2);
-
-    updateNodes(frame.system);
-
-    window.dispatchEvent(new CustomEvent("sextant:run", {
-        detail: { frame, audit }
-    }));
-}
-
-/* =========================
-   UPDATE UI NODES
-========================= */
-function updateNodes(s) {
-
-    set("fx", s.fx);
-    set("bank", s.bank);
-    set("liq", s.liq);
-    set("eq", s.eq);
-    set("conf", s.conf);
-
-    document.getElementById("state").innerText =
-        "OK";
-}
-
-function set(id, v) {
-
-    const el = document.getElementById(id);
-
-    let cls =
-        v > 0.75 ? "ok" :
-        v > 0.5 ? "warn" :
-        v > 0.3 ? "bad" : "crit";
-
-    el.className = "node " + cls;
-    el.innerText = id.toUpperCase() + ": " + Number(v).toFixed(2);
-}
-
-/* =========================
-   MANUAL INPUT
-========================= */
-function runManual() {
-    const v = document.getElementById("input").value;
-    run(v);
-}
-
-</script>
 
 </body>
 </html>
