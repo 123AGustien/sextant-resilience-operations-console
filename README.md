@@ -2,7 +2,7 @@
 1. Operations Console (Main System)
 https://github.com/123AGustien/sextant-resilience-operations-console
 2. Simulation Engine / Self Generator (Core Simulation Layer)
-https://github.com/123AGustien/sextant-self-generatorhttps
+https://github.com/123AGustien/sextant-self-generator
 https://123agustien.github.io/sextant-resilience-console-v8-baseline/
  OJK / ITSK Regulatory Sandbox Context
 Sextant Protocol is being developed as a non-transactional, scenario-based resilience simulation framework for evaluation under the OJK ITSK (Inovasi Teknologi Sektor Keuangan) and Regulatory Sandbox framework.
