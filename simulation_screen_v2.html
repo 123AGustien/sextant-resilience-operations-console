@@ -95,6 +95,7 @@ canvas {
 <canvas id="graph" width="800" height="200"></canvas>
 
 <script>
+
 /* =========================
    ENGINE
 ========================= */
@@ -106,7 +107,6 @@ function runRP04(type) {
     };
 
     const fx = rp04.pressure;
-
     const bank = fx * 0.83;
     const liq  = bank * 0.88;
     const eq   = liq * 0.91;
@@ -193,4 +193,80 @@ function drawGraph() {
 /* =========================
    RESET
 ========================= */
-function resetSim()
+function resetSim() {
+
+    window.logs = [];
+
+    document.getElementById("status").innerText = "RESET";
+    document.getElementById("output").innerText = "RESET";
+
+    document.getElementById("riskLevel").innerText = "Risk: --";
+    document.getElementById("metrics").innerText = "--";
+    document.getElementById("insights").innerText = "--";
+    document.getElementById("recommendations").innerText = "--";
+
+    drawGraph();
+}
+
+/* =========================
+   DASHBOARD
+========================= */
+function updateDashboard(result) {
+
+    const conf = result.system.conf;
+
+    let risk =
+        conf > 0.8 ? "🟢 STABLE" :
+        conf > 0.6 ? "🟡 CONTROLLED STRESS" :
+        conf > 0.4 ? "🟠 ELEVATED RISK" :
+                     "🔴 SYSTEMIC INSTABILITY";
+
+    document.getElementById("riskLevel").innerText = "Risk: " + risk;
+
+    document.getElementById("metrics").innerText =
+        `FX: ${result.system.fx.toFixed(2)}\n` +
+        `BANK: ${result.system.bank.toFixed(2)}\n` +
+        `LIQ: ${result.system.liq.toFixed(2)}\n` +
+        `EQ: ${result.system.eq.toFixed(2)}\n` +
+        `CONF: ${result.system.conf.toFixed(2)}`;
+
+    let insights = [];
+
+    if (result.system.liq < 0.5)
+        insights.push("Liquidity stress propagating through system layers.");
+
+    if (result.system.bank < 0.5)
+        insights.push("Bank subsystem showing instability signals.");
+
+    if (result.system.fx > 0.8)
+        insights.push("FX volatility contributing to cascade amplification.");
+
+    document.getElementById("insights").innerText =
+        insights.length ? insights.join("\n") : "No critical insights detected.";
+
+    let recs = [];
+
+    if (result.system.liq < 0.5)
+        recs.push("Increase liquidity buffers.");
+
+    if (result.system.conf < 0.6)
+        recs.push("Activate circuit breaker logic.");
+
+    if (result.system.bank < 0.5)
+        recs.push("Strengthen banking subsystem redundancy.");
+
+    document.getElementById("recommendations").innerText =
+        recs.length ? recs.join("\n") : "System operating within safe parameters.";
+}
+
+/* =========================
+   INIT
+========================= */
+window.addEventListener("load", () => {
+    document.getElementById("status").innerText = "ONLINE";
+});
+
+</script>
+
+</body>
+</html>
