@@ -1,4 +1,4 @@
-OK / Sextant Protocol Repositories
+ Sextant Protocol Repositories
 1. Operations Console (Main System)
 https://github.com/123AGustien/sextant-resilience-operations-console
 2. Simulation Engine / Self Generator (Core Simulation Layer)
