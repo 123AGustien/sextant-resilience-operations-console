@@ -1,4 +1,144 @@
-interface suitable for early-stage evaluation and prototyping.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sextant Master Console</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    background:#0b0f14;
+    color:#2bd4ff;
+    font-family:Arial, sans-serif;
+    text-align:center;
+    margin:0;
+}
+
+h1 {
+    margin-top:40px;
+    font-size:26px;
+}
+
+p {
+    color:#7aa2b7;
+    font-size:14px;
+}
+
+button {
+    display:block;
+    width:80%;
+    max-width:420px;
+    margin:14px auto;
+    padding:15px;
+    font-size:16px;
+    background:#111826;
+    color:#2bd4ff;
+    border:1px solid #2bd4ff;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover {
+    background:#1a2233;
+}
+
+button:active {
+    transform:scale(0.98);
+}
+
+.status {
+    margin-top:20px;
+    font-size:12px;
+    color:#666;
+}
+
+.footer {
+    margin-top:40px;
+    font-size:12px;
+    color:#666;
+}
+</style>
+</head>
+
+<body>
+
+<h1>SEXTANT MASTER CONSOLE</h1>
+<p>Select System Module</p>
+
+<!-- NAVIGATION BUTTONS -->
+<button onclick="openPage('simulation')">
+FX Cascade Simulation (v2)
+</button>
+
+<button onclick="openPage('industrial')">
+Industrial Control Screen
+</button>
+
+<button onclick="openPage('router')">
+Scenario Router
+</button>
+
+<button onclick="openPage('selftest')">
+Self Test Module
+</button>
+
+<div class="status" id="status">SYSTEM: READY</div>
+
+<div class="footer">
+Unified Navigation Layer • Sextant Protocol • Master Control v1
+</div>
+
+<script>
+
+/* =========================
+   BASE URL (DEPLOYMENT ROOT)
+========================= */
+const BASE = "https://123agustien.github.io/sextant-resilience-operations-console/";
+
+/* =========================
+   ROUTE MAP (FINAL STABLE)
+========================= */
+const ROUTES = {
+    simulation: "simulation_screen_v2.html",
+    industrial: "industrial_control_screen_v1.html",
+    router: "scenario-router.html",
+    selftest: "self-test.html"
+};
+
+/* =========================
+   NAVIGATION ENGINE
+========================= */
+function openPage(type) {
+
+    const file = ROUTES[type];
+
+    if (!file) {
+        document.getElementById("status").innerText =
+            "ERROR: Unknown module → " + type;
+        return;
+    }
+
+    const url = BASE + file;
+
+    document.getElementById("status").innerText =
+        "LOADING: " + file;
+
+    // direct navigation (stable for GitHub Pages)
+    window.location.href = url;
+}
+
+/* =========================
+   BOOT STATUS
+========================= */
+window.onload = function() {
+    document.getElementById("status").innerText =
+        "SYSTEM: MASTER CONSOLE ONLINE";
+};
+
+</script>
+
+</body>
+</html>esuitable for early-stage evaluation and prototyping.
 🔷 Live System Access (Primary Interface)
 https://123agustien.github.io/sextant-resilience-operations-console/
 ---
