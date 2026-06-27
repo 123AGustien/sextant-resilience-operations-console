@@ -1,4 +1,56 @@
-
+OJK / Sextant Protocol Repositories
+1. Operations Console (Main System)
+https://github.com/123AGustien/sextant-resilience-operations-console
+2. Simulation Engine / Self Generator (Core Simulation Layer)
+https://github.com/123AGustien/sextant-self-generator
+ OJK / ITSK Regulatory Sandbox Context
+Sextant Protocol is being developed as a non-transactional, scenario-based resilience simulation framework for evaluation under the OJK ITSK (Inovasi Teknologi Sektor Keuangan) and Regulatory Sandbox framework.
+⚙ System Overview
+The system is composed of two primary repositories:
+1. Operations Console
+Provides the main visualization layer for system state monitoring, including:
+Risk graph visualization
+System status indicators
+Simulation interface
+Real-time resilience metrics
+2. Simulation Engine (Self Generator)
+Provides the core scenario-based simulation logic, including:
+Stress testing engine
+Scenario generation modules
+Failure propagation modeling
+Recovery behavior simulation
+📊 Simulation Behavior
+The system operates on scenario-driven inputs such as:
+Cooling failure
+Network congestion
+Power instability
+Blackout conditions
+Each scenario generates:
+Risk score
+Recovery index
+Critical node count
+System state classification (Stable / Warning / Crisis)
+⚙ Contingency Logic (Planned Enhancement)
+Future versions will include:
+Scenario detection layer
+Automated contingency recommendation engine
+Response-based decision support system
+Cascading failure modeling
+🛑 Regulatory Positioning
+This system:
+Does NOT process real financial transactions
+Does NOT execute financial instructions
+Does NOT connect to payment or settlement systems
+Operates entirely in synthetic simulation environments
+It is intended strictly as a decision-support and resilience modeling framework.
+🧠 Purpose
+To support evaluation of:
+Operational resilience
+System stress response behavior
+Crisis simulation modeling
+Recovery pathway analysis
+within controlled sandbox environments.
+    
 # 🧭 Sextant Protocol – Interactive System Dashboard
 
 > Simulation-based resilience and systemic risk modeling environment
