@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sextant Master Console</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    background:#0b0f14;
+    color:#2bd4ff;
+    font-family:Arial;
+    text-align:center;
+    margin:0;
+}
+
+h1 {
+    margin-top:40px;
+}
+
+button {
+    display:block;
+    width:80%;
+    max-width:400px;
+    margin:15px auto;
+    padding:15px;
+    font-size:16px;
+    background:black;
+    color:#2bd4ff;
+    border:1px solid #2bd4ff;
+    cursor:pointer;
+}
+
+button:hover {
+    background:#111;
+}
+
+.footer {
+    margin-top:40px;
+    font-size:12px;
+    color:#666;
+}
+</style>
+</head>
+
+<body>
+
+<h1>SEXTANT MASTER CONSOLE</h1>
+
+<p>Select System Module</p>
+
+<button onclick="openPage('simulation')">
+FX Cascade Simulation (v2)
+</button>
+
+<button onclick="openPage('industrial')">
+Industrial Control Screen
+</button>
+
+<button onclick="openPage('router')">
+Scenario Router
+</button>
+
+<button onclick="openPage('selftest')">
+Self Test Module
+</button>
+
+<div class="footer">
+Unified Navigation Layer • Sextant Protocol
+</div>
+
+<script>
+
+function openPage(type) {
+
+    const map = {
+        simulation: "simulation_screen_v2.html",
+        industrial: "industrial_control_screen_v1.html",
+        router: "scenario-router.html",
+        selftest: "self-test.html"
+    };
+
+    window.location.href = map[type];
+}
+
+</script>
+
+</body>
+</html>
