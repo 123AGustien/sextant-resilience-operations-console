@@ -90,48 +90,6 @@ Explainable operational resilience simulation framework for:
 
 ---
 
-# 🌐 Live System Access
-
-## 🧠 Master Console (Main Entry)
-https://123agustien.github.io/sextant-resilience-operations-console/
-
-
-## 🧬 Baseline Snapshot (v8)
-
-### Sextant Resilience Console v8 (Frozen Institutional Layer)
-This is the archived baseline version of the Sextant Protocol simulation system.
-
-🔗 v8 Repository:
-https://github.com/123AGustien/sextant-resilience-console-v8-baseline
-
-🔗 v8 Live (GitHub Pages):
-https://123agustien.github.io/sextant-resilience-console-v8-baseline/
----
-
-## 📊 Core Modules
-
-### 📈 Simulation Screen v2
-https://123agustien.github.io/sextant-resilience-operations-console/simulation_screen_v2.html
-
----
-
-### ⚙️ Industrial Control Screen v1
-https://123agustien.github.io/sextant-resilience-operations-console/industrial_control_screen_v1.html
-
----
-
-### 🧭 Control Room
-https://123agustien.github.io/sextant-resilience-operations-console/control_room_v1.html
-
----
-
-### 🔍 Diagnostic Panel
-https://123agustien.github.io/sextant-resilience-operations-console/diagnostic.html
-
----
-
-### 🧪 Master Console File
-https://123agustien.github.io/sextant-resilience-operations-console/master_console.html
 
 ---
 
