@@ -14,9 +14,7 @@ body {
     margin:0;
 }
 
-h1 {
-    margin-top:40px;
-}
+h1 { margin-top:40px; }
 
 button {
     display:block;
@@ -31,9 +29,7 @@ button {
     cursor:pointer;
 }
 
-button:hover {
-    background:#111;
-}
+button:hover { background:#111; }
 
 .footer {
     margin-top:40px;
@@ -46,7 +42,6 @@ button:hover {
 <body>
 
 <h1>SEXTANT MASTER CONSOLE</h1>
-
 <p>Select System Module</p>
 
 <button onclick="openPage('simulation')">
@@ -71,6 +66,14 @@ Unified Navigation Layer • Sextant Protocol
 
 <script>
 
+/* =========================
+   BASE URL (CRITICAL FIX)
+========================= */
+const BASE = "https://123agustien.github.io/sextant-resilience-operations-console/";
+
+/* =========================
+   SAFE NAVIGATION
+========================= */
 function openPage(type) {
 
     const map = {
@@ -80,7 +83,17 @@ function openPage(type) {
         selftest: "self-test.html"
     };
 
-    window.location.href = map[type];
+    const file = map[type];
+
+    if (!file) {
+        alert("Unknown module: " + type);
+        return;
+    }
+
+    const url = BASE + file;
+
+    // simple safe navigation
+    window.location.href = url;
 }
 
 </script>
