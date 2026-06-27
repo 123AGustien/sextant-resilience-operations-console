@@ -1,4 +1,77 @@
-SEXTANTNT MASTER CONSOLE</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sextant Master Console</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    background:#0b0f14;
+    color:#2bd4ff;
+    font-family:Arial, sans-serif;
+    text-align:center;
+    margin:0;
+}
+
+h1 {
+    margin-top:40px;
+}
+
+button {
+    display:block;
+    width:80%;
+    max-width:420px;
+    margin:14px auto;
+    padding:15px;
+    font-size:16px;
+    background:#111826;
+    color:#2bd4ff;
+    border:1px solid #2bd4ff;
+    cursor:pointer;
+}
+
+button:active {
+    transform:scale(0.98);
+}
+
+.footer {
+    margin-top:40px;
+    font-size:12px;
+    color:#666;
+}
+</style>
+</head>
+
+<body>
+
+<h1>SEXTANT MASTER CONSOLE</h1>
+<p>Select System Module</p>
+
+<!-- DIRECT URL NAVIGATION (NO BREAK RISK) -->
+
+<button onclick="window.location.href='https://123agustien.github.io/sextant-resilience-operations-console/simulation_screen_v2.html'">
+FX Cascade Simulation (v2)
+</button>
+
+<button onclick="window.location.href='https://123agustien.github.io/sextant-resilience-operations-console/industrial_control_screen_v1.html'">
+Industrial Control Screen
+</button>
+
+<button onclick="window.location.href='https://123agustien.github.io/sextant-resilience-operations-console/scenario-router.html'">
+Scenario Router
+</button>
+
+<button onclick="window.location.href='https://123agustien.github.io/sextant-resilience-operations-console/self-test.html'">
+Self Test Module
+</button>
+
+<div class="footer">
+Unified Navigation Layer • Absolute URL Mode • No Mapping Engine
+</div>
+
+</body>
+</html> MASTER CONSOLE</h1>
 <p>Select System Module</p>
 
 <!-- NAVIGATION BUTTONS -->
