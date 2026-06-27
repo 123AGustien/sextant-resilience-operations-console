@@ -1,4 +1,4 @@
-OJK / Sextant Protocol Repositories
+OK / Sextant Protocol Repositories
 1. Operations Console (Main System)
 https://github.com/123AGustien/sextant-resilience-operations-console
 2. Simulation Engine / Self Generator (Core Simulation Layer)
@@ -44,7 +44,7 @@ Does NOT execute financial instructions
 Does NOT connect to payment or settlement systems
 Operates entirely in synthetic simulation environments
 It is intended strictly as a decision-support and resilience modeling framework.
-🧠 Purpose
+Purpose
 To support evaluation of:
 Operational resilience
 System stress response behavior
