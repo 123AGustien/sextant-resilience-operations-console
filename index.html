@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sextant Master Console</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0b0f14;
+    color: #2bd4ff;
+    text-align: center;
+}
+
+h1 {
+    margin-top: 20px;
+}
+
+button {
+    width: 90%;
+    max-width: 400px;
+    padding: 15px;
+    margin: 10px;
+    background: #111826;
+    color: #2bd4ff;
+    border: 1px solid #2bd4ff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.note {
+    font-size: 12px;
+    color: #7aa2b7;
+    margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>SEXTANT MASTER CONSOLE</h1>
+
+<button onclick="go('sim')">Run Simulation Screen v2</button>
+<button onclick="go('ind')">Industrial Control Screen v1</button>
+<button onclick="go('pilot')">Schneider Datacentre Pilot</button>
+
+<div class="note">Stable Navigation Layer • No Broken Screens</div>
+
+<script>
+
+/* =========================
+   BASE URL (YOUR REPO)
+========================= */
+const BASE = "https://123agustien.github.io/sextant-resilience-operations-console/";
+
+/* =========================
+   SAFE NAVIGATION
+========================= */
+function go(screen) {
+
+    const routes = {
+        sim: "simulation_screen_v2.html",
+        ind: "industrial_control_screen_v1.html",
+        pilot: "schneider_datacentre_pilot.html"
+    };
+
+    const url = BASE + routes[screen];
+
+    // SAFE CHECK
+    fetch(url, { method: "HEAD" })
+    .then(res => {
+        if (res.ok) {
+            window.location.href = url;
+        } else {
+            alert("Screen not found: " + routes[screen]);
+        }
+    })
+    .catch(() => {
+        alert("Navigation failed or file missing.");
+    });
+}
+
+</script>
+
+</body>
+</html>
