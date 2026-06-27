@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Sextant Simulation Screen v2</title>
@@ -80,7 +80,6 @@ canvas {
 <pre id="output">Waiting...</pre>
 
 <h3>🧭 Risk Dashboard</h3>
-
 <div id="riskLevel" style="font-size:20px; margin:10px;">
 Risk: --
 </div>
@@ -97,15 +96,15 @@ Risk: --
 <h3>FX Risk Graph</h3>
 <canvas id="graph" width="800" height="200"></canvas>
 
-<!-- ========================= -->
-<!-- ENGINE -->
-<!-- ========================= -->
 <script>
+/* =========================
+   RP-04 ENGINE
+========================= */
 function runRP04(type) {
 
     const rp04 = {
         stability: type === "cascade" ? 0.25 : type === "failure" ? 0.55 : 0.82,
-        pressure: type === "cascade" ? 0.95 : type === "failure" ? 0.6 : 0.28
+        pressure:  type === "cascade" ? 0.95 : type === "failure" ? 0.6 : 0.28
     };
 
     const fx = rp04.pressure;
@@ -123,15 +122,15 @@ function runRP04(type) {
         state
     };
 }
-</script>
 
-<!-- ========================= -->
-<!-- SIMULATION LOGIC -->
-<!-- ========================= -->
-<script>
-
+/* =========================
+   SIMULATION STATE
+========================= */
 window.logs = [];
 
+/* =========================
+   NODE STYLING
+========================= */
 function setNode(id, v) {
 
     const el = document.getElementById(id);
@@ -145,6 +144,9 @@ function setNode(id, v) {
     el.innerText = id.toUpperCase() + ": " + v.toFixed(2);
 }
 
+/* =========================
+   RUN SIMULATION
+========================= */
 function run(type) {
 
     const result = window.runRP04(type);
@@ -164,10 +166,12 @@ function run(type) {
     setNode("conf", result.system.conf);
 
     drawGraph();
-
     updateDashboard(result);
 }
 
+/* =========================
+   GRAPH ENGINE
+========================= */
 function drawGraph() {
 
     const canvas = document.getElementById("graph");
@@ -190,6 +194,9 @@ function drawGraph() {
     ctx.stroke();
 }
 
+/* =========================
+   RESET
+========================= */
 function resetSim() {
 
     window.logs = [];
@@ -206,9 +213,8 @@ function resetSim() {
 }
 
 /* =========================
-   🧭 DASHBOARD ENGINE
+   DASHBOARD ENGINE
 ========================= */
-
 function updateDashboard(result) {
 
     const conf = result.system.conf;
@@ -230,38 +236,39 @@ function updateDashboard(result) {
 
     let insights = [];
 
-    if (result.system.liq < 0.5) {
+    if (result.system.liq < 0.5)
         insights.push("Liquidity stress propagating through system layers.");
-    }
 
-    if (result.system.bank < 0.5) {
+    if (result.system.bank < 0.5)
         insights.push("Bank subsystem showing instability signals.");
-    }
 
-    if (result.system.fx > 0.8) {
+    if (result.system.fx > 0.8)
         insights.push("FX volatility contributing to cascade amplification.");
-    }
 
     document.getElementById("insights").innerText =
         insights.length ? insights.join("\n") : "No critical insights detected.";
 
     let recs = [];
 
-    if (result.system.liq < 0.5) {
+    if (result.system.liq < 0.5)
         recs.push("Increase liquidity buffers.");
-    }
 
-    if (result.system.conf < 0.6) {
+    if (result.system.conf < 0.6)
         recs.push("Activate circuit breaker logic.");
-    }
 
-    if (result.system.bank < 0.5) {
+    if (result.system.bank < 0.5)
         recs.push("Strengthen banking subsystem redundancy.");
-    }
 
     document.getElementById("recommendations").innerText =
         recs.length ? recs.join("\n") : "System operating within safe parameters.";
 }
+
+/* =========================
+   INIT
+========================= */
+window.addEventListener("load", () => {
+    document.getElementById("status").innerText = "ONLINE";
+});
 </script>
 
 </body>
