@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sextant Master Console</title>
+<title>Sextant Protocol SPA Control System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -11,117 +11,168 @@ body {
     font-family: Arial, sans-serif;
     background: #0b0f14;
     color: #2bd4ff;
-    text-align: center;
 }
 
-h1 {
-    margin-top: 20px;
-    font-size: 22px;
-    letter-spacing: 1px;
+/* TOP BAR */
+.topbar {
+    position: sticky;
+    top: 0;
+    background: #0f172a;
+    padding: 10px;
+    border-bottom: 1px solid #1f2a44;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-button {
-    width: 90%;
-    max-width: 400px;
-    padding: 15px;
-    margin: 10px;
+.topbar button {
     background: #111826;
     color: #2bd4ff;
     border: 1px solid #2bd4ff;
-    font-size: 16px;
+    padding: 8px 10px;
+    margin-left: 5px;
     cursor: pointer;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+/* SCREEN AREA */
+.screen {
+    display: none;
+    padding: 20px;
+}
+
+.active {
+    display: block;
+}
+
+/* PANELS */
+.panel {
+    border: 1px solid #2a2f3a;
+    background: #111827;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 8px;
+}
+
+/* BUTTONS */
+button.action {
+    width: 100%;
+    max-width: 400px;
+    padding: 15px;
+    margin: 10px auto;
+    display: block;
+    background: #111826;
+    color: #2bd4ff;
+    border: 1px solid #2bd4ff;
     border-radius: 6px;
+    cursor: pointer;
 }
 
-button:active {
-    transform: scale(0.98);
-}
-
-button:hover {
-    opacity: 0.85;
-}
-
-.note {
+/* STATUS */
+.status {
     font-size: 12px;
     color: #7aa2b7;
-    margin-top: 15px;
-}
-
-.status {
-    margin-top: 15px;
-    font-size: 13px;
-    color: #7aa2b7;
+    margin-top: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>SEXTANT MASTER CONSOLE</h1>
-
-<button onclick="go('sim')">Run Simulation Screen v2</button>
-<button onclick="go('ind')">Industrial Control Screen v1</button>
-<button onclick="go('pilot')">Schneider Datacentre Pilot</button>
-
-<div class="status" id="statusBox">
-Navigation Layer: ACTIVE
+<!-- ================= TOP NAV ================= -->
+<div class="topbar">
+    <div>🛰 SEXTANT SPA CONTROL SYSTEM</div>
+    <div>
+        <button onclick="show('gateway')">Gateway</button>
+        <button onclick="show('console')">Console</button>
+        <button onclick="show('sim')">Simulator</button>
+    </div>
 </div>
 
-<div class="note">
-Stable Navigation Layer • Direct Routing Mode
+<!-- ================= GATEWAY ================= -->
+<div id="gateway" class="screen active">
+
+    <h2>Submission Gateway</h2>
+
+    <div class="panel">
+        <p>System Entry Layer · SPD Pilot Control Interface</p>
+        <p class="status">STATUS: ONLINE</p>
+    </div>
+
+    <button class="action" onclick="show('console')">
+        Enter Operations Console
+    </button>
+
+    <button class="action" onclick="show('sim')">
+        Enter Simulation Engine
+    </button>
+
 </div>
 
+<!-- ================= CONSOLE ================= -->
+<div id="console" class="screen">
+
+    <h2>Operations Console</h2>
+
+    <div class="panel">
+        <p>Live system monitoring layer</p>
+        <p class="status">SYSTEM ACTIVE</p>
+    </div>
+
+    <div class="panel">
+        <p>Controls</p>
+        <button onclick="logEvent('FX STRESS')">FX Stress</button>
+        <button onclick="logEvent('COOLING FAILURE')">Cooling Failure</button>
+        <button onclick="logEvent('CYBER ATTACK')">Cyber Attack</button>
+    </div>
+
+    <div class="panel">
+        <h3>Output Log</h3>
+        <pre id="log"></pre>
+    </div>
+
+</div>
+
+<!-- ================= SIMULATOR ================= -->
+<div id="sim" class="screen">
+
+    <h2>Scenario Simulator</h2>
+
+    <div class="panel">
+        <p>Resilience engine simulation layer</p>
+        <p class="status">ENGINE READY</p>
+    </div>
+
+    <button class="action" onclick="runSim('POWER SURGE')">Power Surge</button>
+    <button class="action" onclick="runSim('NETWORK OUTAGE')">Network Outage</button>
+    <button class="action" onclick="runSim('LOAD SPIKE')">Load Spike</button>
+
+    <div class="panel">
+        <h3>Simulation Output</h3>
+        <pre id="simout"></pre>
+    </div>
+
+</div>
+
+<!-- ================= SCRIPT ================= -->
 <script>
 
-/* =========================
-   BASE URL (OPS CONSOLE ROOT)
-========================= */
-const BASE = "https://123agustien.github.io/sextant-resilience-operations-console/";
+function show(screen) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screen).classList.add('active');
+}
 
-/* =========================
-   ROUTES MAP
-========================= */
-const routes = {
-    sim: "simulation_screen_v2.html",
-    ind: "industrial_control_screen_v1.html",
-    pilot: "schneider_datacentre_pilot.html"
-};
+/* CONSOLE LOG */
+function logEvent(event) {
+    const log = document.getElementById("log");
+    log.textContent += "[EVENT] " + event + "\n";
+}
 
-/* =========================
-   SAFE ROUTER ENGINE
-========================= */
-function go(screen) {
-
-    const file = routes[screen];
-
-    const statusBox = document.getElementById("statusBox");
-
-    if (!file) {
-        statusBox.innerText = "Navigation Error: Route not defined";
-        return;
-    }
-
-    const url = BASE + file;
-
-    statusBox.innerText = "Checking route: " + file;
-
-    // validate existence before redirect
-    fetch(url, { method: "HEAD" })
-        .then(res => {
-
-            if (res.ok) {
-                statusBox.innerText = "Opening: " + file;
-                window.location.href = url;
-            } else {
-                statusBox.innerText = "ERROR: Screen not found → " + file;
-                alert("Screen not found: " + file);
-            }
-
-        })
-        .catch(() => {
-            statusBox.innerText = "Network error or missing file";
-            alert("Network error or file missing");
-        });
+/* SIMULATION ENGINE */
+function runSim(event) {
+    const out = document.getElementById("simout");
+    out.textContent += "[SIM] " + event + " → Processing resilience model...\n";
 }
 
 </script>
