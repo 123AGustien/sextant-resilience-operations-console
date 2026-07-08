@@ -332,4 +332,124 @@ Master Console
 ↓
 Simulation / Industrial / Pilot Modules
 ↓
+----
 
+ this is the Control Entry Gateway screen. This should be another section in the operational manual.
+This screen is different from the earlier SPA Control System Gateway Console. This one acts more like the main navigation hub of the Sextant ecosystem.
+⚡ SEXTANT SYSTEM
+Control Entry Gateway
+Operational Manual Section
+1. Purpose
+The Control Entry Gateway is the primary navigation interface for accessing the major Sextant system components.
+It provides a structured entry point where operators, evaluators, or users can select the required operational function.
+The gateway separates the platform into dedicated layers:
+Documentation
+Simulation
+Scenario Management
+Operations Monitoring
+System Validation
+2. Gateway Navigation Structure
+                SEXTANT SYSTEM
+              Control Entry Gateway
+
+                     |
+     -------------------------------------
+     |          |          |       |      |
+ Product   Simulator  Scenario Operations Self Test
+ Overview    Engine     Router   Console  Control Room
+3. Module Explanation
+📘 Product Overview
+Purpose:
+Provides the introduction and system explanation layer.
+Used for:
+Understanding Sextant purpose
+Reviewing architecture
+Learning system capabilities
+Audience:
+Evaluators
+Institutions
+Technical reviewers
+⚡ Simulator v6.2
+Purpose:
+The simulation execution environment.
+Functions:
+Run controlled scenarios
+Model system stress
+Observe possible cascade behaviour
+Generate simulation outputs
+Operational flow:
+Scenario Input
+      ↓
+Simulation Engine
+      ↓
+System Response
+      ↓
+Risk Analysis
+🧭 Scenario Router
+Purpose:
+Directs selected scenarios into the correct simulation pathway.
+Functions:
+Scenario classification
+Routing logic
+Module selection
+Example:
+FX Shock
+   ↓
+Financial Stress Module
+
+Infrastructure Event
+   ↓
+Industrial Resilience Module
+🛰 Operations Console
+Purpose:
+The operational monitoring and visualisation layer.
+Functions:
+Display system state
+Review risk conditions
+Observe resilience indicators
+Support decision analysis
+🧪 Self Test Control Room
+Purpose:
+Validates system readiness before operation.
+Checks:
+Module availability
+Engine status
+Loading sequence
+Runtime condition
+Example:
+Engine        READY
+Scenario      READY
+Console       READY
+System        ONLINE
+4. Operational Workflow
+CONTROL ENTRY GATEWAY
+
+        ↓
+
+Select Function
+
+        ↓
+
+Self Test (Validation)
+
+        ↓
+
+Scenario / Simulation Execution
+
+        ↓
+
+Operations Console Review
+
+        ↓
+
+Audit & Documentation
+Manual Position
+This screen should be placed near the beginning of the manual:
+Control Entry Gateway
+SPA Gateway Console
+Master Console
+Simulation Screen v2
+Operations Console
+Self-Test Control Room
+ this screen is actually the map of the whole ecosystem. It tells an OJK reviewer: "Here is where each part of Sextant begins and how the modules connect."
+-------
