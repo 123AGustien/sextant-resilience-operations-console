@@ -1,4 +1,4 @@
-Sextant SPA Control System
+status SPA Control System
 
 Gateway Console Operational Manual
 
@@ -453,7 +453,7 @@ Operations Console
 Self-Test Control Room
  this screen is actually the map of the whole ecosystem. It tells an OJK reviewer: "Here is where each part of Sextant begins and how the modules connect."
 -------
-this
+
 this is one of the most important screens because it demonstrates the execution of the Sextant Protocol. It is no longer just navigation—it shows the system processing a scenario and explaining the result.
 You can document it in the Operational Manual as follows.
 Self-Test & Cascade Engine Screen
@@ -632,3 +632,96 @@ Self-Test & Cascade Engine – System validation and execution
 True Scenario Engine – Structured simulation output and resilience assessment
 Operations Console – Visualisation, audit, and decision support
 This sequence creates a clear and logical workflow for users, reviewers, and institutional evaluators. It also reinforces that the platform is designed for simulation, resilience analysis, and decision support, rather than making predictions about future real-world events.
+-------
+Perfect, Don. This is the final operational layer where all previous processing is presented to the operator.
+🛰 Sextant Operations Console
+Operational Manual Section
+1. Purpose
+The Sextant Operations Console is the primary operational monitoring and decision-support interface of the Sextant platform.
+It consolidates simulation outputs, system health indicators, and resilience assessments into a single operational view, enabling users to monitor, interpret, and review simulated system behaviour.
+The Operations Console serves as the final visualisation layer following scenario execution.
+2. Operational Role
+The Operations Console acts as the central command interface where operators can:
+Monitor system status
+Review active simulations
+Observe system node conditions
+Analyse resilience indicators
+Review risk assessments
+Support operational decision-making
+3. Primary Functions
+System Monitoring
+Displays the current operational status of all monitored system components.
+Simulation Monitoring
+Receives processed outputs from the Scenario Engine and presents them in an operational format.
+Risk Visualisation
+Provides a clear overview of:
+Risk level
+System stability
+Operational pressure
+Resilience indicators
+Decision Support
+Transforms technical simulation results into information that supports operational review and planning.
+Audit Review
+Displays simulation outputs and operational records for governance, validation, and post-simulation analysis.
+4. Data Sources
+The Operations Console receives information from:
+Gateway Console
+        ↓
+Scenario Router
+        ↓
+Simulation Engine
+        ↓
+RP-04 Engine
+        ↓
+Cascade Engine
+        ↓
+Risk Engine
+        ↓
+Operations Console
+5. Operational Workflow
+Operator Login
+        ↓
+Select Scenario
+        ↓
+Run Simulation
+        ↓
+Validate System
+        ↓
+Generate Risk Assessment
+        ↓
+Display Operational Dashboard
+        ↓
+Review Results
+        ↓
+Generate Audit Record
+6. Operator Responsibilities
+The operator should:
+Confirm system readiness before execution.
+Select the appropriate scenario.
+Monitor system indicators during execution.
+Review risk and resilience outputs.
+Record observations for audit and future analysis.
+7. Position Within the Sextant Architecture
+The Operations Console is the final operational interface in the Sextant workflow.
+It integrates outputs from all preceding modules into a single, coherent view for analysis and review.
+Complete system workflow:
+Control Entry Gateway
+        ↓
+Master Console
+        ↓
+Scenario Router
+        ↓
+Simulation Screen
+        ↓
+Self-Test & Cascade Engine
+        ↓
+True Scenario Engine
+        ↓
+Operations Console
+        ↓
+Audit & Operational Report
+Mission
+The Sextant Operations Console provides a transparent, explainable, and structured environment for resilience simulation, operational monitoring, and decision support. It enables operators to understand simulated system behaviour, evaluate resilience under stress, and document findings in a consistent and auditable manner.
+ with this section, we have documented the complete operational flow from system entry to final operational review. This forms the foundation of a comprehensive Operational Manual for the OJK evaluation branch.
+
+---
