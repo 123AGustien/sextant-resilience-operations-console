@@ -241,11 +241,95 @@ System Nodes Update
 Risk Dashboard
         ↓
 Analysis Output
-Don, this screen fits very well after the Gateway screen:
+Sincehis
+this screen fits very well after the Gateway screen:
 Section 1: Gateway Console → system entry
 Section 2: Simulation Screen → scenario execution
-Section 3 (next): Operations Console → visualisation and decision support
-
-
-
+Section 3 (next): Operations Console → visualisation and decision supposee. Since we already created the manual file, this should become the next section in the same operational manual.
+This screen is important because it is the Master Navigation and Risk Prioritisation Layer. It sits above individual simulations and directs the operator based on the current risk condition.
+SEXTANT MASTER CONSOLE
+Operational Manual Section — Master Risk Navigation Layer
+1. Purpose
+The Sextant Master Console is the central operational gateway that provides an overview of system condition and directs users toward appropriate operational modules.
+Its purpose is to:
+Present overall system risk status
+Prioritise operational attention
+Provide access to simulation and control environments
+Support contingency planning and resilience analysis
+2. Screen Components
+🟠 WARNING
+This indicates that the system has detected a condition requiring attention.
+It does not necessarily mean system failure.
+The warning state represents:
+elevated stress
+increased monitoring requirement
+possible need for scenario analysis
+Example status levels:
+🟢 NORMAL — Stable operation
+🟡 WATCH — Increased monitoring
+🟠 WARNING — Elevated risk
+🔴 CRITICAL — Immediate attention
+Risk Score: 43
+The Risk Score provides a simplified numerical representation of current simulated system pressure.
+Purpose:
+Allow quick operator understanding
+Compare different scenarios
+Support risk-based navigation
+Example interpretation:
+0–20    Stable
+21–40   Watch
+41–60   Warning
+61–80   Severe
+81–100  Critical
+(Current example: 43 = Warning range)
+3. Navigation Modules
+Run Simulation Screen v2
+Accesses the simulation execution environment.
+Function:
+Select scenarios
+Run controlled stress tests
+Observe RP-04 system response
+Flow:
+Scenario Input
+       ↓
+RP-04 Engine
+       ↓
+Simulation Output
+       ↓
+Risk Assessment
+Industrial Control Screen v1
+Provides an operational environment for industrial resilience scenarios.
+Potential applications:
+infrastructure systems
+facility operations
+critical equipment resilience
+contingency planning
+Schneider Datacentre Pilot
+Provides a dedicated pilot scenario environment for data centre resilience assessment.
+Focus areas:
+operational continuity
+infrastructure dependencies
+fallback planning
+system availability
+4. Risk-Driven Navigation Layer
+This is the key concept of this screen.
+Instead of the operator searching through all modules, the system guides attention based on risk condition.
+Concept:
+System Condition
+        ↓
+Risk Score
+        ↓
+Priority Level
+        ↓
+Recommended Module
+        ↓
+Operational Response
+5. Operational Role
+The Master Console acts as the command layer:
+Gateway Console
+↓
+Master Console
+↓
+Simulation / Industrial / Pilot Modules
+↓
 
