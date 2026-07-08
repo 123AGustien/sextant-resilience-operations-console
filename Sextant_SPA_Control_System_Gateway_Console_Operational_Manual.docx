@@ -140,3 +140,112 @@ Mission Statement
 "Discovering pathways to failure and protecting the strategies that prevent them."
 
 The Sextant Operational Manual documents how the platform supports structured resilience analysis, scenario exploration, and institutional preparedness.
+----_
+Next Screen
+SEXTANT SIMULATION SCREEN v2
+Simulation Engine Operational Manual
+1. Purpose
+The Simulation Screen is the operational environment where users select and execute controlled resilience scenarios.
+It receives a selected scenario, processes system stress conditions, and prepares outputs for risk analysis.
+2. Screen Overview
+System Status
+ONLINE
+Indicates that the simulation interface is available for scenario execution.
+Scenario Control
+Example:
+Normal Failure Cascade Reset
+This represents a predefined simulation condition.
+The system can later support multiple scenarios:
+FX Shock
+Banking Stress
+Liquidity Stress
+Confidence Loss
+Systemic Cascade
+3. System Nodes
+The simulation monitors interconnected system components:
+RP-04
+Core Simulation Engine
+Role:
+Executes scenario logic
+Generates simulation frames
+Acts as the simulation source of truth
+FX
+Foreign Exchange Module
+Monitors:
+Currency pressure
+Exchange rate stress
+External financial shock impact
+BANK
+Banking System Module
+Monitors:
+Banking stability
+Liquidity pressure
+Counterparty risks
+LIQ
+Liquidity Module
+Monitors:
+Funding availability
+Cash pressure
+Market liquidity conditions
+EQ
+Equity Market Module
+Monitors:
+Market volatility
+Asset price stress
+Market confidence
+CONF
+Confidence Module
+Monitors:
+Institutional confidence
+Sentiment pressure
+Contagion effects
+4. Output Panel
+Current status:
+Waiting...
+Meaning:
+No simulation has been executed
+System is ready for input
+After execution, this area can display:
+Stability Index
+Risk Score
+Impact Level
+Recovery Pathway
+5. Risk Dashboard
+Purpose:
+Provides a simplified interpretation of simulation results.
+Outputs:
+Risk
+Overall system stress assessment.
+Metrics
+Quantitative indicators generated from simulation results.
+Insights
+Explanation of system behaviour.
+Recommendations
+Possible resilience actions or intervention pathways.
+6. FX Risk Graph
+Purpose:
+Visual representation of currency-related stress movement.
+It helps users understand:
+pressure changes
+volatility
+possible cascade effects
+Operational Flow
+Scenario Selection
+        ↓
+Simulation Engine
+        ↓
+RP-04 Processing
+        ↓
+System Nodes Update
+        ↓
+Risk Dashboard
+        ↓
+Analysis Output
+Don, this screen fits very well after the Gateway screen:
+Section 1: Gateway Console → system entry
+Section 2: Simulation Screen → scenario execution
+Section 3 (next): Operations Console → visualisation and decision support
+
+
+
+
