@@ -453,3 +453,93 @@ Operations Console
 Self-Test Control Room
  this screen is actually the map of the whole ecosystem. It tells an OJK reviewer: "Here is where each part of Sextant begins and how the modules connect."
 -------
+this
+this is one of the most important screens because it demonstrates the execution of the Sextant Protocol. It is no longer just navigation—it shows the system processing a scenario and explaining the result.
+You can document it in the Operational Manual as follows.
+Self-Test & Cascade Engine Screen
+Operational Manual Section
+1. Purpose
+The Self-Test & Cascade Engine verifies that the Sextant system is operational before executing a resilience scenario. It confirms system readiness, runs diagnostic checks, executes the selected scenario, and provides an explainable assessment of cascading effects.
+This screen supports transparency by showing not only the calculated risk, but also the reasoning behind the result.
+2. Screen Components
+RUN SCENARIO
+Starts the selected resilience simulation.
+Functions:
+Loads the chosen scenario
+Initiates the simulation workflow
+Sends data to the Cascade Engine for processing
+RUN SELF TEST
+Performs a system readiness check before simulation.
+Checks may include:
+Engine availability
+Module readiness
+Scenario loading
+Runtime integrity
+System status verification
+CASCADE ENGINE
+Displays the execution status of the simulation engine.
+Example:
+SELF TEST STARTING...
+→ CONFIDENCE_LOSS
+🟢 SELF TEST PASSED
+This indicates that:
+The self-test completed successfully.
+The selected scenario is CONFIDENCE_LOSS.
+The system is ready to continue with the simulation.
+RISK ENGINE
+Example:
+79 (HIGH)
+The Risk Engine calculates the overall simulated risk level based on interactions between the monitored system nodes.
+Illustrative interpretation:
+0–20: Stable
+21–40: Watch
+41–60: Stress
+61–80: High Risk
+81–100: Critical
+TIMELINE
+Displays the sequence of operational events.
+Example:
+BOOT TRACE...
+This provides a chronological record of system activities during the simulation.
+SYSTEM STATE
+Example:
+SYSTEM ONLINE
+Confirms that the platform remains operational throughout the simulation.
+EXPLANATION LAYER
+Example:
+CASCADE ANALYSIS
+
+Drivers:
+currency instability
+→ liquidity contraction
+→ banking stress
+→ confidence erosion
+
+Severity:
+critical
+This is the Explainability Layer of Sextant.
+Rather than presenting only a numerical risk score, the system explains how the simulated cascade developed, allowing operators to understand the chain of events that contributed to the outcome.
+3. Operational Workflow
+Run Self Test
+        ↓
+Verify System Readiness
+        ↓
+Run Scenario
+        ↓
+Cascade Engine Processing
+        ↓
+Risk Engine Assessment
+        ↓
+Timeline Recording
+        ↓
+System State Verification
+        ↓
+Explanation Layer Output
+4. Operational Role
+This screen demonstrates the transition from system validation to scenario execution and finally to explainable resilience analysis.
+It combines:
+System readiness verification
+Scenario execution
+Risk assessment
+Event logging
+Explainable cascade analysThishis section is particularly valuable for institutional users because it shows not only the simulation result, but also the reasoning process behind the assessment, supporting transparency and review.
