@@ -1,0 +1,142 @@
+Sextant SPA Control System
+
+Gateway Console Operational Manual
+
+Document Purpose
+
+This manual describes the operation of the Sextant SPA Control System Gateway Console, which serves as the primary entry interface for the Sextant Resilience Operations Platform.
+
+The Gateway Console provides controlled access to operational modules, confirms system availability, and guides users toward simulation and monitoring functions.
+
+---
+
+1. Gateway Console Overview
+
+The Gateway Console is the first operational layer of the Sextant system.
+
+Its functions are:
+
+- Provide system entry access
+- Display operational status
+- Direct users to appropriate system modules
+- Maintain a structured operational workflow
+
+---
+
+2. System Entry Workflow
+
+User Access
+
+↓
+
+SEXTANT SPA CONTROL SYSTEM
+Gateway Console
+
+↓
+
+Operations Console
+or
+Simulation Engine
+
+↓
+
+System Monitoring / Scenario Execution
+
+↓
+
+Audit and Report Output
+
+---
+
+3. Gateway Screen Components
+
+3.1 System Title
+
+SEXTANT SPA CONTROL SYSTEM
+
+Identifies the operational environment and provides the main system entry point.
+
+---
+
+3.2 Submission Gateway
+
+The Submission Gateway represents the controlled access layer.
+
+Purpose:
+
+- Receive operator input
+- Establish system entry
+- Route users to available functions
+- Maintain operational separation between modules
+
+---
+
+3.3 System Status Indicator
+
+Example:
+
+STATUS: ONLINE
+
+Indicates that the gateway interface is available.
+
+Future status indicators may include:
+
+- ONLINE
+- READY
+- MAINTENANCE
+- OFFLINE
+
+---
+
+3.4 Enter Operations Console
+
+The Operations Console provides access to:
+
+- System monitoring
+- Resilience indicators
+- Simulation result review
+- Operational visualization
+- Decision-support information
+
+---
+
+3.5 Enter Simulation Engine
+
+The Simulation Engine provides access to:
+
+- Scenario configuration
+- Stress testing
+- Failure cascade simulation
+- System resilience analysis
+
+---
+
+4. Operator Procedure
+
+1. Open the Gateway Console.
+2. Confirm system status.
+3. Select the required operational function.
+4. Run simulation activities or review system outputs.
+5. Record findings through audit and reporting functions.
+
+---
+
+5. Future Manual Expansion
+
+Additional sections will be added as new Sextant screens are reviewed.
+
+Planned sections:
+
+- Operations Console Manual
+- Simulation Engine Manual
+- Scenario Router Manual
+- Self-Test Control Room Manual
+- Audit and Reporting Manual
+
+---
+
+Mission Statement
+
+"Discovering pathways to failure and protecting the strategies that prevent them."
+
+The Sextant Operational Manual documents how the platform supports structured resilience analysis, scenario exploration, and institutional preparedness.
