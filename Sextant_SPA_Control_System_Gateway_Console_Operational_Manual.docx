@@ -543,3 +543,92 @@ Scenario execution
 Risk assessment
 Event logging
 Explainable cascade analysThishis section is particularly valuable for institutional users because it shows not only the simulation result, but also the reasoning process behind the assessment, supporting transparency and review.
+
+-----
+
+ this is an excellent screen to include in the manual because it demonstrates the Scenario Execution Engine. Unlike the previous screens that prepare or monitor the simulation, this one shows the actual simulation output in a structured and explainable format.
+⚡ Sextant True Scenario Engine (Complete Build)
+Operational Manual Section
+1. Purpose
+The True Scenario Engine executes predefined resilience scenarios and generates a structured operational assessment. It converts scenario inputs into measurable system effects, calculates a resilience index, and presents the results in an auditable format.
+This module is intended for resilience analysis, decision support, and evaluation of operational responses under simulated stress conditions.
+2. Scenario Selection
+The operator selects one of the available scenarios.
+Examples:
+US–China Trade Escalation
+Taiwan Strait Crisis
+Energy Market Shock
+Global Recession
+Each scenario represents a predefined simulation template designed to evaluate how stress may propagate through interconnected systems.
+3. Execution Output
+The Execution Output presents the simulation results in a structured format.
+Example:
+{
+  "scenario": "US–China Trade Escalation",
+  "narrative": "Export collapse + currency shock detected",
+  "system_effects": {
+    "supply_chain": -70,
+    "currency": -50,
+    "exports": -80,
+    "inflation": 40
+  },
+  "resilience_index": "40.00",
+  "timestamp": "2026-07-08T19:28:29.035Z"
+}
+Purpose
+The structured output allows:
+consistent recording of simulation results
+integration with dashboards and reporting tools
+auditability and repeatability of simulations
+4. Narrative Assessment
+The Narrative provides a human-readable explanation of the simulated outcome.
+Example:
+Export collapse + currency shock detected.
+This enables users to understand the scenario without interpreting raw numerical data alone.
+5. System Effects
+The System Effects section summarises the simulated impact across monitored domains.
+Example:
+Supply Chain
+Currency
+Exports
+Inflation
+These values represent simulated scenario outputs and illustrate the relative direction and magnitude of the modelled impacts. They are intended for analysis within the simulation environment and are not direct forecasts of real-world events.
+6. Resilience Index
+The Resilience Index provides an overall indicator of simulated system resilience after the scenario has been executed.
+Example:
+Resilience Index: 40.00
+A lower value indicates that the simulated system experienced greater stress and reduced resilience under the selected scenario.
+7. Timestamp
+Each simulation includes a timestamp identifying when the scenario was executed.
+Purpose:
+support audit records
+maintain execution history
+enable reproducibility and traceability
+8. Risk Dashboard
+Example:
+Risk Index: HIGH
+Resilience: 40.00
+The Risk Dashboard summarises the overall outcome of the simulation by combining the calculated risk level with the resilience index. This provides operators with a concise view of system condition following scenario execution.
+9. Operational Workflow
+Scenario Selection
+        ↓
+Scenario Engine Execution
+        ↓
+Simulation Processing
+        ↓
+System Effects Calculation
+        ↓
+Resilience Index Generation
+        ↓
+Risk Dashboard
+        ↓
+Operational Assessment
+Position Within the Sextant Workflow
+This screen fits naturally into the overall operational sequence:
+Control Entry Gateway – System access
+Master Console – Operational navigation
+Simulation Screen – Scenario configuration
+Self-Test & Cascade Engine – System validation and execution
+True Scenario Engine – Structured simulation output and resilience assessment
+Operations Console – Visualisation, audit, and decision support
+This sequence creates a clear and logical workflow for users, reviewers, and institutional evaluators. It also reinforces that the platform is designed for simulation, resilience analysis, and decision support, rather than making predictions about future real-world events.
