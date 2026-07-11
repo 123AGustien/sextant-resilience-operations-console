@@ -1,0 +1,49 @@
+{
+  "system": "SEXTANT MEMORY CORE",
+  "version": "SMC-v1.0",
+
+  "environment": "OJK-SANDBOX",
+
+  "storage": {
+    "mode": "local",
+    "type": "browser-storage",
+    "encrypted": false
+  },
+
+  "memory": {
+    "eventRetention": 1000,
+    "scenarioRetention": 100,
+    "auditRetention": 5000
+  },
+
+  "modules": {
+    "eventMemory": true,
+    "scenarioMemory": true,
+    "auditMemory": true,
+    "learningEngine": true
+  },
+
+  "telemetry": {
+    "power": true,
+    "thermal": true,
+    "network": true,
+    "health": true
+  },
+
+  "audit": {
+    "enabled": true,
+    "immutableMode": true,
+    "timestamp": true
+  },
+
+  "learning": {
+    "enabled": true,
+    "ruleModification": false,
+    "explainableOutput": true
+  },
+
+  "deployment": {
+    "branch": "ojk-sandbox-unified",
+    "status": "TEST"
+  }
+}
